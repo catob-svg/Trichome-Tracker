@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trichome Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
+        <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="goHome()">
+                <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <h1 class="text-xl font-bold tracking-tight text-white">Trichome Tracker</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-2xl mx-auto px-4 mt-6">
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-lg font-semibold text-white mb-4">Start ny kultivering</h2>
+                <form id="plant-form" onsubmit="addPlant(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
+                        <input type="text" id="strain-input" required 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition"
+                            placeholder="f.eks. Northern Lights, OG Kush...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
+                        <input type="date" id="date-input" required 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-900/20">
+                        + Legg til
+                    </button>
+                </form>
+            </div>
+
+            <!-- Aktive Grows -->
+            <div>
+                <h2 class="text-md font-semibold text-slate-300 mb-3">Aktive grows</h2>
+                <div id="plants-container" class="space-y-3"></div>
+            </div>
+
+            <!-- Arkiv Seksjon -->
+            <div class="mt-8 pt-6 border-t border-slate-800">
+                <h2 class="text-md font-semibold text-slate-400 mb-3">Arkiv (Fullførte grows)</h2>
+                <div id="archive-container" class="space-y-3"></div>
+            </div>
+
+            <!-- Innstillinger / Backup -->
+            <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 flex justify-between items-center mt-6">
+                <span class="text-xs text-slate-400 font-medium">Data og sikkerhet</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="exportData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+                        Backup
+                    </button>
+                    <label for="import-file" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition">
+                        Gjenopprett
+                    </label>
+                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL VIEW -->
+        <div id="view-detail" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <button onclick="goHome()" class="text-sm text-emerald-400 hover:text-emerald-300 font-medium flex items-center space-x-1">
+                    <span>← <span>Tilbake til oversikt</span></span>
+                </button>
+                <div id="action-harvest-container">
+                    <!-- Knapp for å høste/arkivere dukker opp her hvis aktiv -->
+                </div>
+            </div>
+
+            <!-- Plant Header Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg relative overflow-hidden space-y-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 id="detail-strain" class="text-2xl font-bold text-white"></h2>
+                            <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Arkivert</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">Plantet: <span id="detail-date"></span> <span id="detail-harvest-date-wrap" class="hidden">• Kuttet: <span id="detail-harvest-date"></span></span></p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openEditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition">Rediger</button>
+                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-medium transition">Slett</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                            <span id="age-label-text" class="text-xs text-slate-400 block font-medium uppercase tracking-wider">Alder</span>
+                            <span id="detail-days" class="text-2xl font-extrabold text-emerald-400">0</span> <span id="age-unit-text" class="text-emerald-500 font-medium text-xs">dager</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Rating</span>
+                            <span id="plant-rating-display" class="text-emerald-400 font-bold text-sm">8.0 / 10</span>
+                        </div>
+                        <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-emerald-500 bg-slate-900">
+                    </div>
+                </div>
+            </div>
+
+            <!-- KATEGORI RULLGARDIN (Dropdown) -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex justify-between items-center">
+                    <label for="category-select" class="text-sm font-semibold text-slate-300">Velg kategori:</label>
+                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition">
+                        + Legg til i denne
+                    </button>
+                </div>
+                <select id="category-select" onchange="switchCategory(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white font-medium focus:outline-none focus:border-emerald-500 transition">
+                    <option value="veg">Vegetation</option>
+                    <option value="flower">Flower</option>
+                    <option value="cured">Cured Buds</option>
+                    <option value="extracts">Extraction</option>
+                </select>
+            </div>
+
+            <!-- DYNAMISK INNHOLD FOR VALGT KATEGORI -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <h3 id="current-category-title" class="font-bold text-white text-base">Vegetation</h3>
+                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition">
+                        + Legg til bilde
+                    </button>
+                </div>
+                <div id="category-grid" class="grid grid-cols-1 gap-4">
+                    <!-- Elementer dukker opp her -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FULLSCREEN LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden z-50 flex flex-col items-center justify-center p-2" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-3 text-lg transition z-50">
+            ✕
+        </button>
+        <div class="relative max-w-full max-h-full overflow-auto p-2" onclick="event.stopPropagation()">
+            <img id="lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
+        </div>
+        <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 bg-slate-900/80 py-2 rounded-xl border border-slate-800"></p>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Rediger plante</h3>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
+                <input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
+                <input type="date" id="edit-date-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeEditModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition">Avbryt</button>
+                <button onclick="saveEditedPlant()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition">Lagre</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE SOURCE PICKER MODAL -->
+    <div id="source-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
+            <h3 class="text-md font-bold text-white mb-2">Velg bildekilde</h3>
+            <button onclick="triggerFileCapture('camera')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2">
+                <span>Ta bilde med kamera</span>
+            </button>
+            <button onclick="triggerFileCapture('file')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2">
+                <span>Velg fra enhet</span>
+            </button>
+            <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition">Avbryt</button>
+        </div>
+        <input type="file" id="hidden-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
+        <input type="file" id="hidden-file-input" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
+    </div>
+
+    <!-- COMMENT MODAL -->
+    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Legg til notat / kommentar</h3>
+            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
+                <img id="feedback-preview-img" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Kommentar / Notat</label>
+                <textarea id="comment-input" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition text-sm" placeholder="Skriv egne inntrykk, terpensprofil, virkning..."></textarea>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeFeedbackModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm">Avbryt</button>
+                <button onclick="saveFeedbackAndImage()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm">Lagre</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = {
+            veg: "Vegetation",
+            flower: "Flower",
+            cured: "Cured Buds",
+            extracts: "Extraction"
+        };
+
+        let plants = JSON.parse(localStorage.getItem('trichome_plants') || '[]');
+        let activePlantId = null;
+        let currentCategory = 'veg';
+        let activeStageKey = null;
+        let pendingImageData = null;
+
+        const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('trichome_plants', JSON.stringify(plants));
+            } catch (e) {
+                alert("Lagringsplassen på enheten er full!");
+            }
+        }
+
+        function calculateDays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = endDate ? new Date(endDate) : new Date();
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            const diffTime = end - start;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 ? diffDays : 0;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return "";
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            }
+            return dateString;
+        }
+
+        function switchCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('current-category-title').innerText = categories[cat];
+            renderDetail();
+        }
+
+        function updatePlantRating(val) {
+            document.getElementById('plant-rating-display').innerText = val + " / 10";
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant) {
+                plant.rating = parseFloat(val);
+                saveToStorage();
+            }
+        }
+
+        function renderDashboard() {
+            const container = document.getElementById('plants-container');
+            const archiveContainer = document.getElementById('archive-container');
+
+            const activePlants = plants.filter(p => !p.harvestedDate);
+            const archivedPlants = plants.filter(p => p.harvestedDate);
+
+            if (activePlants.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
+                        <p class="text-slate-400 text-xs">Ingen aktive grows for øyeblikket.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = activePlants.map(plant => {
+                    const days = calculateDays(plant.date);
+                    let totalImages = 0;
+                    stageKeys.forEach(sk => {
+                        if (plant.stages && plant.stages[sk]) {
+                            totalImages += plant.stages[sk].length;
+                        }
+                    });
+                    const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
+
+                    return `
+                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 cursor-pointer transition shadow-lg flex justify-between items-center group">
+                            <div class="space-y-2">
+                                <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${plant.strain}</h3>
+                                <div class="flex flex-wrap items-center gap-2 text-xs">
+                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">Plantet: ${formatDate(plant.date)}</span>
+                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">📸 ${totalImages}</span>
+                                    <span class="bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-medium">⭐ ${plantRating}/10</span>
+                                </div>
+                            </div>
+                            <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
+                                <span class="text-xl font-extrabold text-emerald-400 block leading-tight">${days}</span>
+                                <span class="text-[10px] text-emerald-500 font-semibold tracking-wider uppercase block">dager</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (archivedPlants.length === 0) {
+                archiveContainer.innerHTML = `
+                    <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 text-center">
+                        <p class="text-slate-500 text-xs italic">Ingen arkiverte grows ennå.</p>
+                    </div>
+                `;
+            } else {
+                archiveContainer.innerHTML = archivedPlants.map(plant => {
+                    const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                    let totalImages = 0;
+                    stageKeys.forEach(sk => {
+                        if (plant.stages && plant.stages[sk]) {
+                            totalImages += plant.stages[sk].length;
+                        }
+                    });
+                    const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
+
+                    return `
+                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900/70 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="text-base font-bold text-slate-200 group-hover:text-emerald-400 transition">${plant.strain}</h3>
+                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Arkivert</span>
+                                </div>
+                                <p class="text-xs text-slate-400">Kuttet: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-emerald-400 font-bold">${plantRating}/10</span></p>
+                            </div>
+                            <div class="bg-slate-800/80 border border-slate-700 px-3 py-2 rounded-xl text-center min-w-[65px]">
+                                <span class="text-lg font-bold text-slate-200 block leading-tight">${totalDays}</span>
+                                <span class="text-[9px] text-slate-400 font-medium tracking-wider uppercase block">dager totalt</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function addPlant(e) {
+            e.preventDefault();
+            const strain = document.getElementById('strain-input').value;
+            const date = document.getElementById('date-input').value;
+
+            const newPlant = {
+                id: Date.now().toString(),
+                strain: strain,
+                date: date,
+                harvestedDate: null,
+                rating: 8.0,
+                stages: {}
+            };
+
+            plants.unshift(newPlant);
+            saveToStorage();
+            document.getElementById('plant-form').reset();
+            document.getElementById('date-input').valueAsDate = new Date();
+            renderDashboard();
+        }
+
+        function openDetail(id) {
+            activePlantId = id;
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-detail').classList.remove('hidden');
+            currentCategory = 'veg';
+            document.getElementById('category-select').value = 'veg';
+            document.getElementById('current-category-title').innerText = categories.veg;
+
+            const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
+            document.getElementById('plant-rating-slider').value = currentRating;
+            document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
+
+            const harvestContainer = document.getElementById('action-harvest-container');
+            const archiveBadge = document.getElementById('archive-badge');
+            const harvestDateWrap = document.getElementById('detail-harvest-date-wrap');
+            const ageLabelText = document.getElementById('age-label-text');
+            const ageUnitText = document.getElementById('age-unit-text');
+            const addBtnTop = document.getElementById('btn-add-image-top');
+            const addBtnBottom = document.getElementById('btn-add-image-bottom');
+
+            if (plant.harvestedDate) {
+                archiveBadge.classList.remove('hidden');
+                harvestDateWrap.classList.remove('hidden');
+                document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
+                document.getElementById('detail-days').innerText = calculateDays(plant.date, plant.harvestedDate);
+                ageLabelText.innerText = "Total tid";
+                ageUnitText.innerText = "dager";
+                
+                harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">Ferdig høstet</span>`;
+                addBtnTop.classList.add('hidden');
+                addBtnBottom.classList.add('hidden');
+            } else {
+                archiveBadge.classList.add('hidden');
+                harvestDateWrap.classList.add('hidden');
+                document.getElementById('detail-days').innerText = calculateDays(plant.date);
+                ageLabelText.innerText = "Alder";
+                ageUnitText.innerText = "dager";
+
+                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Kuttet / Høstet</button>`;
+                addBtnTop.classList.remove('hidden');
+                addBtnBottom.classList.remove('hidden');
+            }
+
+            renderDetail();
+        }
+
+        function confirmHarvest() {
+            if (confirm("Vil du markere denne som kuttet/høstet i dag? Den vil da bli flyttet til arkivet.")) {
+                const plant = plants.find(p => p.id === activePlantId);
+                if (plant) {
+                    const today = new Date().toISOString().slice(0, 10);
+                    plant.harvestedDate = today;
+                    saveToStorage();
+                    openDetail(plant.id);
+                }
+            }
+        }
+
+        function goHome() {
+            activePlantId = null;
+            document.getElementById('view-detail').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            renderDashboard();
+        }
+
+        function renderDetail() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return goHome();
+
+            document.getElementById('detail-strain').innerText = plant.strain;
+            document.getElementById('detail-date').innerText = formatDate(plant.date);
+
+            const container = document.getElementById('category-grid');
+            const items = (plant.stages && plant.stages[currentCategory]) || [];
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">Ingen oppføringer ennå</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map((item, index) => {
+                const commentSection = item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-slate-900 p-3 rounded-xl border border-slate-800">${item.comment}</p>` : '';
+                const safeComment = item.comment ? item.comment.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
+                
+                const deleteButtonHtml = !plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : '';
+
+                return `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                        <div class="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
+                            <img src="${item.image}" class="w-full h-full object-cover">
+                            ${deleteButtonHtml}
+                        </div>
+                        ${commentSection}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openLightbox(imgSrc, comment) {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            const commentEl = document.getElementById('lightbox-comment');
+
+            img.src = imgSrc;
+            if (comment && comment.trim() !== "") {
+                commentEl.innerText = comment;
+                commentEl.classList.remove('hidden');
+            } else {
+                commentEl.classList.add('hidden');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        function openSourceModal(stageKey) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant && plant.harvestedDate) return;
+            activeStageKey = stageKey;
+            document.getElementById('source-modal').classList.remove('hidden');
+        }
+
+        function closeSourceModal() {
+            document.getElementById('source-modal').classList.add('hidden');
+        }
+
+        function triggerFileCapture(type) {
+            closeSourceModal();
+            if (type === 'camera') {
+                document.getElementById('hidden-camera-input').click();
+            } else {
+                document.getElementById('hidden-file-input').click();
+            }
+        }
+
+        function handleImageSelected(event) {
+            const file = event.target.files[0];
+            if (!file || !activePlantId || !activeStageKey) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 1200;
+
+                    if (width > height && width > maxDim) {
+                        height *= maxDim / width;
+                        width = maxDim;
+                    } else if (height > maxDim) {
+                        width *= maxDim / height;
+                        height = maxDim;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    pendingImageData = canvas.toDataURL('image/jpeg', 0.85);
+
+                    document.getElementById('feedback-preview-img').src = pendingImageData;
+                    document.getElementById('comment-input').value = "";
+                    document.getElementById('feedback-modal').classList.remove('hidden');
+                }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function closeFeedbackModal() {
+            pendingImageData = null;
+            document.getElementById('feedback-modal').classList.add('hidden');
+        }
+
+        function saveFeedbackAndImage() {
+            if (!pendingImageData || !activePlantId || !activeStageKey) return;
+
+            const comment = document.getElementById('comment-input').value.trim();
+
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant) {
+                if (!plant.stages) plant.stages = {};
+                if (!plant.stages[activeStageKey]) plant.stages[activeStageKey] = [];
+                
+                plant.stages[activeStageKey].push({
+                    image: pendingImageData,
+                    comment: comment,
+                    date: new Date().toISOString()
+                });
+                saveToStorage();
+                renderDetail();
+            }
+            closeFeedbackModal();
+        }
+
+        function confirmDeleteItem(stageKey, index) {
+            if (confirm("Er du sikker på at du vil slette dette bildet?")) {
+                deleteItem(stageKey, index);
+            }
+        }
+
+        function deleteItem(stageKey, index) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant && plant.stages && plant.stages[stageKey]) {
+                plant.stages[stageKey].splice(index, 1);
+                saveToStorage();
+                renderDetail();
+            }
+        }
+
+        function openEditModal() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            document.getElementById('edit-strain-input').value = plant.strain;
+            document.getElementById('edit-date-input').value = plant.date;
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function saveEditedPlant() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.strain = document.getElementById('edit-strain-input').value;
+            plant.date = document.getElementById('edit-date-input').value;
+            saveToStorage();
+            closeEditModal();
+            openDetail(plant.id);
+        }
+
+        function confirmDeletePlant() {
+            if (confirm("Er du sikker på at du vil slette denne planten permanent?")) {
+                plants = plants.filter(p => p.id !== activePlantId);
+                saveToStorage();
+                goHome();
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plants));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `trichome_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        plants = imported;
+                        saveToStorage();
+                        renderDashboard();
+                        alert("Backup gjenopprettet vellykket!");
+                    }
+                } catch (err) {
+                    alert("Ugyldig fil!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        const dateInput = document.getElementById('date-input');
+        if (dateInput && !dateInput.value) {
+            dateInput.valueAsDate = new Date();
+        }
+        
+        renderDashboard();
+    </script>
+</body>
+</html>
