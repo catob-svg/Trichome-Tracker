@@ -10,12 +10,8 @@
         body { font-family: 'Inter', sans-serif; }
         
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-label-area, #print-label-area * {
-                visibility: visible;
-            }
+            body * { visibility: hidden; }
+            #print-label-area, #print-label-area * { visibility: visible; }
             #print-label-area {
                 position: absolute;
                 left: 0;
@@ -35,7 +31,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
 
-    <!-- Header med Logo -->
+    <!-- HEADER -->
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
@@ -52,7 +48,7 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- MAIN CONTAINER -->
     <main class="max-w-2xl mx-auto px-4 mt-6">
         
         <!-- DASHBOARD VIEW -->
@@ -97,16 +93,12 @@
                 <div id="archive-container" class="space-y-3"></div>
             </div>
 
-            <!-- Innstillinger / Backup -->
+            <!-- Backup / Innstillinger -->
             <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 flex justify-between items-center mt-6">
                 <span class="text-xs text-slate-400 font-medium" data-i18n="data_security">Data og sikkerhet</span>
                 <div class="flex items-center space-x-2">
-                    <button onclick="exportData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_backup">
-                        Backup
-                    </button>
-                    <label for="import-file" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition" data-i18n="btn_restore">
-                        Gjenopprett
-                    </label>
+                    <button onclick="exportData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_backup">Backup</button>
+                    <label for="import-file" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition" data-i18n="btn_restore">Gjenopprett</label>
                     <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                 </div>
             </div>
@@ -163,9 +155,7 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <h3 class="font-bold text-white text-base" data-i18n="metrics_title">Miljø & Næringslogg</h3>
-                    <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_new_metric">
-                        + Ny måling
-                    </button>
+                    <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_new_metric">+ Ny måling</button>
                 </div>
                 <div id="metrics-container" class="space-y-2"></div>
             </div>
@@ -174,9 +164,7 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div class="flex justify-between items-center">
                     <label for="category-select" class="text-sm font-semibold text-slate-300" data-i18n="select_category">Velg kategori:</label>
-                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_add_here">
-                        + Legg til i denne
-                    </button>
+                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_add_here">+ Legg til i denne</button>
                 </div>
                 <select id="category-select" onchange="switchCategory(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white font-medium focus:outline-none focus:border-emerald-500 transition">
                     <option value="veg" data-i18n="cat_veg">Vegetation</option>
@@ -190,21 +178,17 @@
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <h3 id="current-category-title" class="font-bold text-white text-base">Vegetation</h3>
-                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition" data-i18n="btn_add_image">
-                        + Legg til bilde
-                    </button>
+                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition" data-i18n="btn_add_image">+ Legg til bilde</button>
                 </div>
                 <div id="category-grid" class="grid grid-cols-1 gap-4"></div>
             </div>
-
         </div>
     </main>
 
-    <!-- PRINT LABEL MODAL -->
+    <!-- MODALER (Etikett, Lightbox, Måling, Redigering, Bildekilde, Kommentar) -->
     <div id="label-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
             <h3 class="text-lg font-bold text-white" data-i18n="label_preview">Etikett-forhåndsvisning</h3>
-            
             <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner">
                 <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
                 <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
@@ -213,7 +197,6 @@
                     <span id="label-date-text">01.01.2026</span>
                 </div>
             </div>
-
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeLabelModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_close">Lukk</button>
                 <button onclick="window.print()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_print">🖨️ Skriv ut</button>
@@ -221,43 +204,24 @@
         </div>
     </div>
 
-    <!-- FULLSCREEN LIGHTBOX MODAL -->
     <div id="lightbox-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden z-50 flex flex-col items-center justify-center p-2" onclick="closeLightbox()">
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-3 text-lg transition z-50">
-            ✕
-        </button>
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-3 text-lg transition z-50">✕</button>
         <div class="relative max-w-full max-h-full overflow-auto p-2" onclick="event.stopPropagation()">
             <img id="lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
         </div>
         <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 bg-slate-900/80 py-2 rounded-xl border border-slate-800"></p>
     </div>
 
-    <!-- METRICS MODAL -->
     <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-lg font-bold text-white" data-i18n="metric_modal_title">Legg til miljø- / næringsmåling</h3>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">pH</label>
-                    <input type="number" step="0.1" id="metric-ph" placeholder="f.eks. 6.2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">EC (mS/cm)</label>
-                    <input type="number" step="0.01" id="metric-ec" placeholder="f.eks. 1.4" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="temp">Temp (°C)</label>
-                    <input type="number" step="0.5" id="metric-temp" placeholder="f.eks. 24" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="rh">Luftfuktighet (%)</label>
-                    <input type="number" id="metric-rh" placeholder="f.eks. 60" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                </div>
+                <div><label class="block text-xs font-medium text-slate-400 mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="f.eks. 6.2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs font-medium text-slate-400 mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="f.eks. 1.4" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="temp">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" placeholder="f.eks. 24" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="rh">Luftfuktighet (%)</label><input type="number" id="metric-rh" placeholder="f.eks. 60" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="note">Notat / Ekstra</label>
-                <input type="text" id="metric-note" placeholder="f.eks. Litt cal-mag tilsatt" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 text-sm">
-            </div>
+            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="note">Notat / Ekstra</label><input type="text" id="metric-note" placeholder="f.eks. Litt cal-mag tilsatt" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 text-sm"></div>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeMetricsModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_cancel">Avbryt</button>
                 <button onclick="saveMetric()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_save_metric">Lagre måling</button>
@@ -265,14 +229,10 @@
         </div>
     </div>
 
-    <!-- EDIT MODAL -->
     <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-lg font-bold text-white" data-i18n="edit_plant">Rediger plante</h3>
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="strain">Strain</label>
-                <input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
-            </div>
+            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="strain">Strain</label><input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition"></div>
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="type">Type</label>
                 <select id="edit-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
@@ -281,10 +241,7 @@
                     <option value="Stikling / Clone" data-i18n="type_clone">Stikling / Clone</option>
                 </select>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="date_planted">Dato plantet</label>
-                <input type="date" id="edit-date-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
-            </div>
+            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="date_planted">Dato plantet</label><input type="date" id="edit-date-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition"></div>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeEditModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition" data-i18n="btn_cancel">Avbryt</button>
                 <button onclick="saveEditedPlant()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition" data-i18n="btn_save">Lagre</button>
@@ -292,23 +249,17 @@
         </div>
     </div>
 
-    <!-- IMAGE SOURCE PICKER MODAL -->
     <div id="source-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
             <h3 class="text-md font-bold text-white mb-2" data-i18n="select_source">Velg bildekilde</h3>
-            <button onclick="triggerFileCapture('camera')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2">
-                <span data-i18n="btn_camera">Ta bilde med kamera</span>
-            </button>
-            <button onclick="triggerFileCapture('file')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-3 rounded-xl transition flex items-center justify-center space-x-2">
-                <span data-i18n="btn_device">Velg fra enhet</span>
-            </button>
+            <button onclick="triggerFileCapture('camera')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition"><span data-i18n="btn_camera">Ta bilde med kamera</span></button>
+            <button onclick="triggerFileCapture('file')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-3 rounded-xl transition"><span data-i18n="btn_device">Velg fra enhet</span></button>
             <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition" data-i18n="btn_cancel">Avbryt</button>
         </div>
         <input type="file" id="hidden-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
         <input type="file" id="hidden-file-input" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
     </div>
 
-    <!-- COMMENT MODAL -->
     <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-lg font-bold text-white" data-i18n="comment_title">Legg til notat / kommentar</h3>
@@ -326,200 +277,83 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIKK -->
     <script>
         const translations = {
             en: {
-                subtitle: "Cultivation Management",
-                new_cultivation: "Start New Cultivation",
-                strain: "Strain",
-                type: "Type",
-                type_auto: "Autoflower",
-                type_photo: "Photoperiod",
-                type_clone: "Cutting / Clone",
-                date_planted: "Date Planted",
-                btn_add: "+ Add Plant",
-                active_grows: "Active Grows",
-                archive_title: "Archive (Completed Grows)",
-                data_security: "Data & Security",
-                btn_backup: "Backup",
-                btn_restore: "Restore",
-                back_to_overview: "Back to Overview",
-                archived: "Archived",
-                planted: "Planted",
-                harvested: "Harvested",
-                btn_label: "🖨️ Label",
-                btn_edit: "Edit",
-                btn_delete: "Delete",
-                days: "days",
-                rating_title: "Rating (Finished Product)",
-                metrics_title: "Environment & Nutrient Log",
-                btn_new_metric: "+ New Metric",
-                select_category: "Select Category:",
-                btn_add_here: "+ Add to this",
-                cat_veg: "Vegetation",
-                cat_flower: "Flower",
-                cat_cured: "Cured Buds",
-                cat_extracts: "Extraction",
-                btn_add_image: "+ Add Image",
-                label_preview: "Label Preview",
-                btn_close: "Close",
-                btn_print: "🖨️ Print",
-                metric_modal_title: "Add Environment / Nutrient Metric",
-                temp: "Temp (°C)",
-                rh: "Humidity (%)",
-                note: "Note / Extra",
-                btn_cancel: "Cancel",
-                btn_save_metric: "Save Metric",
-                edit_plant: "Edit Plant",
-                btn_save: "Save",
-                select_source: "Select Image Source",
-                btn_camera: "Take Photo with Camera",
-                btn_device: "Choose from Device",
-                comment_title: "Add Note / Comment",
-                comment_label: "Comment / Note",
-                no_active: "No active grows currently.",
-                no_archive: "No archived grows yet.",
-                no_metrics: "No metrics recorded yet.",
-                no_images: "No entries yet",
-                harvest_btn: "✂️ Harvested",
-                harvest_status: "Harvested",
-                confirm_harvest: "Do you want to mark this as harvested today? It will be moved to the archive.",
+                subtitle: "Cultivation Management", new_cultivation: "Start New Cultivation", strain: "Strain",
+                type: "Type", type_auto: "Autoflower", type_photo: "Photoperiod", type_clone: "Cutting / Clone",
+                date_planted: "Date Planted", btn_add: "+ Add Plant", active_grows: "Active Grows",
+                archive_title: "Archive (Completed Grows)", data_security: "Data & Security", btn_backup: "Backup",
+                btn_restore: "Restore", back_to_overview: "Back to Overview", archived: "Archived",
+                planted: "Planted", harvested: "Harvested", btn_label: "🖨️ Label", btn_edit: "Edit",
+                btn_delete: "Delete", days: "days", rating_title: "Rating (Finished Product)",
+                metrics_title: "Environment & Nutrient Log", btn_new_metric: "+ New Metric",
+                select_category: "Select Category:", btn_add_here: "+ Add to this", cat_veg: "Vegetation",
+                cat_flower: "Flower", cat_cured: "Cured Buds", cat_extracts: "Extraction", btn_add_image: "+ Add Image",
+                label_preview: "Label Preview", btn_close: "Close", btn_print: "🖨️ Print",
+                metric_modal_title: "Add Environment / Nutrient Metric", temp: "Temp (°C)", rh: "Humidity (%)",
+                note: "Note / Extra", btn_cancel: "Cancel", btn_save_metric: "Save Metric", edit_plant: "Edit Plant",
+                btn_save: "Save", select_source: "Select Image Source", btn_camera: "Take Photo with Camera",
+                btn_device: "Choose from Device", comment_title: "Add Note / Comment", comment_label: "Comment / Note",
+                no_active: "No active grows currently.", no_archive: "No archived grows yet.",
+                no_metrics: "No metrics recorded yet.", no_images: "No entries yet", harvest_btn: "✂️ Harvested",
+                harvest_status: "Harvested", confirm_harvest: "Do you want to mark this as harvested today? It will be moved to the archive.",
                 confirm_delete: "Are you sure you want to permanently delete this plant?",
                 confirm_delete_img: "Are you sure you want to delete this image?",
-                full_storage: "Storage space on device is full!",
-                invalid_file: "Invalid file!",
-                restore_success: "Backup successfully restored!",
-                print_prompt: "Plant saved! Do you want to print a label for the pot right away?"
+                full_storage: "Storage space on device is full!", invalid_file: "Invalid file!",
+                restore_success: "Backup successfully restored!", print_prompt: "Plant saved! Do you want to print a label for the pot right away?"
             },
             no: {
-                subtitle: "Cultivation Management",
-                new_cultivation: "Start ny kultivering",
-                strain: "Strain",
-                type: "Type",
-                type_auto: "Autoflower",
-                type_photo: "Photoperiod",
-                type_clone: "Stikling / Clone",
-                date_planted: "Dato plantet",
-                btn_add: "+ Legg til",
-                active_grows: "Aktive grows",
-                archive_title: "Arkiv (Fullførte grows)",
-                data_security: "Data og sikkerhet",
-                btn_backup: "Backup",
-                btn_restore: "Gjenopprett",
-                back_to_overview: "Tilbake til oversikt",
-                archived: "Arkivert",
-                planted: "Plantet",
-                harvested: "Kuttet",
-                btn_label: "🖨️ Etikett",
-                btn_edit: "Rediger",
-                btn_delete: "Slett",
-                days: "dager",
-                rating_title: "Rating (Ferdig produkt)",
-                metrics_title: "Miljø & Næringslogg",
-                btn_new_metric: "+ Ny måling",
-                select_category: "Velg kategori:",
-                btn_add_here: "+ Legg til i denne",
-                cat_veg: "Vegetation",
-                cat_flower: "Flower",
-                cat_cured: "Cured Buds",
-                cat_extracts: "Extraction",
-                btn_add_image: "+ Legg til bilde",
-                label_preview: "Etikett-forhåndsvisning",
-                btn_close: "Lukk",
-                btn_print: "🖨️ Skriv ut",
-                metric_modal_title: "Legg til miljø- / næringsmåling",
-                temp: "Temp (°C)",
-                rh: "Luftfuktighet (%)",
-                note: "Notat / Ekstra",
-                btn_cancel: "Avbryt",
-                btn_save_metric: "Lagre måling",
-                edit_plant: "Rediger plante",
-                btn_save: "Lagre",
-                select_source: "Velg bildekilde",
-                btn_camera: "Ta bilde med kamera",
-                btn_device: "Velg fra enhet",
-                comment_title: "Legg til notat / kommentar",
-                comment_label: "Kommentar / Notat",
-                no_active: "Ingen aktive grows for øyeblikket.",
-                no_archive: "Ingen arkiverte grows ennå.",
-                no_metrics: "Ingen målinger registrert ennå",
-                no_images: "Ingen oppføringer ennå",
-                harvest_btn: "✂️ Kuttet / Høstet",
-                harvest_status: "Ferdig høstet",
-                confirm_harvest: "Vil du markere denne som kuttet/høstet i dag? Den vil da bli flyttet til arkivet.",
+                subtitle: "Cultivation Management", new_cultivation: "Start ny kultivering", strain: "Strain",
+                type: "Type", type_auto: "Autoflower", type_photo: "Photoperiod", type_clone: "Stikling / Clone",
+                date_planted: "Dato plantet", btn_add: "+ Legg til", active_grows: "Aktive grows",
+                archive_title: "Arkiv (Fullførte grows)", data_security: "Data og sikkerhet", btn_backup: "Backup",
+                btn_restore: "Gjenopprett", back_to_overview: "Tilbake til oversikt", archived: "Arkivert",
+                planted: "Plantet", harvested: "Kuttet", btn_label: "🖨️ Etikett", btn_edit: "Rediger",
+                btn_delete: "Slett", days: "dager", rating_title: "Rating (Ferdig produkt)",
+                metrics_title: "Miljø & Næringslogg", btn_new_metric: "+ Ny måling",
+                select_category: "Velg kategori:", btn_add_here: "+ Legg til i denne", cat_veg: "Vegetation",
+                cat_flower: "Flower", cat_cured: "Cured Buds", cat_extracts: "Extraction", btn_add_image: "+ Legg til bilde",
+                label_preview: "Etikett-forhåndsvisning", btn_close: "Lukk", btn_print: "🖨️ Skriv ut",
+                metric_modal_title: "Legg til miljø- / næringsmåling", temp: "Temp (°C)", rh: "Luftfuktighet (%)",
+                note: "Notat / Ekstra", btn_cancel: "Avbryt", btn_save_metric: "Lagre måling", edit_plant: "Rediger plante",
+                btn_save: "Lagre", select_source: "Velg bildekilde", btn_camera: "Ta bilde med kamera",
+                btn_device: "Velg fra enhet", comment_title: "Legg til notat / kommentar", comment_label: "Kommentar / Notat",
+                no_active: "Ingen aktive grows for øyeblikket.", no_archive: "Ingen arkiverte grows ennå.",
+                no_metrics: "Ingen målinger registrert ennå", no_images: "Ingen oppføringer ennå", harvest_btn: "✂️ Kuttet / Høstet",
+                harvest_status: "Ferdig høstet", confirm_harvest: "Vil du markere denne som kuttet/høstet i dag? Den vil da bli flyttet til arkivet.",
                 confirm_delete: "Er du sikker på at du vil slette denne planten permanent?",
                 confirm_delete_img: "Er du sikker på at du vil slette dette bildet?",
-                full_storage: "Lagringsplassen på enheten er full!",
-                invalid_file: "Ugyldig fil!",
-                restore_success: "Backup gjenopprettet vellykket!",
-                print_prompt: "Planten ble lagret! Vil du skrive ut en etikett til potta med en gang?"
+                full_storage: "Lagringsplassen på enheten er full!", invalid_file: "Ugyldig fil!",
+                restore_success: "Backup gjenopprettet vellykket!", print_prompt: "Planten ble lagret! Vil du skrive ut en etikett til potta med en gang?"
             },
             es: {
-                subtitle: "Gestión de Cultivo",
-                new_cultivation: "Iniciar Nuevo Cultivo",
-                strain: "Genética / Strain",
-                type: "Tipo",
-                type_auto: "Autofloreciente",
-                type_photo: "Fotodependiente",
-                type_clone: "Esqueje / Clone",
-                date_planted: "Fecha de Plantación",
-                btn_add: "+ Añadir Planta",
-                active_grows: "Cultivos Activos",
-                archive_title: "Archivo (Cultivos Finalizados)",
-                data_security: "Datos y Seguridad",
-                btn_backup: "Copia de seguridad",
-                btn_restore: "Restaurar",
-                back_to_overview: "Volver al resumen",
-                archived: "Archivado",
-                planted: "Plantado",
-                harvested: "Cosechado",
-                btn_label: "🖨️ Etiqueta",
-                btn_edit: "Editar",
-                btn_delete: "Eliminar",
-                days: "días",
-                rating_title: "Valoración (Producto Final)",
-                metrics_title: "Registro de Entorno y Nutrientes",
-                btn_new_metric: "+ Nueva Medición",
-                select_category: "Seleccionar Categoría:",
-                btn_add_here: "+ Añadir aquí",
-                cat_veg: "Vegetativo",
-                cat_flower: "Floración",
-                cat_cured: "Curado",
-                cat_extracts: "Extracciones",
-                btn_add_image: "+ Añadir Imagen",
-                label_preview: "Vista Previa de Etiqueta",
-                btn_close: "Cerrar",
-                btn_print: "🖨️ Imprimir",
-                metric_modal_title: "Añadir Medición de Entorno",
-                temp: "Temp (°C)",
-                rh: "Humedad (%)",
-                note: "Nota / Extra",
-                btn_cancel: "Cancelar",
-                btn_save_metric: "Guardar Medición",
-                edit_plant: "Editar Planta",
-                btn_save: "Guardar",
-                select_source: "Seleccionar Fuente",
-                btn_camera: "Hacer Foto con Cámara",
-                btn_device: "Elegir del Dispositivo",
-                comment_title: "Añadir Nota / Comentario",
-                comment_label: "Comentario / Nota",
-                no_active: "No hay cultivos activos actualmente.",
-                no_archive: "No hay cultivos archivados.",
-                no_metrics: "No hay mediciones registradas.",
-                no_images: "Sin entradas todavía",
-                harvest_btn: "✂️ Cosechado",
-                harvest_status: "Cosechado",
-                confirm_harvest: "¿Quieres marcar esto como cosechado hoy? Se moverá al archivo.",
+                subtitle: "Gestión de Cultivo", new_cultivation: "Iniciar Nuevo Cultivo", strain: "Genética / Strain",
+                type: "Tipo", type_auto: "Autofloreciente", type_photo: "Fotodependiente", type_clone: "Esqueje / Clone",
+                date_planted: "Fecha de Plantación", btn_add: "+ Añadir Planta", active_grows: "Cultivos Activos",
+                archive_title: "Archivo (Cultivos Finalizados)", data_security: "Datos y Seguridad", btn_backup: "Copia de seguridad",
+                btn_restore: "Restaurar", back_to_overview: "Volver al resumen", archived: "Archivado",
+                planted: "Plantado", harvested: "Cosechado", btn_label: "🖨️ Etiqueta", btn_edit: "Editar",
+                btn_delete: "Eliminar", days: "días", rating_title: "Valoración (Producto Final)",
+                metrics_title: "Registro de Entorno y Nutrientes", btn_new_metric: "+ Nueva Medición",
+                select_category: "Seleccionar Categoría:", btn_add_here: "+ Añadir aquí", cat_veg: "Vegetativo",
+                cat_flower: "Floración", cat_cured: "Curado", cat_extracts: "Extracciones", btn_add_image: "+ Añadir Imagen",
+                label_preview: "Vista Previa de Etiqueta", btn_close: "Cerrar", btn_print: "🖨️ Imprimir",
+                metric_modal_title: "Añadir Medición de Entorno", temp: "Temp (°C)", rh: "Humedad (%)",
+                note: "Nota / Extra", btn_cancel: "Cancelar", btn_save_metric: "Guardar Medición", edit_plant: "Editar Planta",
+                btn_save: "Guardar", select_source: "Seleccionar Fuente", btn_camera: "Hacer Foto con Cámara",
+                btn_device: "Elegir del Dispositivo", comment_title: "Añadir Nota / Comentario", comment_label: "Comentario / Nota",
+                no_active: "No hay cultivos activos actualmente.", no_archive: "No hay cultivos archivados.",
+                no_metrics: "No hay mediciones registradas.", no_images: "Sin entradas todavía", harvest_btn: "✂️ Cosechado",
+                harvest_status: "Cosechado", confirm_harvest: "¿Quieres marcar esto como cosechado hoy? Se moverá al archivo.",
                 confirm_delete: "¿Estás seguro de que deseas eliminar esta planta permanentemente?",
                 confirm_delete_img: "¿Estás seguro de eliminar esta imagen?",
-                full_storage: "¡El espacio de almacenamiento está lleno!",
-                invalid_file: "¡Archivo inválido!",
-                restore_success: "¡Copia restaurada con éxito!",
-                print_prompt: "¡Planta guardada! ¿Quieres imprimir una etiqueta para la maceta ahora mismo?"
+                full_storage: "¡El espacio de almacenamiento está lleno!", invalid_file: "¡Archivo inválido!",
+                restore_success: "¡Copia restaurada con éxito!", print_prompt: "¡Planta guardada! ¿Quieres imprimir una etiqueta para la maceta ahora mismo?"
             }
         };
 
-        // Forbedret språkdeteksjon som takler koder som 'nb-NO', 'nn-NO', 'no-NO' osv.
         const rawLang = navigator.language || navigator.userLanguage || 'en';
         const userLangCode = rawLang.split('-')[0].toLowerCase();
         const currentLang = translations[userLangCode] ? userLangCode : 'en';
@@ -528,18 +362,11 @@
         function applyTranslations() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (t[key]) {
-                    el.innerText = t[key];
-                }
+                if (t[key]) el.innerText = t[key];
             });
         }
 
-        const categories = {
-            veg: "Vegetation",
-            flower: "Flower",
-            cured: "Cured Buds",
-            extracts: "Extraction"
-        };
+        const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
 
         let plants = [];
         try {
@@ -555,42 +382,31 @@
                     }));
                 }
             }
-        } catch (e) {
-            plants = [];
-        }
+        } catch (e) { plants = []; }
 
         let activePlantId = null;
         let currentCategory = 'veg';
         let activeStageKey = null;
         let pendingImageData = null;
-
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
 
         function saveToStorage() {
-            try {
-                localStorage.setItem('trichome_plants', JSON.stringify(plants));
-            } catch (e) {
-                alert(t.full_storage);
-            }
+            try { localStorage.setItem('trichome_plants', JSON.stringify(plants)); }
+            catch (e) { alert(t.full_storage); }
         }
 
         function calculateDays(startDate, endDate) {
             const start = new Date(startDate);
             const end = endDate ? new Date(endDate) : new Date();
-            start.setHours(0,0,0,0);
-            end.setHours(0,0,0,0);
-            const diffTime = end - start;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            start.setHours(0,0,0,0); end.setHours(0,0,0,0);
+            const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
             return diffDays >= 0 ? diffDays : 0;
         }
 
         function formatDate(dateString) {
             if (!dateString) return "";
             const parts = dateString.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}.${parts[1]}.${parts[0]}`;
-            }
-            return dateString;
+            return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateString;
         }
 
         function switchCategory(cat) {
@@ -602,42 +418,28 @@
         function updatePlantRating(val) {
             document.getElementById('plant-rating-display').innerText = val + " / 10";
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant) {
-                plant.rating = parseFloat(val);
-                saveToStorage();
-            }
+            if (plant) { plant.rating = parseFloat(val); saveToStorage(); }
         }
 
         function renderDashboard() {
             const container = document.getElementById('plants-container');
             const archiveContainer = document.getElementById('archive-container');
-
             const activePlants = plants.filter(p => !p.harvestedDate);
             const archivedPlants = plants.filter(p => p.harvestedDate);
 
             if (activePlants.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
-                        <p class="text-slate-400 text-xs">${t.no_active}</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center"><p class="text-slate-400 text-xs">${t.no_active}</p></div>`;
             } else {
                 container.innerHTML = activePlants.map(plant => {
                     const days = calculateDays(plant.date);
                     let totalImages = 0;
-                    stageKeys.forEach(sk => {
-                        if (plant.stages && plant.stages[sk]) {
-                            totalImages += plant.stages[sk].length;
-                        }
-                    });
-                    const pType = plant.type || 'Autoflower';
-
+                    stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     return `
                         <div onclick="openDetail('${plant.id}')" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 cursor-pointer transition shadow-lg flex justify-between items-center group">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${plant.strain}</h3>
                                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md">${pType}</span>
+                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md">${plant.type || 'Autoflower'}</span>
                                     <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">${t.planted}: ${formatDate(plant.date)}</span>
                                     <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">📸 ${totalImages}</span>
                                 </div>
@@ -652,23 +454,13 @@
             }
 
             if (archivedPlants.length === 0) {
-                archiveContainer.innerHTML = `
-                    <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 text-center">
-                        <p class="text-slate-500 text-xs italic">${t.no_archive}</p>
-                    </div>
-                `;
+                archiveContainer.innerHTML = `<div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">${t.no_archive}</p></div>`;
             } else {
                 archiveContainer.innerHTML = archivedPlants.map(plant => {
                     const totalDays = calculateDays(plant.date, plant.harvestedDate);
                     let totalImages = 0;
-                    stageKeys.forEach(sk => {
-                        if (plant.stages && plant.stages[sk]) {
-                            totalImages += plant.stages[sk].length;
-                        }
-                    });
+                    stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
-                    const pType = plant.type || 'Autoflower';
-
                     return `
                         <div onclick="openDetail('${plant.id}')" class="bg-slate-900/70 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
                             <div class="space-y-1">
@@ -676,7 +468,7 @@
                                     <h3 class="text-base font-bold text-slate-200 group-hover:text-emerald-400 transition">${plant.strain}</h3>
                                     <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">${t.archived}</span>
                                 </div>
-                                <p class="text-xs text-slate-400">${pType} • ${t.harvested}: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-emerald-400 font-bold">${plantRating}/10</span></p>
+                                <p class="text-xs text-slate-400">${plant.type || 'Autoflower'} • ${t.harvested}: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-emerald-400 font-bold">${plantRating}/10</span></p>
                             </div>
                             <div class="bg-slate-800/80 border border-slate-700 px-3 py-2 rounded-xl text-center min-w-[65px]">
                                 <span class="text-lg font-bold text-slate-200 block leading-tight">${totalDays}</span>
@@ -694,26 +486,13 @@
             const type = document.getElementById('plant-type-input').value;
             const date = document.getElementById('date-input').value;
 
-            const newPlant = {
-                id: Date.now().toString(),
-                strain: strain,
-                type: type,
-                date: date,
-                harvestedDate: null,
-                rating: 8.0,
-                metrics: [],
-                stages: {}
-            };
-
-            plants.unshift(newPlant);
+            plants.unshift({ id: Date.now().toString(), strain, type, date, harvestedDate: null, rating: 8.0, metrics: [], stages: {} });
             saveToStorage();
             document.getElementById('plant-form').reset();
             setDefaultDate();
             renderDashboard();
 
-            if (confirm(t.print_prompt)) {
-                openLabelModal(strain, type, formatDate(date));
-            }
+            if (confirm(t.print_prompt)) openLabelModal(strain, type, formatDate(date));
         }
 
         function openLabelModal(strain, type, dateStr) {
@@ -725,13 +504,10 @@
 
         function openLabelModalForActive() {
             const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-            openLabelModal(plant.strain, plant.type || 'Autoflower', formatDate(plant.date));
+            if (plant) openLabelModal(plant.strain, plant.type || 'Autoflower', formatDate(plant.date));
         }
 
-        function closeLabelModal() {
-            document.getElementById('label-modal').classList.add('hidden');
-        }
+        function closeLabelModal() { document.getElementById('label-modal').classList.add('hidden'); }
 
         function openDetail(id) {
             activePlantId = id;
@@ -743,7 +519,6 @@
             currentCategory = 'veg';
             document.getElementById('category-select').value = 'veg';
             document.getElementById('current-category-title').innerText = categories.veg;
-
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
             const harvestContainer = document.getElementById('action-harvest-container');
@@ -754,7 +529,6 @@
             const addBtnTop = document.getElementById('btn-add-image-top');
             const addBtnBottom = document.getElementById('btn-add-image-bottom');
             const btnOpenMetrics = document.getElementById('btn-open-metrics');
-            
             const ageBoxContainer = document.getElementById('age-box-container');
             const archiveRatingBox = document.getElementById('archive-rating-box');
 
@@ -765,31 +539,23 @@
                 document.getElementById('detail-days').innerText = calculateDays(plant.date, plant.harvestedDate);
                 ageLabelText.innerText = "Total tid";
                 ageUnitText.innerText = t.days;
-                
                 archiveRatingBox.classList.remove('hidden');
                 ageBoxContainer.classList.remove('col-span-2');
                 const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
                 document.getElementById('plant-rating-slider').value = currentRating;
                 document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
-
                 harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">${t.harvest_status}</span>`;
-                addBtnTop.classList.add('hidden');
-                addBtnBottom.classList.add('hidden');
-                btnOpenMetrics.classList.add('hidden');
+                addBtnTop.classList.add('hidden'); addBtnBottom.classList.add('hidden'); btnOpenMetrics.classList.add('hidden');
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
                 document.getElementById('detail-days').innerText = calculateDays(plant.date);
                 ageLabelText.innerText = "Alder";
                 ageUnitText.innerText = t.days;
-
                 archiveRatingBox.classList.add('hidden');
                 ageBoxContainer.classList.add('col-span-2');
-
                 harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">${t.harvest_btn}</button>`;
-                addBtnTop.classList.remove('hidden');
-                addBtnBottom.classList.remove('hidden');
-                btnOpenMetrics.classList.remove('hidden');
+                addBtnTop.classList.remove('hidden'); addBtnBottom.classList.remove('hidden'); btnOpenMetrics.classList.remove('hidden');
             }
 
             renderMetrics();
@@ -797,34 +563,24 @@
         }
 
         function openMetricsModal() {
-            document.getElementById('metric-ph').value = '';
-            document.getElementById('metric-ec').value = '';
-            document.getElementById('metric-temp').value = '';
-            document.getElementById('metric-rh').value = '';
-            document.getElementById('metric-note').value = '';
+            ['metric-ph', 'metric-ec', 'metric-temp', 'metric-rh', 'metric-note'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('metrics-modal').classList.remove('hidden');
         }
 
-        function closeMetricsModal() {
-            document.getElementById('metrics-modal').classList.add('hidden');
-        }
+        function closeMetricsModal() { document.getElementById('metrics-modal').classList.add('hidden'); }
 
         function saveMetric() {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
-
-            const ph = document.getElementById('metric-ph').value;
-            const ec = document.getElementById('metric-ec').value;
-            const temp = document.getElementById('metric-temp').value;
-            const rh = document.getElementById('metric-rh').value;
-            const note = document.getElementById('metric-note').value.trim();
-
             if (!plant.metrics) plant.metrics = [];
             plant.metrics.unshift({
                 date: new Date().toISOString(),
-                ph, ec, temp, rh, note
+                ph: document.getElementById('metric-ph').value,
+                ec: document.getElementById('metric-ec').value,
+                temp: document.getElementById('metric-temp').value,
+                rh: document.getElementById('metric-rh').value,
+                note: document.getElementById('metric-note').value.trim()
             });
-
             saveToStorage();
             closeMetricsModal();
             renderMetrics();
@@ -833,29 +589,24 @@
         function renderMetrics() {
             const plant = plants.find(p => p.id === activePlantId);
             const container = document.getElementById('metrics-container');
-            if (!plant || !plant.metrics || plant.metrics.length === 0) {
+            if (!plant?.metrics?.length) {
                 container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">${t.no_metrics}</div>`;
                 return;
             }
-
             container.innerHTML = plant.metrics.map((m, index) => {
-                let badgeParts = [];
-                if (m.ph) badgeParts.push(`pH: <span class="text-white font-bold">${m.ph}</span>`);
-                if (m.ec) badgeParts.push(`EC: <span class="text-white font-bold">${m.ec}</span>`);
-                if (m.temp) badgeParts.push(`Temp: <span class="text-white font-bold">${m.temp}°C</span>`);
-                if (m.rh) badgeParts.push(`RH: <span class="text-white font-bold">${m.rh}%</span>`);
-
-                const noteSection = m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${m.note}</p>` : '';
-                const deleteBtn = !plant.harvestedDate ? `<button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>` : '';
-
+                let parts = [];
+                if (m.ph) parts.push(`pH: <span class="text-white font-bold">${m.ph}</span>`);
+                if (m.ec) parts.push(`EC: <span class="text-white font-bold">${m.ec}</span>`);
+                if (m.temp) parts.push(`Temp: <span class="text-white font-bold">${m.temp}°C</span>`);
+                if (m.rh) parts.push(`RH: <span class="text-white font-bold">${m.rh}%</span>`);
                 return `
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-start text-xs">
                         <div class="space-y-1">
                             <span class="text-slate-400 font-medium">${formatDate(m.date.slice(0,10))}</span>
-                            <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${badgeParts.join(' • ')}</div>
-                            ${noteSection}
+                            <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${parts.join(' • ')}</div>
+                            ${m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${m.note}</p>` : ''}
                         </div>
-                        ${deleteBtn}
+                        ${!plant.harvestedDate ? `<button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>` : ''}
                     </div>
                 `;
             }).join('');
@@ -863,22 +614,13 @@
 
         function deleteMetric(index) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.metrics) {
-                plant.metrics.splice(index, 1);
-                saveToStorage();
-                renderMetrics();
-            }
+            if (plant?.metrics) { plant.metrics.splice(index, 1); saveToStorage(); renderMetrics(); }
         }
 
         function confirmHarvest() {
             if (confirm(t.confirm_harvest)) {
                 const plant = plants.find(p => p.id === activePlantId);
-                if (plant) {
-                    const today = new Date().toISOString().slice(0, 10);
-                    plant.harvestedDate = today;
-                    saveToStorage();
-                    openDetail(plant.id);
-                }
+                if (plant) { plant.harvestedDate = new Date().toISOString().slice(0, 10); saveToStorage(); openDetail(plant.id); }
             }
         }
 
@@ -895,7 +637,6 @@
 
             document.getElementById('detail-strain').innerText = plant.strain;
             document.getElementById('detail-date').innerText = formatDate(plant.date);
-
             const container = document.getElementById('category-grid');
             if (!plant.stages) plant.stages = {};
             const items = plant.stages[currentCategory] || [];
@@ -906,89 +647,54 @@
             }
 
             container.innerHTML = items.map((item, index) => {
-                const commentSection = item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-slate-900 p-3 rounded-xl border border-slate-800">${item.comment}</p>` : '';
                 const safeComment = item.comment ? item.comment.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
-                
-                const deleteButtonHtml = !plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : '';
-
                 return `
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
                         <div class="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
                             <img src="${item.image}" class="w-full h-full object-cover">
-                            ${deleteButtonHtml}
+                            ${!plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : ''}
                         </div>
-                        ${commentSection}
+                        ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-slate-900 p-3 rounded-xl border border-slate-800">${item.comment}</p>` : ''}
                     </div>
                 `;
             }).join('');
         }
 
         function openLightbox(imgSrc, comment) {
-            const modal = document.getElementById('lightbox-modal');
-            const img = document.getElementById('lightbox-img');
+            document.getElementById('lightbox-img').src = imgSrc;
             const commentEl = document.getElementById('lightbox-comment');
-
-            img.src = imgSrc;
-            if (comment && comment.trim() !== "") {
-                commentEl.innerText = comment;
-                commentEl.classList.remove('hidden');
-            } else {
-                commentEl.classList.add('hidden');
-            }
-            modal.classList.remove('hidden');
+            if (comment && comment.trim() !== "") { commentEl.innerText = comment; commentEl.classList.remove('hidden'); }
+            else { commentEl.classList.add('hidden'); }
+            document.getElementById('lightbox-modal').classList.remove('hidden');
         }
 
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').classList.add('hidden');
-        }
-
+        function closeLightbox() { document.getElementById('lightbox-modal').classList.add('hidden'); }
         function openSourceModal(stageKey) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.harvestedDate) return;
+            if (plant?.harvestedDate) return;
             activeStageKey = stageKey;
             document.getElementById('source-modal').classList.remove('hidden');
         }
-
-        function closeSourceModal() {
-            document.getElementById('source-modal').classList.add('hidden');
-        }
-
+        function closeSourceModal() { document.getElementById('source-modal').classList.add('hidden'); }
         function triggerFileCapture(type) {
             closeSourceModal();
-            if (type === 'camera') {
-                document.getElementById('hidden-camera-input').click();
-            } else {
-                document.getElementById('hidden-file-input').click();
-            }
+            document.getElementById(type === 'camera' ? 'hidden-camera-input' : 'hidden-file-input').click();
         }
 
         function handleImageSelected(event) {
             const file = event.target.files[0];
             if (!file || !activePlantId || !activeStageKey) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = 1200;
-
-                    if (width > height && width > maxDim) {
-                        height *= maxDim / width;
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width *= maxDim / height;
-                        height = maxDim;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    let w = img.width, h = img.height, max = 1200;
+                    if (w > h && w > max) { h *= max / w; w = max; }
+                    else if (h > max) { w *= max / h; h = max; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     pendingImageData = canvas.toDataURL('image/jpeg', 0.85);
-
                     document.getElementById('feedback-preview-img').src = pendingImageData;
                     document.getElementById('comment-input').value = "";
                     document.getElementById('feedback-modal').classList.remove('hidden');
@@ -999,44 +705,24 @@
             event.target.value = '';
         }
 
-        function closeFeedbackModal() {
-            pendingImageData = null;
-            document.getElementById('feedback-modal').classList.add('hidden');
-        }
+        function closeFeedbackModal() { pendingImageData = null; document.getElementById('feedback-modal').classList.add('hidden'); }
 
         function saveFeedbackAndImage() {
             if (!pendingImageData || !activePlantId || !activeStageKey) return;
-
-            const comment = document.getElementById('comment-input').value.trim();
-
             const plant = plants.find(p => p.id === activePlantId);
             if (plant) {
                 if (!plant.stages) plant.stages = {};
                 if (!plant.stages[activeStageKey]) plant.stages[activeStageKey] = [];
-                
-                plant.stages[activeStageKey].push({
-                    image: pendingImageData,
-                    comment: comment,
-                    date: new Date().toISOString()
-                });
-                saveToStorage();
-                renderDetail();
+                plant.stages[activeStageKey].push({ image: pendingImageData, comment: document.getElementById('comment-input').value.trim(), date: new Date().toISOString() });
+                saveToStorage(); renderDetail();
             }
             closeFeedbackModal();
         }
 
         function confirmDeleteItem(stageKey, index) {
             if (confirm(t.confirm_delete_img)) {
-                deleteItem(stageKey, index);
-            }
-        }
-
-        function deleteItem(stageKey, index) {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.stages && plant.stages[stageKey]) {
-                plant.stages[stageKey].splice(index, 1);
-                saveToStorage();
-                renderDetail();
+                const plant = plants.find(p => p.id === activePlantId);
+                if (plant?.stages?.[stageKey]) { plant.stages[stageKey].splice(index, 1); saveToStorage(); renderDetail(); }
             }
         }
 
@@ -1049,9 +735,7 @@
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
 
         function saveEditedPlant() {
             const plant = plants.find(p => p.id === activePlantId);
@@ -1059,27 +743,22 @@
             plant.strain = document.getElementById('edit-strain-input').value;
             plant.type = document.getElementById('edit-type-input').value;
             plant.date = document.getElementById('edit-date-input').value;
-            saveToStorage();
-            closeEditModal();
-            openDetail(plant.id);
+            saveToStorage(); closeEditModal(); openDetail(plant.id);
         }
 
         function confirmDeletePlant() {
             if (confirm(t.confirm_delete)) {
                 plants = plants.filter(p => p.id !== activePlantId);
-                saveToStorage();
-                goHome();
+                saveToStorage(); goHome();
             }
         }
 
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plants));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `trichome_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `trichome_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a); a.click(); a.remove();
         }
 
         function importData(event) {
@@ -1089,15 +768,8 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        plants = imported;
-                        saveToStorage();
-                        renderDashboard();
-                        alert(t.restore_success);
-                    }
-                } catch (err) {
-                    alert(t.invalid_file);
-                }
+                    if (Array.isArray(imported)) { plants = imported; saveToStorage(); renderDashboard(); alert(t.restore_success); }
+                } catch (err) { alert(t.invalid_file); }
             };
             reader.readAsText(file);
         }
@@ -1106,10 +778,7 @@
             const dateInput = document.getElementById('date-input');
             if (dateInput && !dateInput.value) {
                 const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                dateInput.value = `${year}-${month}-${day}`;
+                dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             }
         }
 
