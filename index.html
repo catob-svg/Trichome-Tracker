@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trichome Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax5/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #0b0c10; color: #f1f5f9; }
+        .uis-card { background-color: #12151f; border: 1px solid #1e2336; }
+        .uis-card-hover:hover { background-color: #181d2e; border-color: #2a324d; }
+        .uis-input { background-color: #090a0f; border: 1px solid #1e2336; color: white; }
+        .uis-input:focus { border-color: #0077ff; outline: none; }
         @media print {
             body * { visibility: hidden; }
             #print-label-area, #print-label-area * { visibility: visible; }
@@ -21,21 +25,25 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+<body class="min-h-screen pb-12">
 
     <!-- HEADER -->
-    <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
-        <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
+    <header class="border-b border-[#1e2336] bg-[#0b0c10]/80 backdrop-blur sticky top-0 z-30">
+        <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/40 border border-emerald-400/30">
-                    <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-900/30 border border-blue-400/30">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18l4 4m-4-4L8 7m4 14l4-4m-4 4l-4-4M3 12h18"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-extrabold tracking-tight text-white leading-none">Trichome Tracker</h1>
-                    <span class="text-[10px] text-emerald-400 font-semibold uppercase tracking-widest" data-i18n="subtitle">Cultivation Management</span>
+                    <h1 class="text-xs font-bold tracking-[0.2em] text-white uppercase">Trichome Tracker</h1>
+                    <span class="text-[9px] text-blue-400 font-semibold uppercase tracking-widest">Controller AI</span>
                 </div>
+            </div>
+            <div class="flex items-center space-x-2 text-[10px] text-slate-400 bg-[#12151f] border border-[#1e2336] px-2.5 py-1 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span>ONLINE</span>
             </div>
         </div>
     </header>
@@ -45,47 +53,47 @@
         
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="space-y-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
-                <h2 class="text-lg font-semibold text-white mb-4" data-i18n="new_cultivation">Start ny kultivering</h2>
+            <div class="uis-card rounded-2xl p-5 shadow-xl">
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400 mb-4">Start New Cultivation</h2>
                 <form id="plant-form" onsubmit="addPlant(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="strain">Strain</label>
-                        <input type="text" id="strain-input" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition" placeholder="f.eks. Northern Lights, OG Kush...">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Strain</label>
+                        <input type="text" id="strain-input" required class="w-full uis-input rounded-xl px-4 py-3 text-sm placeholder-slate-600 transition" placeholder="e.g. Northern Lights, OG Kush...">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="type">Type</label>
-                        <select id="plant-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                            <option value="Autoflower" data-i18n="type_auto">Autoflower</option>
-                            <option value="Photoperiod" data-i18n="type_photo">Photoperiod</option>
-                            <option value="Stikling / Clone" data-i18n="type_clone">Stikling / Clone</option>
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Type</label>
+                        <select id="plant-type-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition">
+                            <option value="Autoflower">Autoflower</option>
+                            <option value="Photoperiod">Photoperiod</option>
+                            <option value="Cutting / Clone">Cutting / Clone</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="date_planted">Dato plantet</label>
-                        <input type="date" id="date-input" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Date Planted</label>
+                        <input type="date" id="date-input" required class="w-full uis-input rounded-xl px-4 py-3 text-sm transition">
                     </div>
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-900/20" data-i18n="btn_add">+ Legg til</button>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition shadow-lg shadow-blue-900/30">+ Add Plant</button>
                 </form>
             </div>
 
-            <!-- Aktive Grows -->
+            <!-- Active Grows -->
             <div>
-                <h2 class="text-md font-semibold text-slate-300 mb-3" data-i18n="active_grows">Aktive grows</h2>
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400 mb-3 px-1">Active Grows</h2>
                 <div id="plants-container" class="space-y-3"></div>
             </div>
 
-            <!-- Arkiv Seksjon -->
-            <div class="mt-8 pt-6 border-t border-slate-800">
-                <h2 class="text-md font-semibold text-slate-400 mb-3" data-i18n="archive_title">Arkiv (Fullførte grows)</h2>
+            <!-- Archive Section -->
+            <div class="mt-8 pt-6 border-t border-[#1e2336]">
+                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500 mb-3 px-1">Archive (Completed Grows)</h2>
                 <div id="archive-container" class="space-y-3"></div>
             </div>
 
-            <!-- Backup / Innstillinger -->
-            <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 flex justify-between items-center mt-6">
-                <span class="text-xs text-slate-400 font-medium" data-i18n="data_security">Data og sikkerhet</span>
+            <!-- Backup / Settings -->
+            <div class="uis-card rounded-2xl p-4 flex justify-between items-center mt-6">
+                <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Data & Security</span>
                 <div class="flex items-center space-x-2">
-                    <button onclick="exportData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition" data-i18n="btn_backup">Backup</button>
-                    <label for="import-file" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition" data-i18n="btn_restore">Gjenopprett</label>
+                    <button onclick="exportData()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition border border-[#1e2336]">Backup</button>
+                    <label for="import-file" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition border border-[#1e2336]">Restore</label>
                     <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
                 </div>
             </div>
@@ -94,108 +102,106 @@
         <!-- DETAIL VIEW -->
         <div id="view-detail" class="hidden space-y-6">
             <div class="flex justify-between items-center">
-                <button onclick="goHome()" class="text-sm text-emerald-400 hover:text-emerald-300 font-medium flex items-center space-x-1">
-                    <span>← <span data-i18n="back_to_overview">Tilbake til oversikt</span></span>
+                <button onclick="goHome()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold uppercase tracking-wider flex items-center space-x-1">
+                    <span>← Back to Overview</span>
                 </button>
                 <div id="action-harvest-container"></div>
             </div>
 
             <!-- Plant Header Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg relative overflow-hidden space-y-4">
+            <div class="uis-card rounded-2xl p-6 shadow-xl relative overflow-hidden space-y-4">
                 <div class="flex justify-between items-start">
                     <div>
                         <div class="flex items-center space-x-2">
-                            <h2 id="detail-strain" class="text-2xl font-bold text-white"></h2>
-                            <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider" data-i18n="archived">Arkivert</span>
+                            <h2 id="detail-strain" class="text-xl font-black text-white tracking-wide"></h2>
+                            <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-400">
-                            <span id="detail-type-badge" class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md"></span>
+                            <span id="detail-type-badge" class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold"></span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-2"><span data-i18n="planted">Plantet</span>: <span id="detail-date"></span> <span id="detail-harvest-date-wrap" class="hidden">• <span data-i18n="harvested">Kuttet</span>: <span id="detail-harvest-date"></span></span></p>
+                        <p class="text-[11px] text-slate-400 mt-2">Planted: <span id="detail-date" class="text-slate-200"></span> <span id="detail-harvest-date-wrap" class="hidden">• Harvested: <span id="detail-harvest-date" class="text-slate-200"></span></span></p>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="openLabelModalForActive()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="btn_label">🖨️ Etikett</button>
-                        <button onclick="openEditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="btn_edit">Rediger</button>
-                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-medium transition" data-i18n="btn_delete">Slett</button>
+                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition">🖨️ Label</button>
+                        <button onclick="openEditModal()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-[#1e2336]">Edit</button>
+                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-red-500/20">Delete</button>
                     </div>
                 </div>
 
-                <!-- Alder & Vanningsvarsel -->
+                <!-- Age & Watering Widget -->
                 <div class="grid grid-cols-2 gap-3" id="header-stats-grid">
-                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between col-span-2 sm:col-span-1" id="age-box-container">
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex items-center justify-between col-span-2 sm:col-span-1" id="age-box-container">
                         <div>
-                            <span id="age-label-text" class="text-xs text-slate-400 block font-medium uppercase tracking-wider">Alder</span>
-                            <span id="detail-days" class="text-2xl font-extrabold text-emerald-400">0</span> <span id="age-unit-text" class="text-emerald-500 font-medium text-xs" data-i18n="days">dager</span>
+                            <span id="age-label-text" class="text-[10px] text-slate-400 block font-bold uppercase tracking-[0.15em]">Age</span>
+                            <span id="detail-days" class="text-3xl font-black text-blue-400 tracking-tight">0</span> <span id="age-unit-text" class="text-blue-500 font-semibold text-xs">days</span>
                         </div>
                     </div>
-                    <!-- Vanning / Nærings-hurtigknapp -->
-                    <div id="water-widget-box" class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
+                    <div id="water-widget-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider" data-i18n="last_watered">Sist vannet/gjødslet</span>
-                            <span id="water-days-ago" class="text-cyan-400 font-bold text-sm">-</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Last Watered / Fed</span>
+                            <span id="water-days-ago" class="text-blue-400 font-bold text-xs">-</span>
                         </div>
-                        <button onclick="recordWatering()" class="mt-2 bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/30 text-xs py-1.5 px-3 rounded-lg font-medium transition text-center" data-i18n="btn_watered_today">💧 Vannet i dag</button>
+                        <button onclick="recordWatering()" class="mt-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-1.5 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
                     </div>
 
-                    <!-- Rating boks (Arkiv) -->
-                    <div id="archive-rating-box" class="hidden bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-center col-span-2">
+                    <!-- Rating Box (Archive) -->
+                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center col-span-2">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider" data-i18n="rating_title">Rating (Ferdig produkt)</span>
-                            <span id="plant-rating-display" class="text-emerald-400 font-bold text-sm">8.0 / 10</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Rating (Finished Product)</span>
+                            <span id="plant-rating-display" class="text-blue-400 font-black text-sm">8.0 / 10</span>
                         </div>
-                        <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-emerald-500 bg-slate-900">
+                        <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
                     </div>
                 </div>
             </div>
 
-            <!-- CURING / TØRKELOGG (Vises kun i arkiv) -->
-            <div id="curing-section" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="font-bold text-white text-base" data-i18n="curing_title">Curing & Tørkelogg</h3>
-                    <button onclick="openCuringModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_new_curing">+ Ny curing-logg</button>
+            <!-- CURING / DRYING LOG -->
+            <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">Curing & Drying Log</h3>
+                    <button onclick="openCuringModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Curing Log</button>
                 </div>
                 <div id="curing-container" class="space-y-2"></div>
             </div>
 
-            <!-- MILJØ & NÆRING -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 class="font-bold text-white text-base" data-i18n="metrics_title">Miljø & Næringslogg</h3>
-                    <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_new_metric">+ Ny måling</button>
+            <!-- ENVIRONMENT & NUTRIENT LOG -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">Environment & Nutrient Log</h3>
+                    <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Metric</button>
                 </div>
                 <div id="metrics-container" class="space-y-2"></div>
             </div>
 
-            <!-- KATEGORI RULLGARDIN -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+            <!-- CATEGORY SELECTOR -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center">
-                    <label for="category-select" class="text-sm font-semibold text-slate-300" data-i18n="select_category">Velg kategori:</label>
-                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition" data-i18n="btn_add_here">+ Legg til i denne</button>
+                    <label for="category-select" class="text-xs font-bold text-slate-400 uppercase tracking-[0.15em]">Select Category:</label>
+                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Add to this</button>
                 </div>
-                <select id="category-select" onchange="switchCategory(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white font-medium focus:outline-none focus:border-emerald-500 transition">
-                    <option value="veg" data-i18n="cat_veg">Vegetation</option>
-                    <option value="flower" data-i18n="cat_flower">Flower</option>
-                    <option value="cured" data-i18n="cat_cured">Cured Buds</option>
-                    <option value="extracts" data-i18n="cat_extracts">Extraction</option>
+                <select id="category-select" onchange="switchCategory(this.value)" class="w-full uis-input rounded-xl px-4 py-3 text-sm font-semibold transition">
+                    <option value="veg">Vegetation</option>
+                    <option value="flower">Flower</option>
+                    <option value="cured">Cured Buds</option>
+                    <option value="extracts">Extraction</option>
                 </select>
             </div>
 
-            <!-- DYNAMISK INNHOLD -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <h3 id="current-category-title" class="font-bold text-white text-base">Vegetation</h3>
-                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-emerald-400 hover:text-emerald-300 text-xs font-medium transition" data-i18n="btn_add_image">+ Legg til bilde</button>
+            <!-- DYNAMIC CONTENT GRID -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 id="current-category-title" class="font-bold text-white text-xs uppercase tracking-[0.15em]">Vegetation</h3>
+                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-blue-400 hover:text-blue-300 text-xs font-semibold uppercase tracking-wider transition">+ Add Image</button>
                 </div>
                 <div id="category-grid" class="grid grid-cols-1 gap-4"></div>
             </div>
         </div>
     </main>
 
-    <!-- MODALER -->
-    <!-- Etikett Modal m/ QR-kode -->
-    <div id="label-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
-            <h3 class="text-lg font-bold text-white" data-i18n="label_preview">Etikett-forhåndsvisning</h3>
+    <!-- MODALS -->
+    <div id="label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
+            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Label Preview</h3>
             <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center">
                 <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
                 <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
@@ -206,193 +212,99 @@
                 <div id="qrcode" class="mt-2"></div>
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeLabelModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_close">Lukk</button>
-                <button onclick="window.print()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_print">🖨️ Skriv ut</button>
+                <button onclick="closeLabelModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Close</button>
+                <button onclick="window.print()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">🖨️ Print</button>
             </div>
         </div>
     </div>
 
-    <!-- Curing Log Modal -->
-    <div id="curing-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white" data-i18n="curing_modal_title">Ny Curing- / Tørkelogg</h3>
-            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="curing_rh">Glass / Boks luftfuktighet (%)</label><input type="number" id="curing-rh" placeholder="f.eks. 62" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500"></div>
-            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="note">Notat / Burping status</label><input type="text" id="curing-note" placeholder="f.eks. Åpnet glass i 15 minutter" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500 text-sm"></div>
+    <div id="curing-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">New Curing Log</h3>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Jar Humidity (%)</label><input type="number" id="curing-rh" placeholder="e.g. 62" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Burping Status</label><input type="text" id="curing-note" placeholder="e.g. Opened jar for 15 minutes" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeCuringModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_cancel">Avbryt</button>
-                <button onclick="saveCuringLog()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_save">Lagre</button>
+                <button onclick="closeCuringModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
+                <button onclick="saveCuringLog()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save</button>
             </div>
         </div>
     </div>
 
     <div id="lightbox-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden z-50 flex flex-col items-center justify-center p-2" onclick="closeLightbox()">
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-slate-800/80 hover:bg-slate-700 text-white rounded-full p-3 text-lg transition z-50">✕</button>
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-[#12151f] border border-[#1e2336] text-white rounded-full p-3 text-lg transition z-50">✕</button>
         <div class="relative max-w-full max-h-full overflow-auto p-2" onclick="event.stopPropagation()">
             <img id="lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
         </div>
-        <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 bg-slate-900/80 py-2 rounded-xl border border-slate-800"></p>
+        <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 uis-card py-2 rounded-xl"></p>
     </div>
 
-    <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white" data-i18n="metric_modal_title">Legg til miljø- / næringsmåling</h3>
+    <div id="metrics-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Environment / Nutrient Metric</h3>
             <div class="grid grid-cols-2 gap-3">
-                <div><label class="block text-xs font-medium text-slate-400 mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="f.eks. 6.2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
-                <div><label class="block text-xs font-medium text-slate-400 mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="f.eks. 1.4" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
-                <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="temp">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" placeholder="f.eks. 24" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
-                <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="rh">Luftfuktighet (%)</label><input type="number" id="metric-rh" placeholder="f.eks. 60" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="e.g. 6.2" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="e.g. 1.4" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" placeholder="e.g. 24" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Humidity (%)</label><input type="number" id="metric-rh" placeholder="e.g. 60" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             </div>
-            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="note">Notat / Ekstra</label><input type="text" id="metric-note" placeholder="f.eks. Litt cal-mag tilsatt" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 text-sm"></div>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Extra</label><input type="text" id="metric-note" placeholder="e.g. Added some Cal-Mag" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeMetricsModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_cancel">Avbryt</button>
-                <button onclick="saveMetric()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_save_metric">Lagre måling</button>
+                <button onclick="closeMetricsModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
+                <button onclick="saveMetric()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save Metric</button>
             </div>
         </div>
     </div>
 
-    <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white" data-i18n="edit_plant">Rediger plante</h3>
-            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="strain">Strain</label><input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition"></div>
+    <div id="edit-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Edit Plant</h3>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Strain</label><input type="text" id="edit-strain-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition"></div>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="type">Type</label>
-                <select id="edit-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
-                    <option value="Autoflower" data-i18n="type_auto">Autoflower</option>
-                    <option value="Photoperiod" data-i18n="type_photo">Photoperiod</option>
-                    <option value="Stikling / Clone" data-i18n="type_clone">Stikling / Clone</option>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Type</label>
+                <select id="edit-type-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition">
+                    <option value="Autoflower">Autoflower</option>
+                    <option value="Photoperiod">Photoperiod</option>
+                    <option value="Cutting / Clone">Cutting / Clone</option>
                 </select>
             </div>
-            <div><label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="date_planted">Dato plantet</label><input type="date" id="edit-date-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition"></div>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Date Planted</label><input type="date" id="edit-date-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition"></div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeEditModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition" data-i18n="btn_cancel">Avbryt</button>
-                <button onclick="saveEditedPlant()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition" data-i18n="btn_save">Lagre</button>
+                <button onclick="closeEditModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
+                <button onclick="saveEditedPlant()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save</button>
             </div>
         </div>
     </div>
 
-    <div id="source-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
-            <h3 class="text-md font-bold text-white mb-2" data-i18n="select_source">Velg bildekilde</h3>
-            <button onclick="triggerFileCapture('camera')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition"><span data-i18n="btn_camera">Ta bilde med kamera</span></button>
-            <button onclick="triggerFileCapture('file')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-3 rounded-xl transition"><span data-i18n="btn_device">Velg fra enhet</span></button>
-            <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition" data-i18n="btn_cancel">Avbryt</button>
+    <div id="source-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
+            <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white mb-2">Select Image Source</h3>
+            <button onclick="triggerFileCapture('camera')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">Take Photo with Camera</button>
+            <button onclick="triggerFileCapture('file')" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition border border-[#1e2336]">Choose from Device</button>
+            <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition uppercase font-semibold">Cancel</button>
         </div>
         <input type="file" id="hidden-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
         <input type="file" id="hidden-file-input" accept="image/*" class="hidden" onchange="handleImageSelected(event)">
     </div>
 
-    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white" data-i18n="comment_title">Legg til notat / kommentar</h3>
-            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
+    <div id="feedback-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Note / Comment</h3>
+            <div class="w-full h-32 rounded-xl overflow-hidden bg-[#090a0f] border border-[#1e2336] flex items-center justify-center">
                 <img id="feedback-preview-img" class="w-full h-full object-cover">
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1" data-i18n="comment_label">Kommentar / Notat</label>
-                <textarea id="comment-input" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition text-sm" placeholder="Skriv egne inntrykk..."></textarea>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Comment / Note</label>
+                <textarea id="comment-input" rows="3" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition placeholder-slate-600" placeholder="Write your impressions..."></textarea>
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeFeedbackModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_cancel">Avbryt</button>
-                <button onclick="saveFeedbackAndImage()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm" data-i18n="btn_save">Lagre</button>
+                <button onclick="closeFeedbackModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
+                <button onclick="saveFeedbackAndImage()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save</button>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIKK -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        const translations = {
-            en: {
-                subtitle: "Cultivation Management", new_cultivation: "Start New Cultivation", strain: "Strain",
-                type: "Type", type_auto: "Autoflower", type_photo: "Photoperiod", type_clone: "Cutting / Clone",
-                date_planted: "Date Planted", btn_add: "+ Add Plant", active_grows: "Active Grows",
-                archive_title: "Archive (Completed Grows)", data_security: "Data & Security", btn_backup: "Backup",
-                btn_restore: "Restore", back_to_overview: "Back to Overview", archived: "Archived",
-                planted: "Planted", harvested: "Harvested", btn_label: "🖨️ Label", btn_edit: "Edit",
-                btn_delete: "Delete", days: "days", rating_title: "Rating (Finished Product)",
-                metrics_title: "Environment & Nutrient Log", btn_new_metric: "+ New Metric",
-                select_category: "Select Category:", btn_add_here: "+ Add to this", cat_veg: "Vegetation",
-                cat_flower: "Flower", cat_cured: "Cured Buds", cat_extracts: "Extraction", btn_add_image: "+ Add Image",
-                label_preview: "Label Preview", btn_close: "Close", btn_print: "🖨️ Print",
-                metric_modal_title: "Add Environment / Nutrient Metric", temp: "Temp (°C)", rh: "Humidity (%)",
-                note: "Note / Extra", btn_cancel: "Cancel", btn_save_metric: "Save Metric", edit_plant: "Edit Plant",
-                btn_save: "Save", select_source: "Select Image Source", btn_camera: "Take Photo with Camera",
-                btn_device: "Choose from Device", comment_title: "Add Note / Comment", comment_label: "Comment / Note",
-                no_active: "No active grows currently.", no_archive: "No archived grows yet.",
-                no_metrics: "No metrics recorded yet.", no_images: "No entries yet", harvest_btn: "✂️ Harvested",
-                harvest_status: "Harvested", confirm_harvest: "Do you want to mark this as harvested today? It will be moved to the archive.",
-                confirm_delete: "Are you sure you want to permanently delete this plant?",
-                confirm_delete_img: "Are you sure you want to delete this image?",
-                full_storage: "Storage space on device is full!", invalid_file: "Invalid file!",
-                restore_success: "Backup successfully restored!", print_prompt: "Plant saved! Do you want to print a label for the pot right away?",
-                last_watered: "Last watered / fed", btn_watered_today: "💧 Watered today",
-                curing_title: "Curing & Drying Log", btn_new_curing: "+ New curing log", curing_modal_title: "New Curing Log", curing_rh: "Jar Humidity (%)", no_curing: "No curing logs yet"
-            },
-            no: {
-                subtitle: "Cultivation Management", new_cultivation: "Start ny kultivering", strain: "Strain",
-                type: "Type", type_auto: "Autoflower", type_photo: "Photoperiod", type_clone: "Stikling / Clone",
-                date_planted: "Dato plantet", btn_add: "+ Legg til", active_grows: "Aktive grows",
-                archive_title: "Arkiv (Fullførte grows)", data_security: "Data og sikkerhet", btn_backup: "Backup",
-                btn_restore: "Gjenopprett", back_to_overview: "Tilbake til oversikt", archived: "Arkivert",
-                planted: "Plantet", harvested: "Kuttet", btn_label: "🖨️ Etikett", btn_edit: "Rediger",
-                btn_delete: "Slett", days: "dager", rating_title: "Rating (Ferdig produkt)",
-                metrics_title: "Miljø & Næringslogg", btn_new_metric: "+ Ny måling",
-                select_category: "Velg kategori:", btn_add_here: "+ Legg til i denne", cat_veg: "Vegetation",
-                cat_flower: "Flower", cat_cured: "Cured Buds", cat_extracts: "Extraction", btn_add_image: "+ Legg til bilde",
-                label_preview: "Etikett-forhåndsvisning", btn_close: "Lukk", btn_print: "🖨️ Skriv ut",
-                metric_modal_title: "Legg til miljø- / næringsmåling", temp: "Temp (°C)", rh: "Luftfuktighet (%)",
-                note: "Notat / Ekstra", btn_cancel: "Avbryt", btn_save_metric: "Lagre måling", edit_plant: "Rediger plante",
-                btn_save: "Lagre", select_source: "Velg bildekilde", btn_camera: "Ta bilde med kamera",
-                btn_device: "Velg fra enhet", comment_title: "Legg til notat / kommentar", comment_label: "Kommentar / Notat",
-                no_active: "Ingen aktive grows for øyeblikket.", no_archive: "Ingen arkiverte grows ennå.",
-                no_metrics: "Ingen målinger registrert ennå", no_images: "Ingen oppføringer ennå", harvest_btn: "✂️ Kuttet / Høstet",
-                harvest_status: "Ferdig høstet", confirm_harvest: "Vil du markere denne som kuttet/høstet i dag? Den vil da bli flyttet til arkivet.",
-                confirm_delete: "Er du sikker på at du vil slette denne planten permanent?",
-                confirm_delete_img: "Er du sikker på at du vil slette dette bildet?",
-                full_storage: "Lagringsplassen på enheten er full!", invalid_file: "Ugyldig fil!",
-                restore_success: "Backup gjenopprettet vellykket!", print_prompt: "Planten ble lagret! Vil du skrive ut en etikett til potta med en gang?",
-                last_watered: "Sist vannet/gjødslet", btn_watered_today: "💧 Vannet i dag",
-                curing_title: "Curing & Tørkelogg", btn_new_curing: "+ Ny curing-logg", curing_modal_title: "Ny Curing- / Tørkelogg", curing_rh: "Glass / Boks luftfuktighet (%)", no_curing: "Ingen curing-logger ennå"
-            },
-            es: {
-                subtitle: "Gestión de Cultivo", new_cultivation: "Iniciar Nuevo Cultivo", strain: "Genética / Strain",
-                type: "Tipo", type_auto: "Autofloreciente", type_photo: "Fotodependiente", type_clone: "Esqueje / Clone",
-                date_planted: "Fecha de Plantación", btn_add: "+ Añadir Planta", active_grows: "Cultivos Activos",
-                archive_title: "Archivo (Cultivos Finalizados)", data_security: "Datos y Seguridad", btn_backup: "Copia de seguridad",
-                btn_restore: "Restaurar", back_to_overview: "Volver al resumen", archived: "Archivado",
-                planted: "Plantado", harvested: "Cosechado", btn_label: "🖨️ Etiqueta", btn_edit: "Editar",
-                btn_delete: "Eliminar", days: "días", rating_title: "Valoración (Producto Final)",
-                metrics_title: "Registro de Entorno y Nutrientes", btn_new_metric: "+ Nueva Medición",
-                select_category: "Seleccionar Categoría:", btn_add_here: "+ Añadir aquí", cat_veg: "Vegetativo",
-                cat_flower: "Floración", cat_cured: "Curado", cat_extracts: "Extracciones", btn_add_image: "+ Añadir Imagen",
-                label_preview: "Vista Previa de Etiqueta", btn_close: "Cerrar", btn_print: "🖨️ Imprimir",
-                metric_modal_title: "Añadir Medición de Entorno", temp: "Temp (°C)", rh: "Humedad (%)",
-                note: "Nota / Extra", btn_cancel: "Cancelar", btn_save_metric: "Guardar Medición", edit_plant: "Editar Planta",
-                btn_save: "Guardar", select_source: "Seleccionar Fuente", btn_camera: "Hacer Foto con Cámara",
-                btn_device: "Elegir del Dispositivo", comment_title: "Añadir Nota / Comentario", comment_label: "Comentario / Nota",
-                no_active: "No hay cultivos activos actualmente.", no_archive: "No hay cultivos archivados.",
-                no_metrics: "No hay mediciones registradas.", no_images: "Sin entradas todavía", harvest_btn: "✂️ Cosechado",
-                harvest_status: "Cosechado", confirm_harvest: "¿Quieres marcar esto como cosechado hoy? Se moverá al archivo.",
-                confirm_delete: "¿Estás seguro de que deseas eliminar esta planta permanentemente?",
-                confirm_delete_img: "¿Estás seguro de eliminar esta imagen?",
-                full_storage: "¡El espacio de almacenamiento está lleno!", invalid_file: "¡Archivo inválido!",
-                restore_success: "¡Copia restaurada con éxito!", print_prompt: "¡Planta guardada! ¿Quieres imprimir una etiqueta para la maceta ahora mismo?",
-                last_watered: "Último riego / abono", btn_watered_today: "💧 Regado hoy",
-                curing_title: "Registro de Curado y Secado", btn_new_curing: "+ Nuevo registro de curado", curing_modal_title: "Nuevo Registro de Curado", curing_rh: "Humedade del tarro (%)", no_curing: "No hay registros de curado todavía"
-            }
-        };
-
-        const rawLang = navigator.language || navigator.userLanguage || 'en';
-        const userLangCode = rawLang.split('-')[0].toLowerCase();
-        const currentLang = translations[userLangCode] ? userLangCode : 'en';
-        const t = translations[currentLang];
-
-        function applyTranslations() {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (t[key]) el.innerText = t[key];
-            });
-        }
-
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
 
         let plants = [];
@@ -420,7 +332,7 @@
 
         function saveToStorage() {
             try { localStorage.setItem('trichome_plants', JSON.stringify(plants)); }
-            catch (e) { alert(t.full_storage); }
+            catch (e) { alert("Storage space on device is full!"); }
         }
 
         function calculateDays(startDate, endDate) {
@@ -456,25 +368,25 @@
             const archivedPlants = plants.filter(p => p.harvestedDate);
 
             if (activePlants.length === 0) {
-                container.innerHTML = `<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center"><p class="text-slate-400 text-xs">${t.no_active}</p></div>`;
+                container.innerHTML = `<div class="uis-card rounded-2xl p-6 text-center"><p class="text-slate-400 text-xs">No active grows currently.</p></div>`;
             } else {
                 container.innerHTML = activePlants.map(plant => {
                     const days = calculateDays(plant.date);
                     let totalImages = 0;
                     stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 cursor-pointer transition shadow-lg flex justify-between items-center group">
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-5 cursor-pointer transition shadow-xl flex justify-between items-center group">
                             <div class="space-y-2">
-                                <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${plant.strain}</h3>
+                                <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition tracking-wide">${plant.strain}</h3>
                                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md">${plant.type || 'Autoflower'}</span>
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">${t.planted}: ${formatDate(plant.date)}</span>
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">📸 ${totalImages}</span>
+                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold">${plant.type || 'Autoflower'}</span>
+                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2.5 py-1 rounded text-[10px]">Planted: ${formatDate(plant.date)}</span>
+                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2.5 py-1 rounded text-[10px]">📸 ${totalImages}</span>
                                 </div>
                             </div>
-                            <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
-                                <span class="text-xl font-extrabold text-emerald-400 block leading-tight">${days}</span>
-                                <span class="text-[10px] text-emerald-500 font-semibold tracking-wider uppercase block">${t.days}</span>
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
+                                <span class="text-xl font-black text-blue-400 block leading-tight">${days}</span>
+                                <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">days</span>
                             </div>
                         </div>
                     `;
@@ -482,7 +394,7 @@
             }
 
             if (archivedPlants.length === 0) {
-                archiveContainer.innerHTML = `<div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">${t.no_archive}</p></div>`;
+                archiveContainer.innerHTML = `<div class="bg-[#12151f]/50 border border-[#1e2336]/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">No archived grows yet.</p></div>`;
             } else {
                 archiveContainer.innerHTML = archivedPlants.map(plant => {
                     const totalDays = calculateDays(plant.date, plant.harvestedDate);
@@ -490,17 +402,17 @@
                     stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900/70 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
                             <div class="space-y-1">
                                 <div class="flex items-center space-x-2">
-                                    <h3 class="text-base font-bold text-slate-200 group-hover:text-emerald-400 transition">${plant.strain}</h3>
-                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">${t.archived}</span>
+                                    <h3 class="text-sm font-bold text-slate-200 group-hover:text-blue-400 transition">${plant.strain}</h3>
+                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                                 </div>
-                                <p class="text-xs text-slate-400">${plant.type || 'Autoflower'} • ${t.harvested}: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-emerald-400 font-bold">${plantRating}/10</span></p>
+                                <p class="text-[11px] text-slate-400">${plant.type || 'Autoflower'} • Harvested: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-blue-400 font-bold">${plantRating}/10</span></p>
                             </div>
-                            <div class="bg-slate-800/80 border border-slate-700 px-3 py-2 rounded-xl text-center min-w-[65px]">
-                                <span class="text-lg font-bold text-slate-200 block leading-tight">${totalDays}</span>
-                                <span class="text-[9px] text-slate-400 font-medium tracking-wider uppercase block">totalt</span>
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-3 py-2 rounded-xl text-center min-w-[65px]">
+                                <span class="text-base font-bold text-slate-200 block leading-tight">${totalDays}</span>
+                                <span class="text-[9px] text-slate-400 font-medium tracking-wider uppercase block">total</span>
                             </div>
                         </div>
                     `;
@@ -520,7 +432,7 @@
             setDefaultDate();
             renderDashboard();
 
-            if (confirm(t.print_prompt)) openLabelModal(strain, type, formatDate(date), plants[0].id);
+            if (confirm("Plant saved! Do you want to print a label for the pot right away?")) openLabelModal(strain, type, formatDate(date), plants[0].id);
         }
 
         function recordWatering() {
@@ -538,7 +450,7 @@
                 return;
             }
             const daysAgo = calculateDays(plant.lastWatered.slice(0,10));
-            box.innerText = daysAgo === 0 ? "I dag" : `${daysAgo} ${t.days} siden`;
+            box.innerText = daysAgo === 0 ? "Today" : `${daysAgo} days ago`;
         }
 
         function openLabelModal(strain, type, dateStr, plantId = activePlantId) {
@@ -592,8 +504,8 @@
                 harvestDateWrap.classList.remove('hidden');
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
                 document.getElementById('detail-days').innerText = calculateDays(plant.date, plant.harvestedDate);
-                ageLabelText.innerText = "Total tid";
-                ageUnitText.innerText = t.days;
+                ageLabelText.innerText = "Total Time";
+                ageUnitText.innerText = "days";
                 archiveRatingBox.classList.remove('hidden');
                 waterWidgetBox.classList.add('hidden');
                 curingSection.classList.remove('hidden');
@@ -601,19 +513,19 @@
                 const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
                 document.getElementById('plant-rating-slider').value = currentRating;
                 document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
-                harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">${t.harvest_status}</span>`;
+                harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">Harvested</span>`;
                 addBtnTop.classList.add('hidden'); addBtnBottom.classList.add('hidden'); btnOpenMetrics.classList.add('hidden');
                 renderCuringLogs();
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
                 document.getElementById('detail-days').innerText = calculateDays(plant.date);
-                ageLabelText.innerText = "Alder";
-                ageUnitText.innerText = t.days;
+                ageLabelText.innerText = "Age";
+                ageUnitText.innerText = "days";
                 archiveRatingBox.classList.add('hidden');
                 waterWidgetBox.classList.remove('hidden');
                 curingSection.classList.add('hidden');
-                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">${t.harvest_btn}</button>`;
+                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Harvested</button>`;
                 addBtnTop.classList.remove('hidden'); addBtnBottom.classList.remove('hidden'); btnOpenMetrics.classList.remove('hidden');
             }
 
@@ -621,7 +533,6 @@
             renderDetail();
         }
 
-        // Curing Logikk
         function openCuringModal() {
             document.getElementById('curing-rh').value = '';
             document.getElementById('curing-note').value = '';
@@ -645,14 +556,14 @@
             const plant = plants.find(p => p.id === activePlantId);
             const container = document.getElementById('curing-container');
             if (!plant?.curingLogs?.length) {
-                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">${t.no_curing}</div>`;
+                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">No curing logs yet</div>`;
                 return;
             }
             container.innerHTML = plant.curingLogs.map((c, index) => `
-                <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-start text-xs">
+                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                     <div class="space-y-1">
                         <span class="text-slate-400 font-medium">${formatDate(c.date.slice(0,10))}</span>
-                        <div class="text-slate-300 mt-1">Luftfuktighet i glass: <span class="text-amber-400 font-bold">${c.rh}%</span></div>
+                        <div class="text-slate-300 mt-1">Jar Humidity: <span class="text-amber-400 font-bold">${c.rh}%</span></div>
                         ${c.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${c.note}</p>` : ''}
                     </div>
                     <button onclick="deleteCuringLog(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
@@ -692,7 +603,7 @@
             const plant = plants.find(p => p.id === activePlantId);
             const container = document.getElementById('metrics-container');
             if (!plant?.metrics?.length) {
-                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">${t.no_metrics}</div>`;
+                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">No metrics recorded yet.</div>`;
                 return;
             }
             container.innerHTML = plant.metrics.map((m, index) => {
@@ -702,7 +613,7 @@
                 if (m.temp) parts.push(`Temp: <span class="text-white font-bold">${m.temp}°C</span>`);
                 if (m.rh) parts.push(`RH: <span class="text-white font-bold">${m.rh}%</span>`);
                 return `
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-start text-xs">
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                         <div class="space-y-1">
                             <span class="text-slate-400 font-medium">${formatDate(m.date.slice(0,10))}</span>
                             <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${parts.join(' • ')}</div>
@@ -720,7 +631,7 @@
         }
 
         function confirmHarvest() {
-            if (confirm(t.confirm_harvest)) {
+            if (confirm("Do you want to mark this as harvested today? It will be moved to the archive.")) {
                 const plant = plants.find(p => p.id === activePlantId);
                 if (plant) { plant.harvestedDate = new Date().toISOString().slice(0, 10); saveToStorage(); openDetail(plant.id); }
             }
@@ -744,19 +655,19 @@
             const items = plant.stages[currentCategory] || [];
 
             if (items.length === 0) {
-                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">${t.no_images}</div>`;
+                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">No entries yet</div>`;
                 return;
             }
 
             container.innerHTML = items.map((item, index) => {
                 const safeComment = item.comment ? item.comment.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
                 return `
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
-                        <div class="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
+                        <div class="relative aspect-video rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
                             <img src="${item.image}" class="w-full h-full object-cover">
                             ${!plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : ''}
                         </div>
-                        ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-slate-900 p-3 rounded-xl border border-slate-800">${item.comment}</p>` : ''}
+                        ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-[#12151f] p-3 rounded-xl border border-[#1e2336]">${item.comment}</p>` : ''}
                     </div>
                 `;
             }).join('');
@@ -822,6 +733,80 @@
         }
 
         function confirmDeleteItem(stageKey, index) {
-            if (confirm(t.confirm_delete_img)) {
+            if (confirm("Are you sure you want to delete this image?")) {
                 const plant = plants.find(p => p.id === activePlantId);
-                if (plant?.stages?.[stageKey]) { plant.stages[stageKey].splice(index,
+                if (plant?.stages?.[stageKey]) { plant.stages[stageKey].splice(index, 1); saveToStorage(); renderDetail(); }
+            }
+        }
+
+        function openEditModal() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            document.getElementById('edit-strain-input').value = plant.strain;
+            document.getElementById('edit-type-input').value = plant.type || 'Autoflower';
+            document.getElementById('edit-date-input').value = plant.date;
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+
+        function saveEditedPlant() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.strain = document.getElementById('edit-strain-input').value;
+            plant.type = document.getElementById('edit-type-input').value;
+            plant.date = document.getElementById('edit-date-input').value;
+            saveToStorage(); closeEditModal(); openDetail(plant.id);
+        }
+
+        function confirmDeletePlant() {
+            if (confirm("Are you sure you want to permanently delete this plant?")) {
+                plants = plants.filter(p => p.id !== activePlantId);
+                saveToStorage(); goHome();
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plants));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `trichome_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a); a.click(); a.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) { plants = imported; saveToStorage(); renderDashboard(); alert("Backup successfully restored!"); }
+                } catch (err) { alert("Invalid file!"); }
+            };
+            reader.readAsText(file);
+        }
+
+        function setDefaultDate() {
+            const dateInput = document.getElementById('date-input');
+            if (dateInput && !dateInput.value) {
+                const today = new Date();
+                dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            }
+        }
+
+        setDefaultDate();
+        renderDashboard();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash;
+            if (hash.includes('#plant=')) {
+                const pId = hash.split('=')[1];
+                if (plants.some(p => p.id === pId)) {
+                    openDetail(pId);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
