@@ -38,23 +38,13 @@
                             class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition"
                             placeholder="f.eks. Northern Lights, OG Kush...">
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
-                            <select id="plant-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
-                                <option value="Autoflower">Autoflower</option>
-                                <option value="Photoperiod">Photoperiod</option>
-                                <option value="Stikling / Clone">Stikling / Clone</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-400 mb-1">Genetikk</label>
-                            <select id="plant-genetics-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
-                                <option value="Hybrid">Hybrid</option>
-                                <option value="Indica">Indica</option>
-                                <option value="Sativa">Sativa</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
+                        <select id="plant-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="Autoflower">Autoflower</option>
+                            <option value="Photoperiod">Photoperiod</option>
+                            <option value="Stikling / Clone">Stikling / Clone</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
@@ -113,7 +103,6 @@
                         </div>
                         <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-400">
                             <span id="detail-type-badge" class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md"></span>
-                            <span id="detail-genetics-badge" class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md"></span>
                         </div>
                         <p class="text-xs text-slate-400 mt-2">Plantet: <span id="detail-date"></span> <span id="detail-harvest-date-wrap" class="hidden">• Kuttet: <span id="detail-harvest-date"></span></span></p>
                     </div>
@@ -238,23 +227,13 @@
                 <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
                 <input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
-                    <select id="edit-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="Autoflower">Autoflower</option>
-                        <option value="Photoperiod">Photoperiod</option>
-                        <option value="Stikling / Clone">Stikling / Clone</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-slate-400 mb-1">Genetikk</label>
-                    <select id="edit-genetics-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
-                        <option value="Hybrid">Hybrid</option>
-                        <option value="Indica">Indica</option>
-                        <option value="Sativa">Sativa</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
+                <select id="edit-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    <option value="Autoflower">Autoflower</option>
+                    <option value="Photoperiod">Photoperiod</option>
+                    <option value="Stikling / Clone">Stikling / Clone</option>
+                </select>
             </div>
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
@@ -284,4 +263,25 @@
     </div>
 
     <!-- COMMENT MODAL -->
-    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdro
+    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-white">Legg til notat / kommentar</h3>
+            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
+                <img id="feedback-preview-img" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Kommentar / Notat</label>
+                <textarea id="comment-input" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition text-sm" placeholder="Skriv egne inntrykk, terpensprofil, virkning..."></textarea>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeFeedbackModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm">Avbryt</button>
+                <button onclick="saveFeedbackAndImage()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm">Lagre</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = {
+            veg: "Vegetation",
+            flower: "Flower",
+            cured: "Cured Bud
