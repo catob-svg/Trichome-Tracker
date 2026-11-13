@@ -38,6 +38,24 @@
                             class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition"
                             placeholder="f.eks. Northern Lights, OG Kush...">
                     </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
+                            <select id="plant-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
+                                <option value="Autoflower">Autoflower</option>
+                                <option value="Photoperiod">Photoperiod</option>
+                                <option value="Stikling / Clone">Stikling / Clone</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Genetikk</label>
+                            <select id="plant-genetics-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="Indica">Indica</option>
+                                <option value="Sativa">Sativa</option>
+                            </select>
+                        </div>
+                    </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
                         <input type="date" id="date-input" required 
@@ -93,7 +111,11 @@
                             <h2 id="detail-strain" class="text-2xl font-bold text-white"></h2>
                             <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Arkivert</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">Plantet: <span id="detail-date"></span> <span id="detail-harvest-date-wrap" class="hidden">• Kuttet: <span id="detail-harvest-date"></span></span></p>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-400">
+                            <span id="detail-type-badge" class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md"></span>
+                            <span id="detail-genetics-badge" class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Plantet: <span id="detail-date"></span> <span id="detail-harvest-date-wrap" class="hidden">• Kuttet: <span id="detail-harvest-date"></span></span></p>
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="openEditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition">Rediger</button>
@@ -101,16 +123,17 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between">
+                <div class="grid grid-cols-2 gap-3" id="header-stats-grid">
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between col-span-2" id="age-box-container">
                         <div>
                             <span id="age-label-text" class="text-xs text-slate-400 block font-medium uppercase tracking-wider">Alder</span>
                             <span id="detail-days" class="text-2xl font-extrabold text-emerald-400">0</span> <span id="age-unit-text" class="text-emerald-500 font-medium text-xs">dager</span>
                         </div>
                     </div>
-                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-center">
+                    <!-- Rating boks (vises kun i arkiv) -->
+                    <div id="archive-rating-box" class="hidden bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-center col-span-2">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Rating</span>
+                            <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Rating (Ferdig produkt)</span>
                             <span id="plant-rating-display" class="text-emerald-400 font-bold text-sm">8.0 / 10</span>
                         </div>
                         <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-emerald-500 bg-slate-900">
@@ -215,6 +238,24 @@
                 <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
                 <input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
             </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Type</label>
+                    <select id="edit-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="Autoflower">Autoflower</option>
+                        <option value="Photoperiod">Photoperiod</option>
+                        <option value="Stikling / Clone">Stikling / Clone</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Genetikk</label>
+                    <select id="edit-genetics-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-emerald-500">
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Indica">Indica</option>
+                        <option value="Sativa">Sativa</option>
+                    </select>
+                </div>
+            </div>
             <div>
                 <label class="block text-xs font-medium text-slate-400 mb-1">Dato plantet</label>
                 <input type="date" id="edit-date-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
@@ -243,545 +284,4 @@
     </div>
 
     <!-- COMMENT MODAL -->
-    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <h3 class="text-lg font-bold text-white">Legg til notat / kommentar</h3>
-            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
-                <img id="feedback-preview-img" class="w-full h-full object-cover">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Kommentar / Notat</label>
-                <textarea id="comment-input" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition text-sm" placeholder="Skriv egne inntrykk, terpensprofil, virkning..."></textarea>
-            </div>
-            <div class="flex space-x-3 pt-2">
-                <button onclick="closeFeedbackModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition text-sm">Avbryt</button>
-                <button onclick="saveFeedbackAndImage()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition text-sm">Lagre</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const categories = {
-            veg: "Vegetation",
-            flower: "Flower",
-            cured: "Cured Buds",
-            extracts: "Extraction"
-        };
-
-        let plants = JSON.parse(localStorage.getItem('trichome_plants') || '[]');
-        let activePlantId = null;
-        let currentCategory = 'veg';
-        let activeStageKey = null;
-        let pendingImageData = null;
-
-        const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem('trichome_plants', JSON.stringify(plants));
-            } catch (e) {
-                alert("Lagringsplassen på enheten er full!");
-            }
-        }
-
-        function calculateDays(startDate, endDate) {
-            const start = new Date(startDate);
-            const end = endDate ? new Date(endDate) : new Date();
-            start.setHours(0,0,0,0);
-            end.setHours(0,0,0,0);
-            const diffTime = end - start;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays >= 0 ? diffDays : 0;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return "";
-            const parts = dateString.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}.${parts[1]}.${parts[0]}`;
-            }
-            return dateString;
-        }
-
-        function switchCategory(cat) {
-            currentCategory = cat;
-            document.getElementById('current-category-title').innerText = categories[cat];
-            renderDetail();
-        }
-
-        function updatePlantRating(val) {
-            document.getElementById('plant-rating-display').innerText = val + " / 10";
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant) {
-                plant.rating = parseFloat(val);
-                saveToStorage();
-            }
-        }
-
-        function renderDashboard() {
-            const container = document.getElementById('plants-container');
-            const archiveContainer = document.getElementById('archive-container');
-
-            const activePlants = plants.filter(p => !p.harvestedDate);
-            const archivedPlants = plants.filter(p => p.harvestedDate);
-
-            if (activePlants.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-2">
-                        <p class="text-slate-400 text-xs">Ingen aktive grows for øyeblikket.</p>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = activePlants.map(plant => {
-                    const days = calculateDays(plant.date);
-                    let totalImages = 0;
-                    stageKeys.forEach(sk => {
-                        if (plant.stages && plant.stages[sk]) {
-                            totalImages += plant.stages[sk].length;
-                        }
-                    });
-                    const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
-
-                    return `
-                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 cursor-pointer transition shadow-lg flex justify-between items-center group">
-                            <div class="space-y-2">
-                                <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${plant.strain}</h3>
-                                <div class="flex flex-wrap items-center gap-2 text-xs">
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">Plantet: ${formatDate(plant.date)}</span>
-                                    <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">📸 ${totalImages}</span>
-                                    <span class="bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-medium">⭐ ${plantRating}/10</span>
-                                </div>
-                            </div>
-                            <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
-                                <span class="text-xl font-extrabold text-emerald-400 block leading-tight">${days}</span>
-                                <span class="text-[10px] text-emerald-500 font-semibold tracking-wider uppercase block">dager</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            if (archivedPlants.length === 0) {
-                archiveContainer.innerHTML = `
-                    <div class="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 text-center">
-                        <p class="text-slate-500 text-xs italic">Ingen arkiverte grows ennå.</p>
-                    </div>
-                `;
-            } else {
-                archiveContainer.innerHTML = archivedPlants.map(plant => {
-                    const totalDays = calculateDays(plant.date, plant.harvestedDate);
-                    let totalImages = 0;
-                    stageKeys.forEach(sk => {
-                        if (plant.stages && plant.stages[sk]) {
-                            totalImages += plant.stages[sk].length;
-                        }
-                    });
-                    const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
-
-                    return `
-                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900/70 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
-                            <div class="space-y-1">
-                                <div class="flex items-center space-x-2">
-                                    <h3 class="text-base font-bold text-slate-200 group-hover:text-emerald-400 transition">${plant.strain}</h3>
-                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Arkivert</span>
-                                </div>
-                                <p class="text-xs text-slate-400">Kuttet: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-emerald-400 font-bold">${plantRating}/10</span></p>
-                            </div>
-                            <div class="bg-slate-800/80 border border-slate-700 px-3 py-2 rounded-xl text-center min-w-[65px]">
-                                <span class="text-lg font-bold text-slate-200 block leading-tight">${totalDays}</span>
-                                <span class="text-[9px] text-slate-400 font-medium tracking-wider uppercase block">dager totalt</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
-
-        function addPlant(e) {
-            e.preventDefault();
-            const strain = document.getElementById('strain-input').value;
-            const date = document.getElementById('date-input').value;
-
-            const newPlant = {
-                id: Date.now().toString(),
-                strain: strain,
-                date: date,
-                harvestedDate: null,
-                rating: 8.0,
-                metrics: [],
-                stages: {}
-            };
-
-            plants.unshift(newPlant);
-            saveToStorage();
-            document.getElementById('plant-form').reset();
-            document.getElementById('date-input').valueAsDate = new Date();
-            renderDashboard();
-        }
-
-        function openDetail(id) {
-            activePlantId = id;
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-detail').classList.remove('hidden');
-            currentCategory = 'veg';
-            document.getElementById('category-select').value = 'veg';
-            document.getElementById('current-category-title').innerText = categories.veg;
-
-            const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
-            document.getElementById('plant-rating-slider').value = currentRating;
-            document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
-
-            const harvestContainer = document.getElementById('action-harvest-container');
-            const archiveBadge = document.getElementById('archive-badge');
-            const harvestDateWrap = document.getElementById('detail-harvest-date-wrap');
-            const ageLabelText = document.getElementById('age-label-text');
-            const ageUnitText = document.getElementById('age-unit-text');
-            const addBtnTop = document.getElementById('btn-add-image-top');
-            const addBtnBottom = document.getElementById('btn-add-image-bottom');
-            const btnOpenMetrics = document.getElementById('btn-open-metrics');
-
-            if (plant.harvestedDate) {
-                archiveBadge.classList.remove('hidden');
-                harvestDateWrap.classList.remove('hidden');
-                document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
-                document.getElementById('detail-days').innerText = calculateDays(plant.date, plant.harvestedDate);
-                ageLabelText.innerText = "Total tid";
-                ageUnitText.innerText = "dager";
-                
-                harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">Ferdig høstet</span>`;
-                addBtnTop.classList.add('hidden');
-                addBtnBottom.classList.add('hidden');
-                btnOpenMetrics.classList.add('hidden');
-            } else {
-                archiveBadge.classList.add('hidden');
-                harvestDateWrap.classList.add('hidden');
-                document.getElementById('detail-days').innerText = calculateDays(plant.date);
-                ageLabelText.innerText = "Alder";
-                ageUnitText.innerText = "dager";
-
-                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Kuttet / Høstet</button>`;
-                addBtnTop.classList.remove('hidden');
-                addBtnBottom.classList.remove('hidden');
-                btnOpenMetrics.classList.remove('hidden');
-            }
-
-            renderMetrics();
-            renderDetail();
-        }
-
-        // Miljø & Næringslogg funksjoner
-        function openMetricsModal() {
-            document.getElementById('metric-ph').value = '';
-            document.getElementById('metric-ec').value = '';
-            document.getElementById('metric-temp').value = '';
-            document.getElementById('metric-rh').value = '';
-            document.getElementById('metric-note').value = '';
-            document.getElementById('metrics-modal').classList.remove('hidden');
-        }
-
-        function closeMetricsModal() {
-            document.getElementById('metrics-modal').classList.add('hidden');
-        }
-
-        function saveMetric() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-
-            const ph = document.getElementById('metric-ph').value;
-            const ec = document.getElementById('metric-ec').value;
-            const temp = document.getElementById('metric-temp').value;
-            const rh = document.getElementById('metric-rh').value;
-            const note = document.getElementById('metric-note').value.trim();
-
-            if (!plant.metrics) plant.metrics = [];
-            plant.metrics.unshift({
-                date: new Date().toISOString(),
-                ph, ec, temp, rh, note
-            });
-
-            saveToStorage();
-            closeMetricsModal();
-            renderMetrics();
-        }
-
-        function renderMetrics() {
-            const plant = plants.find(p => p.id === activePlantId);
-            const container = document.getElementById('metrics-container');
-            if (!plant || !plant.metrics || plant.metrics.length === 0) {
-                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">Ingen målinger registrert ennå</div>`;
-                return;
-            }
-
-            container.innerHTML = plant.metrics.map((m, index) => {
-                let badgeParts = [];
-                if (m.ph) badgeParts.push(`pH: <span class="text-white font-bold">${m.ph}</span>`);
-                if (m.ec) badgeParts.push(`EC: <span class="text-white font-bold">${m.ec}</span>`);
-                if (m.temp) badgeParts.push(`Temp: <span class="text-white font-bold">${m.temp}°C</span>`);
-                if (m.rh) badgeParts.push(`RH: <span class="text-white font-bold">${m.rh}%</span>`);
-
-                const noteSection = m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${m.note}</p>` : '';
-                const deleteBtn = !plant.harvestedDate ? `<button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>` : '';
-
-                return `
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex justify-between items-start text-xs">
-                        <div class="space-y-1">
-                            <span class="text-slate-400 font-medium">${formatDate(m.date.slice(0,10))}</span>
-                            <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${badgeParts.join(' • ')}</div>
-                            ${noteSection}
-                        </div>
-                        ${deleteBtn}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function deleteMetric(index) {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.metrics) {
-                plant.metrics.splice(index, 1);
-                saveToStorage();
-                renderMetrics();
-            }
-        }
-
-        function confirmHarvest() {
-            if (confirm("Vil du markere denne som kuttet/høstet i dag? Den vil da bli flyttet til arkivet.")) {
-                const plant = plants.find(p => p.id === activePlantId);
-                if (plant) {
-                    const today = new Date().toISOString().slice(0, 10);
-                    plant.harvestedDate = today;
-                    saveToStorage();
-                    openDetail(plant.id);
-                }
-            }
-        }
-
-        function goHome() {
-            activePlantId = null;
-            document.getElementById('view-detail').classList.add('hidden');
-            document.getElementById('view-dashboard').classList.remove('hidden');
-            renderDashboard();
-        }
-
-        function renderDetail() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return goHome();
-
-            document.getElementById('detail-strain').innerText = plant.strain;
-            document.getElementById('detail-date').innerText = formatDate(plant.date);
-
-            const container = document.getElementById('category-grid');
-            const items = (plant.stages && plant.stages[currentCategory]) || [];
-
-            if (items.length === 0) {
-                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">Ingen oppføringer ennå</div>`;
-                return;
-            }
-
-            container.innerHTML = items.map((item, index) => {
-                const commentSection = item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-slate-900 p-3 rounded-xl border border-slate-800">${item.comment}</p>` : '';
-                const safeComment = item.comment ? item.comment.replace(/'/g, "&apos;").replace(/"/g, "&quot;") : "";
-                
-                const deleteButtonHtml = !plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : '';
-
-                return `
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
-                        <div class="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
-                            <img src="${item.image}" class="w-full h-full object-cover">
-                            ${deleteButtonHtml}
-                        </div>
-                        ${commentSection}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openLightbox(imgSrc, comment) {
-            const modal = document.getElementById('lightbox-modal');
-            const img = document.getElementById('lightbox-img');
-            const commentEl = document.getElementById('lightbox-comment');
-
-            img.src = imgSrc;
-            if (comment && comment.trim() !== "") {
-                commentEl.innerText = comment;
-                commentEl.classList.remove('hidden');
-            } else {
-                commentEl.classList.add('hidden');
-            }
-            modal.classList.remove('hidden');
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').classList.add('hidden');
-        }
-
-        function openSourceModal(stageKey) {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.harvestedDate) return;
-            activeStageKey = stageKey;
-            document.getElementById('source-modal').classList.remove('hidden');
-        }
-
-        function closeSourceModal() {
-            document.getElementById('source-modal').classList.add('hidden');
-        }
-
-        function triggerFileCapture(type) {
-            closeSourceModal();
-            if (type === 'camera') {
-                document.getElementById('hidden-camera-input').click();
-            } else {
-                document.getElementById('hidden-file-input').click();
-            }
-        }
-
-        function handleImageSelected(event) {
-            const file = event.target.files[0];
-            if (!file || !activePlantId || !activeStageKey) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = 1200;
-
-                    if (width > height && width > maxDim) {
-                        height *= maxDim / width;
-                        width = maxDim;
-                    } else if (height > maxDim) {
-                        width *= maxDim / height;
-                        height = maxDim;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    pendingImageData = canvas.toDataURL('image/jpeg', 0.85);
-
-                    document.getElementById('feedback-preview-img').src = pendingImageData;
-                    document.getElementById('comment-input').value = "";
-                    document.getElementById('feedback-modal').classList.remove('hidden');
-                }
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
-        }
-
-        function closeFeedbackModal() {
-            pendingImageData = null;
-            document.getElementById('feedback-modal').classList.add('hidden');
-        }
-
-        function saveFeedbackAndImage() {
-            if (!pendingImageData || !activePlantId || !activeStageKey) return;
-
-            const comment = document.getElementById('comment-input').value.trim();
-
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant) {
-                if (!plant.stages) plant.stages = {};
-                if (!plant.stages[activeStageKey]) plant.stages[activeStageKey] = [];
-                
-                plant.stages[activeStageKey].push({
-                    image: pendingImageData,
-                    comment: comment,
-                    date: new Date().toISOString()
-                });
-                saveToStorage();
-                renderDetail();
-            }
-            closeFeedbackModal();
-        }
-
-        function confirmDeleteItem(stageKey, index) {
-            if (confirm("Er du sikker på at du vil slette dette bildet?")) {
-                deleteItem(stageKey, index);
-            }
-        }
-
-        function deleteItem(stageKey, index) {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant && plant.stages && plant.stages[stageKey]) {
-                plant.stages[stageKey].splice(index, 1);
-                saveToStorage();
-                renderDetail();
-            }
-        }
-
-        function openEditModal() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-            document.getElementById('edit-strain-input').value = plant.strain;
-            document.getElementById('edit-date-input').value = plant.date;
-            document.getElementById('edit-modal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
-        }
-
-        function saveEditedPlant() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-            plant.strain = document.getElementById('edit-strain-input').value;
-            plant.date = document.getElementById('edit-date-input').value;
-            saveToStorage();
-            closeEditModal();
-            openDetail(plant.id);
-        }
-
-        function confirmDeletePlant() {
-            if (confirm("Er du sikker på at du vil slette denne planten permanent?")) {
-                plants = plants.filter(p => p.id !== activePlantId);
-                saveToStorage();
-                goHome();
-            }
-        }
-
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plants));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `trichome_tracker_backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        plants = imported;
-                        saveToStorage();
-                        renderDashboard();
-                        alert("Backup gjenopprettet vellykket!");
-                    }
-                } catch (err) {
-                    alert("Ugyldig fil!");
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        const dateInput = document.getElementById('date-input');
-        if (dateInput && !dateInput.value) {
-            dateInput.valueAsDate = new Date();
-        }
-        
-        renderDashboard();
-    </script>
-</body>
-</html>
+    <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdro
