@@ -133,7 +133,10 @@
                     <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex items-center justify-between col-span-2 sm:col-span-1" id="age-box-container">
                         <div>
                             <span id="age-label-text" class="text-[10px] text-slate-400 block font-bold uppercase tracking-[0.15em]">Age</span>
-                            <span id="detail-days" class="text-3xl font-black text-blue-400 tracking-tight">0</span> <span id="age-unit-text" class="text-blue-500 font-semibold text-xs">days</span>
+                            <div>
+                                <span id="detail-days" class="text-3xl font-black text-blue-400 tracking-tight">0</span> 
+                                <span id="age-unit-text" class="text-blue-500 font-semibold text-xs">days</span>
+                            </div>
                         </div>
                     </div>
                     <div id="water-widget-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
@@ -343,6 +346,11 @@
             return diffDays >= 0 ? diffDays : 0;
         }
 
+        // Hjelpefunksjon for å returnere "1 day" eller "X days" korrekt
+        function formatDayString(count) {
+            return count === 1 ? "1 day" : `${count} days`;
+        }
+
         function formatDate(dateString) {
             if (!dateString) return "";
             const parts = dateString.split('-');
@@ -372,6 +380,7 @@
             } else {
                 container.innerHTML = activePlants.map(plant => {
                     const days = calculateDays(plant.date);
+                    const dayText = days === 1 ? "day" : "days";
                     let totalImages = 0;
                     stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     return `
@@ -386,7 +395,7 @@
                             </div>
                             <div class="bg-[#090a0f] border border-[#1e2336] px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
                                 <span class="text-xl font-black text-blue-400 block leading-tight">${days}</span>
-                                <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">days</span>
+                                <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">${dayText}</span>
                             </div>
                         </div>
                     `;
@@ -450,7 +459,7 @@
                 return;
             }
             const daysAgo = calculateDays(plant.lastWatered.slice(0,10));
-            box.innerText = daysAgo === 0 ? "Today" : `${daysAgo} days ago`;
+            box.innerText = daysAgo === 0 ? "Today" : (daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`);
         }
 
         function openLabelModal(strain, type, dateStr, plantId = activePlantId) {
@@ -503,9 +512,10 @@
                 archiveBadge.classList.remove('hidden');
                 harvestDateWrap.classList.remove('hidden');
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
-                document.getElementById('detail-days').innerText = calculateDays(plant.date, plant.harvestedDate);
+                const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                document.getElementById('detail-days').innerText = totalDays;
                 ageLabelText.innerText = "Total Time";
-                ageUnitText.innerText = "days";
+                ageUnitText.innerText = totalDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.remove('hidden');
                 waterWidgetBox.classList.add('hidden');
                 curingSection.classList.remove('hidden');
@@ -519,9 +529,10 @@
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
-                document.getElementById('detail-days').innerText = calculateDays(plant.date);
+                const ageDays = calculateDays(plant.date);
+                document.getElementById('detail-days').innerText = ageDays;
                 ageLabelText.innerText = "Age";
-                ageUnitText.innerText = "days";
+                ageUnitText.innerText = ageDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.add('hidden');
                 waterWidgetBox.classList.remove('hidden');
                 curingSection.classList.add('hidden');
