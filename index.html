@@ -176,11 +176,11 @@
                 <div id="metrics-container" class="space-y-2"></div>
             </div>
 
-            <!-- CATEGORY SELECTOR -->
+            <!-- UNIFIED CATEGORY SELECTOR & CONTENT CARD -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center">
-                    <label for="category-select" class="text-xs font-bold text-slate-400 uppercase tracking-[0.15em]">Select Category:</label>
-                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Add to this</button>
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <label for="category-select" class="text-xs font-bold text-white uppercase tracking-[0.15em]">Category Feed</label>
+                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Add Image</button>
                 </div>
                 <select id="category-select" onchange="switchCategory(this.value)" class="w-full uis-input rounded-xl px-4 py-3 text-sm font-semibold transition">
                     <option value="veg">Vegetation</option>
@@ -188,15 +188,9 @@
                     <option value="cured">Cured Buds</option>
                     <option value="extracts">Extraction</option>
                 </select>
-            </div>
 
-            <!-- DYNAMIC CONTENT GRID -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 id="current-category-title" class="font-bold text-white text-xs uppercase tracking-[0.15em]">Vegetation</h3>
-                    <button id="btn-add-image-bottom" onclick="openSourceModal(currentCategory)" class="text-blue-400 hover:text-blue-300 text-xs font-semibold uppercase tracking-wider transition">+ Add Image</button>
-                </div>
-                <div id="category-grid" class="grid grid-cols-1 gap-4"></div>
+                <!-- Dynamic Content Grid -->
+                <div id="category-grid" class="grid grid-cols-1 gap-4 pt-2"></div>
             </div>
         </div>
     </main>
@@ -346,11 +340,6 @@
             return diffDays >= 0 ? diffDays : 0;
         }
 
-        // Hjelpefunksjon for å returnere "1 day" eller "X days" korrekt
-        function formatDayString(count) {
-            return count === 1 ? "1 day" : `${count} days`;
-        }
-
         function formatDate(dateString) {
             if (!dateString) return "";
             const parts = dateString.split('-');
@@ -359,7 +348,6 @@
 
         function switchCategory(cat) {
             currentCategory = cat;
-            document.getElementById('current-category-title').innerText = categories[cat];
             renderDetail();
         }
 
@@ -491,7 +479,6 @@
             document.getElementById('view-detail').classList.remove('hidden');
             currentCategory = 'veg';
             document.getElementById('category-select').value = 'veg';
-            document.getElementById('current-category-title').innerText = categories.veg;
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
             const harvestContainer = document.getElementById('action-harvest-container');
@@ -500,7 +487,6 @@
             const ageLabelText = document.getElementById('age-label-text');
             const ageUnitText = document.getElementById('age-unit-text');
             const addBtnTop = document.getElementById('btn-add-image-top');
-            const addBtnBottom = document.getElementById('btn-add-image-bottom');
             const btnOpenMetrics = document.getElementById('btn-open-metrics');
             const archiveRatingBox = document.getElementById('archive-rating-box');
             const waterWidgetBox = document.getElementById('water-widget-box');
@@ -524,7 +510,7 @@
                 document.getElementById('plant-rating-slider').value = currentRating;
                 document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
                 harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">Harvested</span>`;
-                addBtnTop.classList.add('hidden'); addBtnBottom.classList.add('hidden'); btnOpenMetrics.classList.add('hidden');
+                addBtnTop.classList.add('hidden'); btnOpenMetrics.classList.add('hidden');
                 renderCuringLogs();
             } else {
                 archiveBadge.classList.add('hidden');
@@ -537,7 +523,7 @@
                 waterWidgetBox.classList.remove('hidden');
                 curingSection.classList.add('hidden');
                 harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Harvested</button>`;
-                addBtnTop.classList.remove('hidden'); addBtnBottom.classList.remove('hidden'); btnOpenMetrics.classList.remove('hidden');
+                addBtnTop.classList.remove('hidden'); btnOpenMetrics.classList.remove('hidden');
             }
 
             renderMetrics();
@@ -666,7 +652,7 @@
             const items = plant.stages[currentCategory] || [];
 
             if (items.length === 0) {
-                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">No entries yet</div>`;
+                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">No entries in this category yet.</div>`;
                 return;
             }
 
