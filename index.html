@@ -205,11 +205,10 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
             <h3 class="text-lg font-bold text-white" data-i18n="label_preview">Etikett-forhåndsvisning</h3>
             
-            <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-2 text-center mx-auto shadow-inner">
-                <span class="text-[10px] tracking-widest uppercase font-bold text-slate-500 block">TRICHOME TRACKER</span>
-                <h4 id="label-strain-text" class="text-2xl font-black tracking-tight">Strain</h4>
-                <div class="flex justify-center items-center space-x-2 text-xs font-semibold">
-                    <span id="label-type-text" class="bg-black text-white px-2 py-0.5 rounded">Autoflower</span>
+            <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner">
+                <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
+                <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
+                    <span id="label-type-text" class="border border-black px-2 py-0.5 rounded">Autoflower</span>
                     <span>•</span>
                     <span id="label-date-text">01.01.2026</span>
                 </div>
@@ -328,7 +327,6 @@
     </div>
 
     <script>
-        // Global Internasjonaliserings-motor (i18n) - Støtter automatisk alle språk med fallback til Engelsk
         const translations = {
             en: {
                 subtitle: "Cultivation Management",
@@ -521,8 +519,9 @@
             }
         };
 
-        // Finn enhetens språk (f.eks. 'no', 'es', 'en'). Fallback til 'en' hvis språket ikke finnes.
-        const userLangCode = (navigator.language || navigator.userLanguage || 'en').split('-')[0];
+        // Forbedret språkdeteksjon som takler koder som 'nb-NO', 'nn-NO', 'no-NO' osv.
+        const rawLang = navigator.language || navigator.userLanguage || 'en';
+        const userLangCode = rawLang.split('-')[0].toLowerCase();
         const currentLang = translations[userLangCode] ? userLangCode : 'en';
         const t = translations[currentLang];
 
@@ -634,8 +633,8 @@
                     const pType = plant.type || 'Autoflower';
 
                     return `
-                        <div class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 transition shadow-lg flex justify-between items-center group">
-                            <div onclick="openDetail('${plant.id}')" class="cursor-pointer space-y-2 flex-1">
+                        <div onclick="openDetail('${plant.id}')" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-5 cursor-pointer transition shadow-lg flex justify-between items-center group">
+                            <div class="space-y-2">
                                 <h3 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${plant.strain}</h3>
                                 <div class="flex flex-wrap items-center gap-2 text-xs">
                                     <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded-md">${pType}</span>
@@ -643,14 +642,9 @@
                                     <span class="bg-slate-950 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg">📸 ${totalImages}</span>
                                 </div>
                             </div>
-                            <div class="flex flex-col items-end space-y-2">
-                                <button onclick="event.stopPropagation(); openLabelModal('${plant.strain}', '${pType}', '${formatDate(plant.date)}')" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-1.5 rounded-lg font-medium transition flex items-center space-x-1">
-                                    <span>${t.btn_label}</span>
-                                </button>
-                                <div onclick="openDetail('${plant.id}')" class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2 rounded-xl text-center min-w-[70px] cursor-pointer">
-                                    <span class="text-lg font-extrabold text-emerald-400 block leading-tight">${days}</span>
-                                    <span class="text-[9px] text-emerald-500 font-semibold tracking-wider uppercase block">${t.days}</span>
-                                </div>
+                            <div class="bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
+                                <span class="text-xl font-extrabold text-emerald-400 block leading-tight">${days}</span>
+                                <span class="text-[10px] text-emerald-500 font-semibold tracking-wider uppercase block">${t.days}</span>
                             </div>
                         </div>
                     `;
@@ -1119,7 +1113,6 @@
             }
         }
 
-        // Kjør oversettelser og initialisering ved oppstart
         applyTranslations();
         setDefaultDate();
         renderDashboard();
