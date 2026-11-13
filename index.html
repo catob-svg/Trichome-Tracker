@@ -16,7 +16,7 @@
     <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
-                <!-- Tilpasset Trichome / Krystall-logo -->
+                <!-- Trichome / Krystall-logo -->
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/40 border border-emerald-400/30">
                     <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18l4 4m-4-4L8 7m4 14l4-4m-4 4l-4-4M3 12h18"></path>
@@ -39,7 +39,7 @@
                 <h2 class="text-lg font-semibold text-white mb-4">Start ny kultivering</h2>
                 <form id="plant-form" onsubmit="addPlant(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Strain</label>
                         <input type="text" id="strain-input" required 
                             class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition"
                             placeholder="f.eks. Northern Lights, OG Kush...">
@@ -144,9 +144,7 @@
                         + Ny måling
                     </button>
                 </div>
-                <div id="metrics-container" class="space-y-2">
-                    <!-- Målinger dukker opp her -->
-                </div>
+                <div id="metrics-container" class="space-y-2"></div>
             </div>
 
             <!-- KATEGORI RULLGARDIN (Dropdown) -->
@@ -173,9 +171,7 @@
                         + Legg til bilde
                     </button>
                 </div>
-                <div id="category-grid" class="grid grid-cols-1 gap-4">
-                    <!-- Elementer dukker opp her -->
-                </div>
+                <div id="category-grid" class="grid grid-cols-1 gap-4"></div>
             </div>
 
         </div>
@@ -192,7 +188,7 @@
         <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 bg-slate-900/80 py-2 rounded-xl border border-slate-800"></p>
     </div>
 
-    <!-- METRICS MODAL (pH / EC registrering) -->
+    <!-- METRICS MODAL -->
     <div id="metrics-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-lg font-bold text-white">Legg til miljø- / næringsmåling</h3>
@@ -230,7 +226,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-lg font-bold text-white">Rediger plante</h3>
             <div>
-                <label class="block text-xs font-medium text-slate-400 mb-1">Strain-navn</label>
+                <label class="block text-xs font-medium text-slate-400 mb-1">Strain</label>
                 <input type="text" id="edit-strain-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition">
             </div>
             <div>
@@ -461,7 +457,7 @@
             plants.unshift(newPlant);
             saveToStorage();
             document.getElementById('plant-form').reset();
-            document.getElementById('date-input').valueAsDate = new Date();
+            setDefaultDate();
             renderDashboard();
         }
 
@@ -834,11 +830,18 @@
             reader.readAsText(file);
         }
 
-        const dateInput = document.getElementById('date-input');
-        if (dateInput && !dateInput.value) {
-            dateInput.valueAsDate = new Date();
+        function setDefaultDate() {
+            const dateInput = document.getElementById('date-input');
+            if (dateInput && !dateInput.value) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                dateInput.value = `${year}-${month}-${day}`;
+            }
         }
-        
+
+        setDefaultDate();
         renderDashboard();
     </script>
 </body>
