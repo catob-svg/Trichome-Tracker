@@ -31,9 +31,10 @@
     <header class="border-b border-[#1e2336] bg-[#0b0c10]/80 backdrop-blur sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-900/30 border border-blue-400/30">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18l4 4m-4-4L8 7m4 14l4-4m-4 4l-4-4M3 12h18"></path>
+                <!-- New Plant/Leaf Logo pointing up and down -->
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-400/30">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0 0l-3-3m3 3l3-3M12 3L9 6m3-3l3 3"></path>
                     </svg>
                 </div>
                 <div>
@@ -143,14 +144,104 @@
                         <button onclick="recordWatering()" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-2 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
                     </div>
 
-                    <!-- Rating Box (Archive) -->
-                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center col-span-2">
-                        <div class="flex justify-between items-center mb-1">
+                    <!-- Rating Box & Yield Stats (Archive) -->
+                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center col-span-2 space-y-3">
+                        <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Rating (Finished Product)</span>
                             <span id="plant-rating-display" class="text-blue-400 font-black text-sm">8.0 / 10</span>
                         </div>
                         <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
+                        
+                        <!-- Yield Summary info in archive -->
+                        <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2 border-t border-[#1e2336] flex justify-between">
+                            <span>Dry Yield: <strong id="sum-dry" class="text-white">-</strong> g</span>
+                            <span>Rosine Return: <strong id="sum-return" class="text-amber-400">-</strong> %</span>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- NEW FEATURE 1: TRICHOME RIPENESS CHECKER -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
+                    <button onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Update Status</button>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-center pt-1">
+                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Clear (%)</span>
+                        <input type="number" id="tri-clear" min="0" max="100" placeholder="0" onchange="saveTrichomeStatus()" class="w-full bg-transparent text-center font-bold text-blue-400 text-sm mt-1 uis-input rounded-lg py-1">
+                    </div>
+                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Cloudy (%)</span>
+                        <input type="number" id="tri-cloudy" min="0" max="100" placeholder="80" onchange="saveTrichomeStatus()" class="w-full bg-transparent text-center font-bold text-emerald-400 text-sm mt-1 uis-input rounded-lg py-1">
+                    </div>
+                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Amber (%)</span>
+                        <input type="number" id="tri-amber" min="0" max="100" placeholder="20" onchange="saveTrichomeStatus()" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW FEATURE 2: YIELD & EXTRACTION CALCULATOR -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin Calculator</h3>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Wet Weight (g)</label>
+                        <input type="number" step="0.1" id="calc-wet" oninput="calculateYield()" placeholder="e.g. 500" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Dry Weight (g)</label>
+                        <input type="number" step="0.1" id="calc-dry" oninput="calculateYield()" placeholder="e.g. 125" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Rosin Output (g)</label>
+                        <input type="number" step="0.1" id="calc-rosin" oninput="calculateYield()" placeholder="e.g. 25" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                    </div>
+                </div>
+                <div class="bg-[#090a0f] border border-[#1e2336] p-3 rounded-xl flex justify-around text-center text-xs">
+                    <div><span class="text-slate-400 block text-[10px] uppercase">Dry Loss</span><strong id="res-dry-loss" class="text-white">-</strong></div>
+                    <div class="border-l border-[#1e2336] pl-4"><span class="text-slate-400 block text-[10px] uppercase">Rosin Return</span><strong id="res-return" class="text-amber-400 font-bold">-</strong></div>
+                </div>
+            </div>
+
+            <!-- NEW FEATURE 3: TERPENE PROFILE LOG -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
+                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌿 Terpene & Aroma Profile</h3>
+                    <button onclick="saveTerpenes()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save Terpenes</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Primary Terpene</label>
+                        <select id="terp-primary" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                            <option value="Myrcene">Myrcene (Earthy / Herbal)</option>
+                            <option value="Limonene">Limonene (Citrus / Lemon)</option>
+                            <option value="Caryophyllene">Caryophyllene (Spicy / Pepper)</option>
+                            <option value="Linalool">Linalool (Floral / Lavender)</option>
+                            <option value="Pinene">Pinene (Pine / Fresh)</option>
+                            <option value="Terpinolene">Terpinolene (Fruity / Woody)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Secondary Terpene</label>
+                        <select id="terp-secondary" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                            <option value="None">None / Other</option>
+                            <option value="Myrcene">Myrcene</option>
+                            <option value="Limonene">Limonene</option>
+                            <option value="Caryophyllene">Caryophyllene</option>
+                            <option value="Linalool">Linalool</option>
+                            <option value="Pinene">Pinene</option>
+                            <option value="Terpinolene">Terpinolene</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Aroma & Taste Notes</label>
+                    <input type="text" id="terp-notes" placeholder="e.g. Sweet diesel, hint of ripe mango..." class="w-full uis-input rounded-xl px-3 py-2 text-xs">
                 </div>
             </div>
 
@@ -311,7 +402,10 @@
                         type: p.type || 'Autoflower',
                         metrics: Array.isArray(p.metrics) ? p.metrics : [],
                         curingLogs: Array.isArray(p.curingLogs) ? p.curingLogs : [],
-                        stages: p.stages || {}
+                        stages: p.stages || {},
+                        trichomes: p.trichomes || { clear: 0, cloudy: 80, amber: 20 },
+                        yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
+                        terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
                     }));
                 }
             }
@@ -351,6 +445,59 @@
             document.getElementById('plant-rating-display').innerText = val + " / 10";
             const plant = plants.find(p => p.id === activePlantId);
             if (plant) { plant.rating = parseFloat(val); saveToStorage(); }
+        }
+
+        function saveTrichomeStatus() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.trichomes = {
+                clear: document.getElementById('tri-clear').value || 0,
+                cloudy: document.getElementById('tri-cloudy').value || 0,
+                amber: document.getElementById('tri-amber').value || 0
+            };
+            saveToStorage();
+        }
+
+        function calculateYield() {
+            const wet = parseFloat(document.getElementById('calc-wet').value) || 0;
+            const dry = parseFloat(document.getElementById('calc-dry').value) || 0;
+            const rosin = parseFloat(document.getElementById('calc-rosin').value) || 0;
+
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant) {
+                plant.yieldData = { wet, dry, rosin };
+                saveToStorage();
+            }
+
+            let dryLossText = "-";
+            if (wet > 0 && dry > 0) {
+                const loss = ((wet - dry) / wet * 100).toFixed(1);
+                dryLossText = `${loss}% loss`;
+            }
+            document.getElementById('res-dry-loss').innerText = dryLossText;
+
+            let returnText = "-";
+            if (dry > 0 && rosin > 0) {
+                const ret = (rosin / dry * 100).toFixed(1);
+                returnText = `${ret}%`;
+                document.getElementById('sum-return').innerText = `${ret}%`;
+            } else {
+                document.getElementById('sum-return').innerText = "-";
+            }
+            document.getElementById('res-return').innerText = returnText;
+            document.getElementById('sum-dry').innerText = dry > 0 ? dry : "-";
+        }
+
+        function saveTerpenes() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.terpenes = {
+                primary: document.getElementById('terp-primary').value,
+                secondary: document.getElementById('terp-secondary').value,
+                notes: document.getElementById('terp-notes').value.trim()
+            };
+            saveToStorage();
+            alert("Terpene profile saved!");
         }
 
         function renderDashboard() {
@@ -394,6 +541,7 @@
                     let totalImages = 0;
                     stageKeys.forEach(sk => { if (plant.stages?.[sk]) totalImages += plant.stages[sk].length; });
                     const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
+                    const dryVal = plant.yieldData?.dry || '-';
                     return `
                         <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
                             <div class="space-y-1">
@@ -401,7 +549,7 @@
                                     <h3 class="text-sm font-bold text-slate-200 group-hover:text-blue-400 transition">${plant.strain}</h3>
                                     <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                                 </div>
-                                <p class="text-[11px] text-slate-400">${plant.type || 'Autoflower'} • Harvested: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Rating: <span class="text-blue-400 font-bold">${plantRating}/10</span></p>
+                                <p class="text-[11px] text-slate-400">${plant.type || 'Autoflower'} • Harvested: ${formatDate(plant.harvestedDate)} • Dry: <strong class="text-white">${dryVal}g</strong> • Rating: <span class="text-blue-400 font-bold">${plantRating}/10</span></p>
                             </div>
                             <div class="bg-[#090a0f] border border-[#1e2336] px-3 py-2 rounded-xl text-center min-w-[65px]">
                                 <span class="text-base font-bold text-slate-200 block leading-tight">${totalDays}</span>
@@ -419,7 +567,21 @@
             const type = document.getElementById('plant-type-input').value;
             const date = document.getElementById('date-input').value;
 
-            plants.unshift({ id: Date.now().toString(), strain, type, date, harvestedDate: null, rating: 8.0, lastWatered: null, metrics: [], curingLogs: [], stages: {} });
+            plants.unshift({ 
+                id: Date.now().toString(), 
+                strain, 
+                type, 
+                date, 
+                harvestedDate: null, 
+                rating: 8.0, 
+                lastWatered: null, 
+                metrics: [], 
+                curingLogs: [], 
+                stages: {},
+                trichomes: { clear: 0, cloudy: 80, amber: 20 },
+                yieldData: { wet: '', dry: '', rosin: '' },
+                terpenes: { primary: 'Myrcene', secondary: 'None', notes: '' }
+            });
             saveToStorage();
             document.getElementById('plant-form').reset();
             setDefaultDate();
@@ -476,6 +638,22 @@
             currentCategory = 'veg';
             document.getElementById('category-select').value = 'veg';
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
+
+            // Populate Trichome fields
+            document.getElementById('tri-clear').value = plant.trichomes?.clear ?? 0;
+            document.getElementById('tri-cloudy').value = plant.trichomes?.cloudy ?? 80;
+            document.getElementById('tri-amber').value = plant.trichomes?.amber ?? 20;
+
+            // Populate Yield fields
+            document.getElementById('calc-wet').value = plant.yieldData?.wet ?? '';
+            document.getElementById('calc-dry').value = plant.yieldData?.dry ?? '';
+            document.getElementById('calc-rosin').value = plant.yieldData?.rosin ?? '';
+            calculateYield();
+
+            // Populate Terpene fields
+            document.getElementById('terp-primary').value = plant.terpenes?.primary ?? 'Myrcene';
+            document.getElementById('terp-secondary').value = plant.terpenes?.secondary ?? 'None';
+            document.getElementById('terp-notes').value = plant.terpenes?.notes ?? '';
 
             const harvestContainer = document.getElementById('action-harvest-container');
             const archiveBadge = document.getElementById('archive-badge');
