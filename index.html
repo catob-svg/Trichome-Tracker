@@ -123,9 +123,9 @@
                     </div>
                 </div>
 
-                <!-- Age & Watering Widget -->
-                <div class="grid grid-cols-2 gap-3" id="header-stats-grid">
-                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex items-center justify-between col-span-2 sm:col-span-1" id="age-box-container">
+                <!-- Age & Watering Widgets -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="header-stats-grid">
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex items-center justify-between" id="age-box-container">
                         <div>
                             <span id="age-label-text" class="text-[10px] text-slate-400 block font-bold uppercase tracking-[0.15em]">Age</span>
                             <div>
@@ -134,12 +134,13 @@
                             </div>
                         </div>
                     </div>
-                    <div id="water-widget-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-between col-span-2 sm:col-span-1">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Last Watered / Fed</span>
+                    
+                    <div id="water-widget-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Last Watered</span>
                             <span id="water-days-ago" class="text-blue-400 font-bold text-xs">-</span>
                         </div>
-                        <button onclick="recordWatering()" class="mt-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-1.5 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
+                        <button onclick="recordWatering()" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-2 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
                     </div>
 
                     <!-- Rating Box (Archive) -->
@@ -438,7 +439,7 @@
         function updateWaterWidget(plant) {
             const box = document.getElementById('water-days-ago');
             if (!plant.lastWatered) {
-                box.innerText = "-";
+                box.innerText = "Never";
                 return;
             }
             const daysAgo = calculateDays(plant.lastWatered.slice(0,10));
