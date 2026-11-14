@@ -385,11 +385,10 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC (Secure IndexedDB Local Storage) -->
+    <!-- STABILIZED LOCAL STORAGE JAVASCRIPT -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
 
-        let db = null;
         let plants = [];
         let activePlantId = null;
         let currentCategory = 'veg';
@@ -397,79 +396,39 @@
         let pendingImagesData = [];
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
 
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open('TrichomeTrackerDB', 2);
-                request.onerror = e => reject(e);
-                request.onsuccess = e => {
-                    db = e.target.result;
-                    loadPlantsFromDB().then(() => resolve());
-                };
-                request.onupgradeneeded = e => {
-                    const database = e.target.result;
-                    if (!database.objectStoreNames.contains('plants')) {
-                        database.createObjectStore('plants', { keyPath: 'id' });
+        // Bruker stabil og umiddelbar localStorage i bunn for å garantere at data aldri forsvinner ved oppdatering.
+        // (localStorage støtter opptil 5-10MB, og med bildekomprimering holder dette i massevis lokalt).
+        function loadPlants() {
+            try {
+                const rawData = localStorage.getItem('trichome_plants_v2');
+                if (rawData) {
+                    const parsed = JSON.parse(rawData);
+                    if (Array.isArray(parsed)) {
+                        plants = parsed;
                     }
-                };
-            });
+                }
+            } catch (e) {
+                plants = [];
+            }
+            
+            plants = plants.map(p => ({
+                ...p,
+                type: p.type || 'Autoflower',
+                metrics: Array.isArray(p.metrics) ? p.metrics : [],
+                curingLogs: Array.isArray(p.curingLogs) ? p.curingLogs : [],
+                stages: p.stages || {},
+                trichomes: p.trichomes || { clear: 0, cloudy: 80, amber: 20 },
+                yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
+                terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
+            }));
         }
 
-        function loadPlantsFromDB() {
-            return new Promise((resolve) => {
-                if (!db) return resolve([]);
-                const transaction = db.transaction(['plants'], 'readonly');
-                const store = transaction.objectStore('plants');
-                const request = store.getAll();
-                
-                request.onsuccess = e => {
-                    const storedPlants = e.target.result || [];
-                    
-                    if (storedPlants.length > 0) {
-                        plants = storedPlants;
-                    } else {
-                        // Fallback check: if IndexedDB is empty, check localStorage once to migrate old data safely
-                        try {
-                            const rawData = localStorage.getItem('trichome_plants');
-                            if (rawData) {
-                                const parsed = JSON.parse(rawData);
-                                if (Array.isArray(parsed) && parsed.length > 0) {
-                                    plants = parsed;
-                                    saveAllToDB(); // Save safely into IndexedDB
-                                    localStorage.removeItem('trichome_plants');
-                                }
-                            }
-                        } catch (err) {}
-                    }
-
-                    plants = plants.map(p => ({
-                        ...p,
-                        type: p.type || 'Autoflower',
-                        metrics: Array.isArray(p.metrics) ? p.metrics : [],
-                        curingLogs: Array.isArray(p.curingLogs) ? p.curingLogs : [],
-                        stages: p.stages || {},
-                        trichomes: p.trichomes || { clear: 0, cloudy: 80, amber: 20 },
-                        yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
-                        terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
-                    }));
-
-                    renderDashboard();
-                    resolve();
-                };
-
-                request.onerror = () => resolve([]);
-            });
-        }
-
-        function saveToStorage() {
-            if (!db) return;
-            const transaction = db.transaction(['plants'], 'readwrite');
-            const store = transaction.objectStore('plants');
-            store.clear();
-            plants.forEach(p => store.put(p));
-        }
-
-        function saveAllToDB() {
-            saveToStorage();
+        function savePlants() {
+            try {
+                localStorage.setItem('trichome_plants_v2', JSON.stringify(plants));
+            } catch (e) {
+                alert("Lagringsplassen på enheten er full!");
+            }
         }
 
         function calculateDays(startDate, endDate) {
@@ -494,7 +453,7 @@
         function updatePlantRating(val) {
             document.getElementById('plant-rating-display').innerText = val + " / 10";
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant) { plant.rating = parseFloat(val); saveToStorage(); }
+            if (plant) { plant.rating = parseFloat(val); savePlants(); }
         }
 
         function saveTrichomeStatus() {
@@ -505,7 +464,7 @@
                 cloudy: document.getElementById('tri-cloudy').value || 0,
                 amber: document.getElementById('tri-amber').value || 0
             };
-            saveToStorage();
+            savePlants();
             alert("Trichome status saved!");
         }
 
@@ -517,7 +476,7 @@
             const plant = plants.find(p => p.id === activePlantId);
             if (plant) {
                 plant.yieldData = { wet, dry, rosin };
-                saveToStorage();
+                savePlants();
             }
 
             let dryLossText = "-";
@@ -547,7 +506,7 @@
                 secondary: document.getElementById('terp-secondary').value,
                 notes: document.getElementById('terp-notes').value.trim()
             };
-            saveToStorage();
+            savePlants();
             alert("Terpene profile saved!");
         }
 
@@ -635,7 +594,7 @@
             };
 
             plants.unshift(newPlant);
-            saveToStorage();
+            savePlants();
             document.getElementById('plant-form').reset();
             setDefaultDate();
             renderDashboard();
@@ -647,7 +606,7 @@
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
             plant.lastWatered = new Date().toISOString();
-            saveToStorage();
+            savePlants();
             updateWaterWidget(plant);
         }
 
@@ -766,7 +725,7 @@
                 rh: document.getElementById('curing-rh').value,
                 note: document.getElementById('curing-note').value.trim()
             });
-            saveToStorage();
+            savePlants();
             closeCuringModal();
             renderCuringLogs();
         }
@@ -790,7 +749,7 @@
         }
         function deleteCuringLog(index) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant?.curingLogs) { plant.curingLogs.splice(index, 1); saveToStorage(); renderCuringLogs(); }
+            if (plant?.curingLogs) { plant.curingLogs.splice(index, 1); savePlants(); renderCuringLogs(); }
         }
 
         function openMetricsModal() {
@@ -812,7 +771,7 @@
                 rh: document.getElementById('metric-rh').value,
                 note: document.getElementById('metric-note').value.trim()
             });
-            saveToStorage();
+            savePlants();
             closeMetricsModal();
             renderMetrics();
         }
@@ -845,20 +804,20 @@
 
         function deleteMetric(index) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant?.metrics) { plant.metrics.splice(index, 1); saveToStorage(); renderMetrics(); }
+            if (plant?.metrics) { plant.metrics.splice(index, 1); savePlants(); renderMetrics(); }
         }
 
         function confirmHarvest() {
             if (confirm("Do you want to mark this as harvested today? It will be moved to the archive.")) {
                 const plant = plants.find(p => p.id === activePlantId);
-                if (plant) { plant.harvestedDate = new Date().toISOString().slice(0, 10); saveToStorage(); openDetail(plant.id); }
+                if (plant) { plant.harvestedDate = new Date().toISOString().slice(0, 10); savePlants(); openDetail(plant.id); }
             }
         }
 
         function unharvestPlant() {
             if (confirm("Do you want to move this plant back to active grows?")) {
                 const plant = plants.find(p => p.id === activePlantId);
-                if (plant) { plant.harvestedDate = null; saveToStorage(); openDetail(plant.id); }
+                if (plant) { plant.harvestedDate = null; savePlants(); openDetail(plant.id); }
             }
         }
 
@@ -974,7 +933,7 @@
                     });
                 });
 
-                saveToStorage(); 
+                savePlants(); 
                 renderDetail();
             }
             closeFeedbackModal();
@@ -983,7 +942,7 @@
         function confirmDeleteItem(stageKey, index) {
             if (confirm("Are you sure you want to delete this image?")) {
                 const plant = plants.find(p => p.id === activePlantId);
-                if (plant?.stages?.[stageKey]) { plant.stages[stageKey].splice(index, 1); saveToStorage(); renderDetail(); }
+                if (plant?.stages?.[stageKey]) { plant.stages[stageKey].splice(index, 1); savePlants(); renderDetail(); }
             }
         }
 
@@ -1001,16 +960,16 @@
         function saveEditedPlant() {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
-            plant.strain = document.getElementById('edit-strain-input'].value;
+            plant.strain = document.getElementById('edit-strain-input').value;
             plant.type = document.getElementById('edit-type-input').value;
             plant.date = document.getElementById('edit-date-input').value;
-            saveToStorage(); closeEditModal(); openDetail(plant.id);
+            savePlants(); closeEditModal(); openDetail(plant.id);
         }
 
         function confirmDeletePlant() {
             if (confirm("Are you sure you want to permanently delete this plant?")) {
                 plants = plants.filter(p => p.id !== activePlantId);
-                saveToStorage(); goHome();
+                savePlants(); goHome();
             }
         }
 
@@ -1028,10 +987,10 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const imported = JSON.parse(e.type ? e.target.result : e.target.result);
+                    const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) { 
                         plants = imported; 
-                        saveAllToDB(); 
+                        savePlants(); 
                         renderDashboard(); 
                         alert("Backup successfully restored!"); 
                     }
@@ -1048,19 +1007,18 @@
             }
         }
 
-        initDB().then(() => {
-            setDefaultDate();
-        });
+        // Kjører umiddelbart ved oppstart
+        loadPlants();
+        setDefaultDate();
+        renderDashboard();
 
         window.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash;
             if (hash.includes('#plant=')) {
                 const pId = hash.split('=')[1];
-                setTimeout(() => {
-                    if (plants.some(p => p.id === pId)) {
-                        openDetail(pId);
-                    }
-                }, 300);
+                if (plants.some(p => p.id === pId)) {
+                    openDetail(pId);
+                }
             }
         });
     </script>
