@@ -6,7 +6,7 @@
     <title>Trichome Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0b0c10; color: #f1f5f9; }
         .uis-card { background-color: #12151f; border: 1px solid #1e2336; }
@@ -28,7 +28,7 @@
 <body class="min-h-screen pb-12">
 
     <!-- HEADER -->
-    <header class="border-b border-[#1e2336] bg-[#0b0c10]/80 backdrop-blur sticky top-0 z-30">
+    <header class="border-b border-[#1e2336] bg-[#0b0c10]/85 backdrop-blur sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-blue-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-400/30">
@@ -73,14 +73,29 @@
 
             <!-- Active Grows -->
             <div>
-                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400 mb-3 px-1">Active Grows</h2>
+                <div class="flex justify-between items-center mb-3 px-1">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Active Grows</h2>
+                    <span id="active-count-badge" class="text-[11px] text-slate-500 font-semibold"></span>
+                </div>
                 <div id="plants-container" class="space-y-3"></div>
             </div>
 
             <!-- Archive Section -->
-            <div class="mt-8 pt-6 border-t border-[#1e2336]">
-                <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-500 mb-3 px-1">Archive (Completed Grows)</h2>
-                <div id="archive-container" class="space-y-3"></div>
+            <div class="mt-8 pt-6 border-t border-[#1e2336] space-y-3">
+                <div class="flex justify-between items-center px-1 gap-2">
+                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Archive</h2>
+                    <select id="archive-sort-select" onchange="changeArchiveSort(this.value)" class="bg-[#12151f] border border-[#1e2336] text-slate-300 text-[11px] font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500">
+                        <option value="newest">Sort: Newest</option>
+                        <option value="rating">Sort: Highest Rating</option>
+                        <option value="rosin">Sort: Best Rosin %</option>
+                        <option value="yield">Sort: Highest Yield</option>
+                    </select>
+                </div>
+
+                <!-- Compact Archive Summary Bar -->
+                <div id="archive-stats-bar" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl px-3.5 py-2.5 flex flex-wrap justify-between items-center gap-2 text-[11px] text-slate-400"></div>
+
+                <div id="archive-container" class="space-y-2.5"></div>
             </div>
 
             <!-- Backup / Settings -->
@@ -96,30 +111,31 @@
 
         <!-- DETAIL VIEW -->
         <div id="view-detail" class="hidden space-y-6">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center gap-2">
                 <button onclick="goHome()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold uppercase tracking-wider flex items-center space-x-1">
-                    <span>← Back to Overview</span>
+                    <span>← Overview</span>
                 </button>
-                <div id="action-harvest-container"></div>
+                <div id="action-harvest-container" class="flex items-center gap-2"></div>
             </div>
 
             <!-- Plant Header Card -->
-            <div class="uis-card rounded-2xl p-6 shadow-xl relative overflow-hidden space-y-4">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h2 id="detail-strain" class="text-xl font-black text-white tracking-wide"></h2>
+            <div class="uis-card rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-4">
+                <div class="flex justify-between items-start gap-3">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h2 id="detail-strain" class="text-xl font-black text-white tracking-wide break-words"></h2>
                             <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-400">
+                        <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
                             <span id="detail-type-badge" class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold"></span>
+                            <span id="detail-curing-badge" class="hidden bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-semibold"></span>
                         </div>
                         <p class="text-[11px] text-slate-400 mt-2">Planted: <span id="detail-date" class="text-slate-200"></span> <span id="detail-harvest-date-wrap" class="hidden">• Harvested: <span id="detail-harvest-date" class="text-slate-200"></span></span></p>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition">🖨️ Label</button>
-                        <button onclick="openEditModal()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-[#1e2336]">Edit</button>
-                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-xl text-xs font-semibold transition border border-red-500/20">Delete</button>
+                    <div class="flex items-center space-x-1.5 shrink-0">
+                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">🖨️</button>
+                        <button onclick="openEditModal()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-[#1e2336]">Edit</button>
+                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-500/20">✕</button>
                     </div>
                 </div>
 
@@ -144,7 +160,7 @@
                     </div>
 
                     <!-- Rating Box & Yield Stats (Archive) -->
-                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center col-span-2 space-y-3">
+                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center sm:col-span-2 space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Rating (Finished Product)</span>
                             <span id="plant-rating-display" class="text-blue-400 font-black text-sm">8.0 / 10</span>
@@ -153,7 +169,7 @@
                         
                         <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2 border-t border-[#1e2336] flex justify-between">
                             <span>Dry Yield: <strong id="sum-dry" class="text-white">-</strong> g</span>
-                            <span>Rosin Return: <strong id="sum-return" class="text-amber-400">-</strong> %</span>
+                            <span>Rosin Return: <strong id="sum-return" class="text-amber-400">-</strong></span>
                         </div>
                     </div>
                 </div>
@@ -163,20 +179,32 @@
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
-                    <button onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save Status</button>
+                    <button onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
                 </div>
                 <div class="grid grid-cols-3 gap-3 text-center pt-1">
                     <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
                         <span class="text-[10px] text-slate-400 block font-semibold uppercase">Clear (%)</span>
-                        <input type="number" id="tri-clear" min="0" max="100" placeholder="0" class="w-full bg-transparent text-center font-bold text-blue-400 text-sm mt-1 uis-input rounded-lg py-1">
+                        <input type="number" id="tri-clear" min="0" max="100" placeholder="0" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-blue-400 text-sm mt-1 uis-input rounded-lg py-1">
                     </div>
                     <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
                         <span class="text-[10px] text-slate-400 block font-semibold uppercase">Cloudy (%)</span>
-                        <input type="number" id="tri-cloudy" min="0" max="100" placeholder="80" class="w-full bg-transparent text-center font-bold text-emerald-400 text-sm mt-1 uis-input rounded-lg py-1">
+                        <input type="number" id="tri-cloudy" min="0" max="100" placeholder="80" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-emerald-400 text-sm mt-1 uis-input rounded-lg py-1">
                     </div>
                     <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
                         <span class="text-[10px] text-slate-400 block font-semibold uppercase">Amber (%)</span>
-                        <input type="number" id="tri-amber" min="0" max="100" placeholder="20" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
+                        <input type="number" id="tri-amber" min="0" max="100" placeholder="20" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
+                    </div>
+                </div>
+                <!-- Visual Trichome Ratio Bar + Effect Predictor -->
+                <div class="space-y-1.5 pt-1">
+                    <div class="w-full h-2.5 bg-[#090a0f] rounded-full overflow-hidden flex border border-[#1e2336]">
+                        <div id="tri-bar-clear" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
+                        <div id="tri-bar-cloudy" class="bg-emerald-400 h-full transition-all duration-300" style="width: 80%"></div>
+                        <div id="tri-bar-amber" class="bg-amber-500 h-full transition-all duration-300" style="width: 20%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                        <span class="text-slate-500">Effect Profile:</span>
+                        <span id="tri-effect-label" class="font-semibold text-emerald-400">Balanced / Peak THC</span>
                     </div>
                 </div>
             </div>
@@ -186,18 +214,18 @@
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin Calculator</h3>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2.5">
                     <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Wet Weight (g)</label>
-                        <input type="number" step="0.1" id="calc-wet" oninput="calculateYield()" placeholder="e.g. 500" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Wet (g)</label>
+                        <input type="number" step="0.1" id="calc-wet" oninput="calculateYield()" placeholder="500" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Dry Weight (g)</label>
-                        <input type="number" step="0.1" id="calc-dry" oninput="calculateYield()" placeholder="e.g. 125" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Dry (g)</label>
+                        <input type="number" step="0.1" id="calc-dry" oninput="calculateYield()" placeholder="125" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
                     </div>
                     <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Rosin Output (g)</label>
-                        <input type="number" step="0.1" id="calc-rosin" oninput="calculateYield()" placeholder="e.g. 25" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Rosin (g)</label>
+                        <input type="number" step="0.1" id="calc-rosin" oninput="calculateYield()" placeholder="25" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
                     </div>
                 </div>
                 <div class="bg-[#090a0f] border border-[#1e2336] p-3 rounded-xl flex justify-around text-center text-xs">
@@ -210,7 +238,7 @@
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌿 Terpene & Aroma Profile</h3>
-                    <button onclick="saveTerpenes()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save Terpenes</button>
+                    <button onclick="saveTerpenes()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -243,11 +271,11 @@
                 </div>
             </div>
 
-            <!-- CURING / DRYING LOG -->
-            <div id="curing-section" class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
+            <!-- CURING / DRYING LOG (Shown automatically when harvested) -->
+            <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">Curing & Drying Log</h3>
-                    <button onclick="openCuringModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Curing Log</button>
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying Log</h3>
+                    <button onclick="openCuringModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Curing Log</button>
                 </div>
                 <div id="curing-container" class="space-y-2"></div>
             </div>
@@ -255,7 +283,7 @@
             <!-- ENVIRONMENT & NUTRIENT LOG -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">Environment & Nutrient Log</h3>
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌡️ Environment & Nutrient Log</h3>
                     <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Metric</button>
                 </div>
                 <div id="metrics-container" class="space-y-2"></div>
@@ -326,8 +354,13 @@
             <div class="grid grid-cols-2 gap-3">
                 <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="e.g. 6.2" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
                 <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="e.g. 1.4" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" placeholder="e.g. 24" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Humidity (%)</label><input type="number" id="metric-rh" placeholder="e.g. 60" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" oninput="updateLiveVPDPreview()" placeholder="e.g. 24" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Humidity (%)</label><input type="number" id="metric-rh" oninput="updateLiveVPDPreview()" placeholder="e.g. 60" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+            </div>
+            <!-- Live Auto-VPD Preview -->
+            <div id="live-vpd-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl px-3.5 py-2.5 flex justify-between items-center text-xs">
+                <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Auto VPD</span>
+                <span id="live-vpd-result" class="text-slate-500 font-semibold">Enter Temp & RH</span>
             </div>
             <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Extra</label><input type="text" id="metric-note" placeholder="e.g. Added some Cal-Mag" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             <div class="flex space-x-3 pt-2">
@@ -388,7 +421,7 @@
         </div>
     </div>
 
-    <!-- UNIFIED & NON-DESTRUCTIVE INDEXEDDB + RECOVERY LOGIC -->
+    <!-- UNIFIED INDEXEDDB + SMART FEATURES -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
@@ -399,6 +432,7 @@
         let currentCategory = 'veg';
         let activeStageKey = null;
         let pendingImagesData = [];
+        let archiveSort = 'newest';
 
         function normalizePlant(p) {
             return {
@@ -422,13 +456,84 @@
             return count;
         }
 
+        function getLatestPlantThumbnail(p) {
+            const priority = ['extracts', 'cured', 'flower', 'veg'];
+            for (const sk of priority) {
+                const arr = p?.stages?.[sk];
+                if (Array.isArray(arr) && arr.length > 0 && arr[arr.length - 1]?.image) {
+                    return arr[arr.length - 1].image;
+                }
+            }
+            return null;
+        }
+
+        function calculateVPD(tempC, rh) {
+            const t = parseFloat(tempC);
+            const h = parseFloat(rh);
+            if (isNaN(t) || isNaN(h) || h <= 0 || h > 100) return null;
+            const svp = 0.61078 * Math.exp((17.27 * t) / (t + 237.3));
+            const vpd = svp * (1 - h / 100);
+            const val = vpd.toFixed(2);
+            if (vpd < 0.4) return { val, label: 'Low / Humid', color: 'text-red-400' };
+            if (vpd < 0.8) return { val, label: 'Seedling / Clone', color: 'text-blue-400' };
+            if (vpd <= 1.2) return { val, label: 'Optimal Veg', color: 'text-emerald-400' };
+            if (vpd <= 1.6) return { val, label: 'Optimal Flower', color: 'text-amber-400' };
+            return { val, label: 'High / Dry', color: 'text-red-400' };
+        }
+
+        function updateLiveVPDPreview() {
+            const temp = document.getElementById('metric-temp').value;
+            const rh = document.getElementById('metric-rh').value;
+            const resEl = document.getElementById('live-vpd-result');
+            const vpdData = calculateVPD(temp, rh);
+            if (!vpdData) {
+                resEl.textContent = 'Enter Temp & RH';
+                resEl.className = 'text-slate-500 font-semibold';
+                return;
+            }
+            resEl.textContent = `${vpdData.val} kPa • ${vpdData.label}`;
+            resEl.className = `font-bold ${vpdData.color}`;
+        }
+
+        function updateTrichomeVisual() {
+            const clear = Math.max(0, parseFloat(document.getElementById('tri-clear').value) || 0);
+            const cloudy = Math.max(0, parseFloat(document.getElementById('tri-cloudy').value) || 0);
+            const amber = Math.max(0, parseFloat(document.getElementById('tri-amber').value) || 0);
+            const total = clear + cloudy + amber;
+
+            const cPct = total > 0 ? (clear / total) * 100 : 0;
+            const clPct = total > 0 ? (cloudy / total) * 100 : 0;
+            const aPct = total > 0 ? (amber / total) * 100 : 0;
+
+            document.getElementById('tri-bar-clear').style.width = `${cPct}%`;
+            document.getElementById('tri-bar-cloudy').style.width = `${clPct}%`;
+            document.getElementById('tri-bar-amber').style.width = `${aPct}%`;
+
+            const labelEl = document.getElementById('tri-effect-label');
+            if (total === 0) {
+                labelEl.textContent = 'No data entered';
+                labelEl.className = 'font-semibold text-slate-500';
+            } else if (cPct > 40) {
+                labelEl.textContent = 'Immature / Too Early';
+                labelEl.className = 'font-semibold text-blue-400';
+            } else if (aPct >= 30) {
+                labelEl.textContent = 'Heavy / Sedative (Couch-Lock)';
+                labelEl.className = 'font-semibold text-amber-400';
+            } else if (aPct >= 10) {
+                labelEl.textContent = 'Balanced Hybrid / Optimal';
+                labelEl.className = 'font-semibold text-emerald-400';
+            } else {
+                labelEl.textContent = 'Peak THC / Uplifting & Energetic';
+                labelEl.className = 'font-semibold text-emerald-300';
+            }
+        }
+
         function initDB() {
             return new Promise((resolve) => {
                 if (navigator.storage && navigator.storage.persist) {
                     navigator.storage.persist().catch(() => {});
                 }
 
-                // Open without a version parameter so it opens whatever version (v1 or v2) already exists on device without blocking
                 const request = indexedDB.open('TrichomeTrackerDB');
 
                 request.onupgradeneeded = (e) => {
@@ -451,18 +556,14 @@
                             db = ev.target.result;
                             loadAndMergeAllSources().then(resolve);
                         };
-                        upgradeReq.onerror = () => {
-                            loadAndMergeAllSources().then(resolve);
-                        };
+                        upgradeReq.onerror = () => loadAndMergeAllSources().then(resolve);
                     } else {
                         db = openedDb;
                         loadAndMergeAllSources().then(resolve);
                     }
                 };
 
-                request.onerror = () => {
-                    loadAndMergeAllSources().then(resolve);
-                };
+                request.onerror = () => loadAndMergeAllSources().then(resolve);
             });
         }
 
@@ -497,7 +598,6 @@
             const lsV2Plants = readFromLocalStorageKey('trichome_plants_v2');
             const lsV1Plants = readFromLocalStorageKey('trichome_plants');
 
-            // Merge all sources by plant ID without losing anything
             const mergedMap = new Map();
 
             [...lsV1Plants, ...lsV2Plants, ...idbPlants].forEach(rawPlant => {
@@ -507,7 +607,6 @@
                 if (!existing) {
                     mergedMap.set(normalized.id, normalized);
                 } else {
-                    // Keep the version with more images/logs if both exist
                     const existingScore = countPlantImages(existing) * 10 + existing.metrics.length + existing.curingLogs.length;
                     const newScore = countPlantImages(normalized) * 10 + normalized.metrics.length + normalized.curingLogs.length;
                     if (newScore >= existingScore) {
@@ -518,7 +617,6 @@
 
             plants = Array.from(mergedMap.values());
 
-            // Ensure all merged plants are safely persisted into IndexedDB using non-destructive put()
             if (db && plants.length > 0) {
                 saveAllPlantsToDB(plants);
             }
@@ -579,9 +677,23 @@
             return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateString;
         }
 
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function switchCategory(cat) {
             currentCategory = cat;
             renderDetail();
+        }
+
+        function changeArchiveSort(sortVal) {
+            archiveSort = sortVal;
+            renderDashboard();
         }
 
         function updatePlantRating(val) {
@@ -647,11 +759,23 @@
             alert("Terpene profile saved!");
         }
 
+        function getRosinReturnPct(plant) {
+            const dry = parseFloat(plant?.yieldData?.dry) || 0;
+            const rosin = parseFloat(plant?.yieldData?.rosin) || 0;
+            if (dry > 0 && rosin > 0) return (rosin / dry) * 100;
+            return 0;
+        }
+
         function renderDashboard() {
             const container = document.getElementById('plants-container');
             const archiveContainer = document.getElementById('archive-container');
+            const activeCountBadge = document.getElementById('active-count-badge');
+            const archiveStatsBar = document.getElementById('archive-stats-bar');
+
             const activePlants = plants.filter(p => !p.harvestedDate);
             const archivedPlants = plants.filter(p => p.harvestedDate);
+
+            activeCountBadge.textContent = activePlants.length > 0 ? `${activePlants.length} active` : '';
 
             if (activePlants.length === 0) {
                 container.innerHTML = `<div class="uis-card rounded-2xl p-6 text-center"><p class="text-slate-400 text-xs">No active grows currently.</p></div>`;
@@ -660,17 +784,22 @@
                     const days = calculateDays(plant.date);
                     const dayText = days === 1 ? "day" : "days";
                     const totalImages = countPlantImages(plant);
+                    const thumb = getLatestPlantThumbnail(plant);
+
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-5 cursor-pointer transition shadow-xl flex justify-between items-center group">
-                            <div class="space-y-2">
-                                <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition tracking-wide">${plant.strain}</h3>
-                                <div class="flex flex-wrap items-center gap-2 text-xs">
-                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold">${plant.type || 'Autoflower'}</span>
-                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2.5 py-1 rounded text-[10px]">Planted: ${formatDate(plant.date)}</span>
-                                    <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2.5 py-1 rounded text-[10px]">📸 ${totalImages}</span>
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-4 cursor-pointer transition shadow-xl flex items-center justify-between gap-3 group">
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                ${thumb ? `<img src="${thumb}" class="w-12 h-12 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
+                                <div class="min-w-0 flex-1 space-y-1.5">
+                                    <h3 class="text-base font-bold text-white truncate group-hover:text-blue-400 transition tracking-wide">${escapeHtml(plant.strain)}</h3>
+                                    <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                                        <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px] font-semibold">${escapeHtml(plant.type || 'Autoflower')}</span>
+                                        <span class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">${formatDate(plant.date)}</span>
+                                        ${totalImages > 0 ? `<span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">📸 ${totalImages}</span>` : ''}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-3.5 py-2.5 rounded-xl text-center min-w-[70px]">
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-3 py-2 rounded-xl text-center min-w-[64px] shrink-0">
                                 <span class="text-xl font-black text-blue-400 block leading-tight">${days}</span>
                                 <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">${dayText}</span>
                             </div>
@@ -680,25 +809,65 @@
             }
 
             if (archivedPlants.length === 0) {
+                archiveStatsBar.classList.add('hidden');
                 archiveContainer.innerHTML = `<div class="bg-[#12151f]/50 border border-[#1e2336]/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">No archived grows yet.</p></div>`;
             } else {
-                archiveContainer.innerHTML = archivedPlants.map(plant => {
+                // Sort archived plants
+                const sortedArchive = [...archivedPlants].sort((a, b) => {
+                    if (archiveSort === 'rating') {
+                        return (b.rating ?? 8.0) - (a.rating ?? 8.0);
+                    }
+                    if (archiveSort === 'rosin') {
+                        return getRosinReturnPct(b) - getRosinReturnPct(a);
+                    }
+                    if (archiveSort === 'yield') {
+                        return (parseFloat(b.yieldData?.dry) || 0) - (parseFloat(a.yieldData?.dry) || 0);
+                    }
+                    return String(b.harvestedDate).localeCompare(String(a.harvestedDate));
+                });
+
+                // Compute summary stats
+                const avgDays = Math.round(archivedPlants.reduce((acc, p) => acc + calculateDays(p.date, p.harvestedDate), 0) / archivedPlants.length);
+                const avgRating = (archivedPlants.reduce((acc, p) => acc + (p.rating ?? 8.0), 0) / archivedPlants.length).toFixed(1);
+                const totalDry = archivedPlants.reduce((acc, p) => acc + (parseFloat(p.yieldData?.dry) || 0), 0);
+
+                archiveStatsBar.classList.remove('hidden');
+                archiveStatsBar.innerHTML = `
+                    <span>Completed: <strong class="text-white">${archivedPlants.length}</strong></span>
+                    <span>Avg Cycle: <strong class="text-slate-200">${avgDays}d</strong></span>
+                    <span>Avg Rating: <strong class="text-blue-400">★ ${avgRating}</strong></span>
+                    ${totalDry > 0 ? `<span>Total Dry: <strong class="text-emerald-400">${totalDry.toFixed(1)}g</strong></span>` : ''}
+                `;
+
+                archiveContainer.innerHTML = sortedArchive.map(plant => {
                     const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                    const curingDays = calculateDays(plant.harvestedDate);
                     const totalImages = countPlantImages(plant);
-                    const plantRating = plant.rating !== undefined ? plant.rating : 8.0;
-                    const dryVal = plant.yieldData?.dry || '-';
+                    const plantRating = plant.rating !== undefined ? Number(plant.rating).toFixed(1) : '8.0';
+                    const dryVal = parseFloat(plant.yieldData?.dry) || 0;
+                    const rosinPct = getRosinReturnPct(plant);
+                    const thumb = getLatestPlantThumbnail(plant);
+
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-4 cursor-pointer transition shadow flex justify-between items-center group">
-                            <div class="space-y-1">
-                                <div class="flex items-center space-x-2">
-                                    <h3 class="text-sm font-bold text-slate-200 group-hover:text-blue-400 transition">${plant.strain}</h3>
-                                    <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3.5 cursor-pointer transition shadow flex items-center justify-between gap-3 group">
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                ${thumb ? `<img src="${thumb}" class="w-12 h-12 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <h3 class="text-sm font-bold text-white truncate group-hover:text-blue-400 transition">${escapeHtml(plant.strain)}</h3>
+                                    <div class="text-[11px] text-slate-400 truncate">
+                                        ${escapeHtml(plant.type || 'Autoflower')} • ${formatDate(plant.harvestedDate)} <span class="text-slate-500">(${curingDays}d cure)</span>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                        <span class="inline-flex items-center bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold">★ ${plantRating}/10</span>
+                                        ${totalImages > 0 ? `<span class="inline-flex items-center bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">📸 ${totalImages}</span>` : ''}
+                                        ${dryVal > 0 ? `<span class="inline-flex items-center bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">⚖️ ${dryVal}g</span>` : ''}
+                                        ${rosinPct > 0 ? `<span class="inline-flex items-center bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold">🍯 ${rosinPct.toFixed(1)}%</span>` : ''}
+                                    </div>
                                 </div>
-                                <p class="text-[11px] text-slate-400">${plant.type || 'Autoflower'} • Harvested: ${formatDate(plant.harvestedDate)} • 📸 ${totalImages} • Dry: <strong class="text-white">${dryVal}g</strong> • Rating: <span class="text-blue-400 font-bold">${plantRating}/10</span></p>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-3 py-2 rounded-xl text-center min-w-[65px]">
-                                <span class="text-base font-bold text-slate-200 block leading-tight">${totalDays}</span>
-                                <span class="text-[9px] text-slate-400 font-medium tracking-wider uppercase block">total</span>
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[58px] shrink-0">
+                                <span class="text-base font-black text-slate-200 block leading-tight">${totalDays}</span>
+                                <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase block">days</span>
                             </div>
                         </div>
                     `;
@@ -735,6 +904,38 @@
             renderDashboard();
 
             if (confirm("Plant saved! Do you want to print a label for the pot right away?")) openLabelModal(strain, type, formatDate(date), newPlant.id);
+        }
+
+        function growAgain() {
+            const sourcePlant = plants.find(p => p.id === activePlantId);
+            if (!sourcePlant) return;
+
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            const clonedRun = normalizePlant({
+                id: Date.now().toString(),
+                strain: sourcePlant.strain,
+                type: sourcePlant.type || 'Autoflower',
+                date: todayStr,
+                harvestedDate: null,
+                rating: 8.0,
+                lastWatered: null,
+                metrics: [],
+                curingLogs: [],
+                stages: {},
+                trichomes: { clear: 0, cloudy: 80, amber: 20 },
+                yieldData: { wet: '', dry: '', rosin: '' },
+                terpenes: {
+                    primary: sourcePlant.terpenes?.primary || 'Myrcene',
+                    secondary: sourcePlant.terpenes?.secondary || 'None',
+                    notes: ''
+                }
+            });
+
+            plants.unshift(clonedRun);
+            savePlantToDB(clonedRun);
+            openDetail(clonedRun.id);
         }
 
         function recordWatering() {
@@ -782,13 +983,14 @@
 
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-detail').classList.remove('hidden');
-            currentCategory = 'veg';
-            document.getElementById('category-select').value = 'veg';
+            currentCategory = plant.harvestedDate ? 'cured' : 'veg';
+            document.getElementById('category-select').value = currentCategory;
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
             document.getElementById('tri-clear').value = plant.trichomes?.clear ?? 0;
             document.getElementById('tri-cloudy').value = plant.trichomes?.cloudy ?? 80;
             document.getElementById('tri-amber').value = plant.trichomes?.amber ?? 20;
+            updateTrichomeVisual();
 
             document.getElementById('calc-wet').value = plant.yieldData?.wet ?? '';
             document.getElementById('calc-dry').value = plant.yieldData?.dry ?? '';
@@ -801,6 +1003,8 @@
 
             const harvestContainer = document.getElementById('action-harvest-container');
             const archiveBadge = document.getElementById('archive-badge');
+            const curingBadge = document.getElementById('detail-curing-badge');
+            const curingSection = document.getElementById('curing-section');
             const harvestDateWrap = document.getElementById('detail-harvest-date-wrap');
             const ageLabelText = document.getElementById('age-label-text');
             const ageUnitText = document.getElementById('age-unit-text');
@@ -814,29 +1018,41 @@
             if (plant.harvestedDate) {
                 archiveBadge.classList.remove('hidden');
                 harvestDateWrap.classList.remove('hidden');
+                curingSection.classList.remove('hidden');
+
+                const curingDays = calculateDays(plant.harvestedDate);
+                curingBadge.textContent = `🏺 Curing: ${curingDays}d`;
+                curingBadge.classList.remove('hidden');
+
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
                 const totalDays = calculateDays(plant.date, plant.harvestedDate);
                 document.getElementById('detail-days').innerText = totalDays;
-                ageLabelText.innerText = "Total Time";
+                ageLabelText.innerText = "Total Cycle";
                 ageUnitText.innerText = totalDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.remove('hidden');
                 waterWidgetBox.classList.add('hidden');
                 
                 const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
                 document.getElementById('plant-rating-slider').value = currentRating;
-                document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
+                document.getElementById('plant-rating-display').innerText = Number(currentRating).toFixed(1) + " / 10";
                 
-                harvestContainer.innerHTML = `<button onclick="unharvestPlant()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition">↩️ Unharvest</button>`;
+                harvestContainer.innerHTML = `
+                    <button onclick="growAgain()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">↻ Grow Again</button>
+                    <button onclick="unharvestPlant()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">↩️ Unharvest</button>
+                `;
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
+                curingBadge.classList.add('hidden');
+                curingSection.classList.add('hidden');
+
                 const ageDays = calculateDays(plant.date);
                 document.getElementById('detail-days').innerText = ageDays;
                 ageLabelText.innerText = "Age";
                 ageUnitText.innerText = ageDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.add('hidden');
                 waterWidgetBox.classList.remove('hidden');
-                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Harvested</button>`;
+                harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow">✂️ Harvested</button>`;
             }
 
             renderCuringLogs();
@@ -874,8 +1090,8 @@
                 <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                     <div class="space-y-1">
                         <span class="text-slate-400 font-medium">${formatDate(c.date.slice(0,10))}</span>
-                        <div class="text-slate-300 mt-1">Jar Humidity: <span class="text-amber-400 font-bold">${c.rh}%</span></div>
-                        ${c.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${c.note}</p>` : ''}
+                        <div class="text-slate-300 mt-1">Jar Humidity: <span class="text-amber-400 font-bold">${escapeHtml(c.rh)}%</span></div>
+                        ${c.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${escapeHtml(c.note)}</p>` : ''}
                     </div>
                     <button onclick="deleteCuringLog(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
                 </div>
@@ -892,6 +1108,7 @@
 
         function openMetricsModal() {
             ['metric-ph', 'metric-ec', 'metric-temp', 'metric-rh', 'metric-note'].forEach(id => document.getElementById(id).value = '');
+            updateLiveVPDPreview();
             document.getElementById('metrics-modal').classList.remove('hidden');
         }
 
@@ -901,12 +1118,17 @@
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
             if (!plant.metrics) plant.metrics = [];
+            const tempVal = document.getElementById('metric-temp').value;
+            const rhVal = document.getElementById('metric-rh').value;
+            const vpdInfo = calculateVPD(tempVal, rhVal);
+
             plant.metrics.unshift({
                 date: new Date().toISOString(),
                 ph: document.getElementById('metric-ph').value,
                 ec: document.getElementById('metric-ec').value,
-                temp: document.getElementById('metric-temp').value,
-                rh: document.getElementById('metric-rh').value,
+                temp: tempVal,
+                rh: rhVal,
+                vpd: vpdInfo ? vpdInfo.val : '',
                 note: document.getElementById('metric-note').value.trim()
             });
             savePlantToDB(plant);
@@ -923,16 +1145,22 @@
             }
             container.innerHTML = plant.metrics.map((m, index) => {
                 let parts = [];
-                if (m.ph) parts.push(`pH: <span class="text-white font-bold">${m.ph}</span>`);
-                if (m.ec) parts.push(`EC: <span class="text-white font-bold">${m.ec}</span>`);
-                if (m.temp) parts.push(`Temp: <span class="text-white font-bold">${m.temp}°C</span>`);
-                if (m.rh) parts.push(`RH: <span class="text-white font-bold">${m.rh}%</span>`);
+                if (m.ph) parts.push(`pH: <span class="text-white font-bold">${escapeHtml(m.ph)}</span>`);
+                if (m.ec) parts.push(`EC: <span class="text-white font-bold">${escapeHtml(m.ec)}</span>`);
+                if (m.temp) parts.push(`Temp: <span class="text-white font-bold">${escapeHtml(m.temp)}°C</span>`);
+                if (m.rh) parts.push(`RH: <span class="text-white font-bold">${escapeHtml(m.rh)}%</span>`);
+                
+                const computedVpd = m.vpd || calculateVPD(m.temp, m.rh)?.val;
+                if (computedVpd) {
+                    parts.push(`VPD: <span class="text-emerald-400 font-bold">${escapeHtml(computedVpd)} kPa</span>`);
+                }
+
                 return `
                     <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                         <div class="space-y-1">
                             <span class="text-slate-400 font-medium">${formatDate(m.date.slice(0,10))}</span>
-                            <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${parts.join(' • ')}</div>
-                            ${m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${m.note}</p>` : ''}
+                            <div class="flex flex-wrap gap-2.5 text-slate-300 mt-1">${parts.join(' • ')}</div>
+                            ${m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${escapeHtml(m.note)}</p>` : ''}
                         </div>
                         <button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
                     </div>
@@ -950,7 +1178,7 @@
         }
 
         function confirmHarvest() {
-            if (confirm("Do you want to mark this as harvested today? It will be moved to the archive.")) {
+            if (confirm("Mark this plant as harvested today and move to archive?")) {
                 const plant = plants.find(p => p.id === activePlantId);
                 if (plant) {
                     plant.harvestedDate = new Date().toISOString().slice(0, 10);
@@ -961,7 +1189,7 @@
         }
 
         function unharvestPlant() {
-            if (confirm("Do you want to move this plant back to active grows?")) {
+            if (confirm("Move this plant back to active grows?")) {
                 const plant = plants.find(p => p.id === activePlantId);
                 if (plant) {
                     plant.harvestedDate = null;
@@ -993,24 +1221,19 @@
                 return;
             }
 
-            container.innerHTML = items.map((item, index) => `
-                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
-                    <div class="relative aspect-video rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightboxByIndex(${index})">
-                        <img src="${item.image}" class="w-full h-full object-cover">
-                        <button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>
+            container.innerHTML = items.map((item, index) => {
+                const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
+                return `
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
+                        <div class="relative aspect-video rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightboxByIndex(${index})">
+                            <img src="${item.image}" class="w-full h-full object-cover">
+                            ${photoDay !== null ? `<span class="absolute top-2 left-2 bg-black/75 backdrop-blur-sm text-white border border-white/10 px-2 py-0.5 rounded-md text-[10px] font-bold">Day ${photoDay}</span>` : ''}
+                            <button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>
+                        </div>
+                        ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-[#12151f] p-3 rounded-xl border border-[#1e2336] whitespace-pre-wrap">${escapeHtml(item.comment)}</p>` : ''}
                     </div>
-                    ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-[#12151f] p-3 rounded-xl border border-[#1e2336] whitespace-pre-wrap">${escapeHtml(item.comment)}</p>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+                `;
+            }).join('');
         }
 
         function openLightboxByIndex(index) {
@@ -1075,7 +1298,6 @@
             pendingImagesData = [];
             const fileArray = Array.from(files);
 
-            // Process sequentially to avoid memory spikes on mobile browsers
             for (const file of fileArray) {
                 const compressed = await compressImageFile(file);
                 if (compressed) pendingImagesData.push(compressed);
