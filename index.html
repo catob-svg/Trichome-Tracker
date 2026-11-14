@@ -244,7 +244,7 @@
             </div>
 
             <!-- CURING / DRYING LOG -->
-            <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
+            <div id="curing-section" class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">Curing & Drying Log</h3>
                     <button onclick="openCuringModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Curing Log</button>
@@ -397,7 +397,6 @@
         let pendingImageData = null;
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
 
-        // Init IndexedDB for robust local storage
         function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open('TrichomeTrackerDB', 1);
@@ -423,7 +422,6 @@
                 const request = store.getAll();
                 request.onsuccess = e => {
                     plants = e.target.result || [];
-                    // Fallback to localStorage migration if DB is empty
                     if (plants.length === 0) {
                         try {
                             const rawData = localStorage.getItem('trichome_plants');
@@ -704,10 +702,8 @@
             const ageLabelText = document.getElementById('age-label-text');
             const ageUnitText = document.getElementById('age-unit-text');
             const addBtnTop = document.getElementById('btn-add-image-top');
-            const btnOpenMetrics = document.getElementById('btn-open-metrics');
             const archiveRatingBox = document.getElementById('archive-rating-box');
             const waterWidgetBox = document.getElementById('water-widget-box');
-            const curingSection = document.getElementById('curing-section');
 
             updateWaterWidget(plant);
 
@@ -721,13 +717,14 @@
                 ageUnitText.innerText = totalDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.remove('hidden');
                 waterWidgetBox.classList.add('hidden');
-                curingSection.classList.remove('hidden');
                 
                 const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
                 document.getElementById('plant-rating-slider').value = currentRating;
                 document.getElementById('plant-rating-display').innerText = currentRating + " / 10";
-                harvestContainer.innerHTML = `<span class="text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl">Harvested</span>`;
-                addBtnTop.classList.add('hidden'); btnOpenMetrics.classList.add('hidden');
+                
+                // Keep harvest button available so user can undo or see it, and ALWAYS keep image/curing buttons active!
+                harvestContainer.innerHTML = `<button onclick="unharvestPlant()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold transition">↩️ Unharvest</button>`;
+                addBtnTop.classList.remove('hidden');
                 renderCuringLogs();
             } else {
                 archiveBadge.classList.add('hidden');
@@ -738,9 +735,8 @@
                 ageUnitText.innerText = ageDays === 1 ? "day" : "days";
                 archiveRatingBox.classList.add('hidden');
                 waterWidgetBox.classList.remove('hidden');
-                curingSection.classList.add('hidden');
                 harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow">✂️ Harvested</button>`;
-                addBtnTop.classList.remove('hidden'); btnOpenMetrics.classList.remove('hidden');
+                addBtnTop.classList.remove('hidden');
             }
 
             renderMetrics();
@@ -833,7 +829,7 @@
                             <div class="flex flex-wrap gap-3 text-slate-300 mt-1">${parts.join(' • ')}</div>
                             ${m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${m.note}</p>` : ''}
                         </div>
-                        ${!plant.harvestedDate ? `<button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>` : ''}
+                        <button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
                     </div>
                 `;
             }).join('');
@@ -848,6 +844,13 @@
             if (confirm("Do you want to mark this as harvested today? It will be moved to the archive.")) {
                 const plant = plants.find(p => p.id === activePlantId);
                 if (plant) { plant.harvestedDate = new Date().toISOString().slice(0, 10); saveToStorage(); openDetail(plant.id); }
+            }
+        }
+
+        function unharvestPlant() {
+            if (confirm("Do you want to move this plant back to active grows?")) {
+                const plant = plants.find(p => p.id === activePlantId);
+                if (plant) { plant.harvestedDate = null; saveToStorage(); openDetail(plant.id); }
             }
         }
 
@@ -879,7 +882,7 @@
                     <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
                         <div class="relative aspect-video rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightbox('${item.image}', '${safeComment}')">
                             <img src="${item.image}" class="w-full h-full object-cover">
-                            ${!plant.harvestedDate ? `<button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>` : ''}
+                            <button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>
                         </div>
                         ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-[#12151f] p-3 rounded-xl border border-[#1e2336]">${item.comment}</p>` : ''}
                     </div>
@@ -898,7 +901,7 @@
         function closeLightbox() { document.getElementById('lightbox-modal').classList.add('hidden'); }
         function openSourceModal(stageKey) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant?.harvestedDate) return;
+            if (!plant) return;
             activeStageKey = stageKey;
             document.getElementById('source-modal').classList.remove('hidden');
         }
@@ -1014,7 +1017,6 @@
             }
         }
 
-        // Start app with IndexedDB initialization
         initDB().then(() => {
             setDefaultDate();
         });
