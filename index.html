@@ -213,7 +213,7 @@
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
-                    <button onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
+                    <button id="btn-save-trichomes" onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
                 </div>
                 <div class="grid grid-cols-3 gap-3 text-center pt-1">
                     <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
@@ -267,40 +267,38 @@
                 </div>
             </div>
 
-            <!-- TERPENE PROFILE LOG -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
+            <!-- SENSORY & EFFECT PROFILE (Reworked practical aroma/flavor/loudness/vibe log) -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌿 Terpene & Aroma Profile</h3>
-                    <button onclick="saveTerpenes()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
+                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">👃 Sensory & Effect Profile</h3>
+                    <button id="btn-save-sensory" onclick="saveSensoryProfile()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Primary Terpene</label>
-                        <select id="terp-primary" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
-                            <option value="Myrcene">Myrcene (Earthy / Herbal)</option>
-                            <option value="Limonene">Limonene (Citrus / Lemon)</option>
-                            <option value="Caryophyllene">Caryophyllene (Spicy / Pepper)</option>
-                            <option value="Linalool">Linalool (Floral / Lavender)</option>
-                            <option value="Pinene">Pinene (Pine / Fresh)</option>
-                            <option value="Terpinolene">Terpinolene (Fruity / Woody)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Secondary Terpene</label>
-                        <select id="terp-secondary" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
-                            <option value="None">None / Other</option>
-                            <option value="Myrcene">Myrcene</option>
-                            <option value="Limonene">Limonene</option>
-                            <option value="Caryophyllene">Caryophyllene</option>
-                            <option value="Linalool">Linalool</option>
-                            <option value="Pinene">Pinene</option>
-                            <option value="Terpinolene">Terpinolene</option>
-                        </select>
-                    </div>
-                </div>
+
+                <!-- Aroma & Flavor Notes -->
                 <div>
-                    <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Aroma & Taste Notes</label>
-                    <input type="text" id="terp-notes" placeholder="e.g. Sweet diesel, hint of ripe mango..." class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Aroma & Flavor Notes (Select all that apply)</label>
+                    <div id="sensory-flavors-grid" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <!-- Terp Loudness (1-5) -->
+                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Nose / Terp Loudness</span>
+                        <span id="sensory-loudness-label" class="text-[11px] font-bold text-emerald-400">3 / 5 • Noticeable</span>
+                    </div>
+                    <div id="sensory-loudness-buttons" class="grid grid-cols-5 gap-1.5"></div>
+                </div>
+
+                <!-- Effect / Vibe -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Experience & Effect</label>
+                    <div id="sensory-effects-grid" class="flex flex-wrap gap-1.5"></div>
+                </div>
+
+                <!-- Tasting Notes -->
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-1">Tasting Notes (Jar Nose vs. Inhale / Exhale)</label>
+                    <textarea id="sensory-notes" rows="2" placeholder="e.g. Sharp funky cheese on jar crack, sweet creamy gas on exhale..." class="w-full uis-input rounded-xl px-3 py-2 text-xs placeholder-slate-600"></textarea>
                 </div>
             </div>
 
@@ -367,7 +365,7 @@
             <!-- Web NFC Direct Write & Read (Supported on Android Chrome) -->
             <div id="web-nfc-supported-box" class="space-y-2.5">
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Tap <strong class="text-slate-200">Write to NFC Tag</strong> and hold your 3D-printed plant stake (NTAG213 / 215 / 216) against the back of your phone.
+                    Tap <strong class="text-slate-200">Write Tag</strong> and hold your 3D-printed plant stake (NTAG213 / 215 / 216) against the back of your phone.
                 </p>
                 <div class="grid grid-cols-2 gap-2.5">
                     <button type="button" onclick="writeNfcTag()" id="btn-write-nfc" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition shadow-lg shadow-emerald-900/30">
@@ -514,10 +512,39 @@
         </div>
     </div>
 
-    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC TAG WRITER/READER -->
+    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY PROFILE -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
+
+        const FLAVOR_OPTIONS = [
+            "⛽ Gas / Diesel",
+            "🍋 Citrus / Sour",
+            "🍓 Fruity / Berry",
+            "🍬 Sweet / Candy",
+            "🧀 Cheese / Funk",
+            "🌲 Pine / Earthy",
+            "🌶️ Spicy / Herbal",
+            "🍰 Creamy / Vanilla",
+            "🦨 Skunk / Musk",
+            "🥭 Tropical"
+        ];
+
+        const EFFECT_OPTIONS = [
+            "⚡ Energetic / Uplifting",
+            "🎨 Creative / Focus",
+            "⚖️ Balanced Hybrid",
+            "🛋️ Relaxing / Body",
+            "😴 Heavy / Sleep"
+        ];
+
+        const LOUDNESS_LABELS = {
+            1: { text: "1 / 5 • Mute / Faint", color: "text-slate-400" },
+            2: { text: "2 / 5 • Subtle", color: "text-blue-400" },
+            3: { text: "3 / 5 • Noticeable", color: "text-emerald-400" },
+            4: { text: "4 / 5 • Strong", color: "text-amber-400" },
+            5: { text: "5 / 5 • Loud / Room-Filler", color: "text-rose-400" }
+        };
 
         let db = null;
         let plants = [];
@@ -530,6 +557,7 @@
         let nfcAbortController = null;
 
         function normalizePlant(p) {
+            const existingSensory = p.sensory || {};
             return {
                 ...p,
                 id: String(p.id),
@@ -539,8 +567,106 @@
                 stages: p.stages || {},
                 trichomes: p.trichomes || { clear: 0, cloudy: 80, amber: 20 },
                 yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
-                terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
+                sensory: {
+                    flavors: Array.isArray(existingSensory.flavors) ? existingSensory.flavors : [],
+                    loudness: Number(existingSensory.loudness) >= 1 && Number(existingSensory.loudness) <= 5 ? Number(existingSensory.loudness) : 3,
+                    effects: Array.isArray(existingSensory.effects) ? existingSensory.effects : [],
+                    notes: existingSensory.notes !== undefined ? existingSensory.notes : (p.terpenes?.notes || '')
+                }
             };
+        }
+
+        function flashSaveButton(btnId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            const origText = btn.textContent;
+            btn.textContent = "✓ Saved";
+            btn.classList.add("bg-emerald-600/30", "text-emerald-300", "border-emerald-500/40");
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.classList.remove("bg-emerald-600/30", "text-emerald-300", "border-emerald-500/40");
+            }, 1400);
+        }
+
+        /* SENSORY & EFFECT PROFILE FUNCTIONS */
+        function renderSensoryEditor(plant) {
+            const sensory = plant.sensory || { flavors: [], loudness: 3, effects: [], notes: '' };
+
+            // Render Flavor Pills
+            const flavorsGrid = document.getElementById('sensory-flavors-grid');
+            flavorsGrid.innerHTML = FLAVOR_OPTIONS.map(flavor => {
+                const isSelected = sensory.flavors.includes(flavor);
+                const cls = isSelected
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm'
+                    : 'bg-[#090a0f] text-slate-400 border-[#1e2336] hover:border-slate-600 hover:text-slate-200';
+                return `<button type="button" onclick="toggleSensoryFlavor('${flavor}')" class="border px-2.5 py-1.5 rounded-xl text-[11px] font-semibold transition ${cls}">${flavor}</button>`;
+            }).join('');
+
+            // Render Loudness 1-5 Buttons
+            const loudness = sensory.loudness || 3;
+            const lInfo = LOUDNESS_LABELS[loudness] || LOUDNESS_LABELS[3];
+            const lLabel = document.getElementById('sensory-loudness-label');
+            lLabel.textContent = lInfo.text;
+            lLabel.className = `text-[11px] font-bold ${lInfo.color}`;
+
+            const loudnessContainer = document.getElementById('sensory-loudness-buttons');
+            loudnessContainer.innerHTML = [1, 2, 3, 4, 5].map(num => {
+                const active = num <= loudness;
+                const cls = active
+                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50 font-black'
+                    : 'bg-[#12151f] text-slate-500 border-[#1e2336] hover:text-slate-300 font-semibold';
+                return `<button type="button" onclick="setSensoryLoudness(${num})" class="border py-1.5 rounded-lg text-xs transition ${cls}">${num}</button>`;
+            }).join('');
+
+            // Render Effect Pills
+            const effectsGrid = document.getElementById('sensory-effects-grid');
+            effectsGrid.innerHTML = EFFECT_OPTIONS.map(effect => {
+                const isSelected = sensory.effects.includes(effect);
+                const cls = isSelected
+                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/50 shadow-sm'
+                    : 'bg-[#090a0f] text-slate-400 border-[#1e2336] hover:border-slate-600 hover:text-slate-200';
+                return `<button type="button" onclick="toggleSensoryEffect('${effect}')" class="border px-2.5 py-1.5 rounded-xl text-[11px] font-semibold transition ${cls}">${effect}</button>`;
+            }).join('');
+
+            document.getElementById('sensory-notes').value = sensory.notes || '';
+        }
+
+        function toggleSensoryFlavor(flavor) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            const list = plant.sensory.flavors;
+            const idx = list.indexOf(flavor);
+            if (idx === -1) list.push(flavor);
+            else list.splice(idx, 1);
+            savePlantToDB(plant);
+            renderSensoryEditor(plant);
+        }
+
+        function setSensoryLoudness(level) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.sensory.loudness = level;
+            savePlantToDB(plant);
+            renderSensoryEditor(plant);
+        }
+
+        function toggleSensoryEffect(effect) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            const list = plant.sensory.effects;
+            const idx = list.indexOf(effect);
+            if (idx === -1) list.push(effect);
+            else list.splice(idx, 1);
+            savePlantToDB(plant);
+            renderSensoryEditor(plant);
+        }
+
+        function saveSensoryProfile() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.sensory.notes = document.getElementById('sensory-notes').value.trim();
+            savePlantToDB(plant);
+            flashSaveButton('btn-save-sensory');
         }
 
         function getPlantDeepLink(plantId) {
@@ -1018,7 +1144,7 @@
                 amber: document.getElementById('tri-amber').value || 0
             };
             savePlantToDB(plant);
-            alert("Trichome status saved!");
+            flashSaveButton('btn-save-trichomes');
         }
 
         function calculateYield() {
@@ -1049,18 +1175,6 @@
             }
             document.getElementById('res-return').innerText = returnText;
             document.getElementById('sum-dry').innerText = dry > 0 ? dry : "-";
-        }
-
-        function saveTerpenes() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-            plant.terpenes = {
-                primary: document.getElementById('terp-primary').value,
-                secondary: document.getElementById('terp-secondary').value,
-                notes: document.getElementById('terp-notes').value.trim()
-            };
-            savePlantToDB(plant);
-            alert("Terpene profile saved!");
         }
 
         function getRosinReturnPct(plant) {
@@ -1190,7 +1304,7 @@
                 stages: {},
                 trichomes: { clear: 0, cloudy: 80, amber: 20 },
                 yieldData: { wet: '', dry: '', rosin: '' },
-                terpenes: { primary: 'Myrcene', secondary: 'None', notes: '' }
+                sensory: { flavors: [], loudness: 3, effects: [], notes: '' }
             });
 
             plants.unshift(newPlant);
@@ -1220,11 +1334,7 @@
                 stages: {},
                 trichomes: { clear: 0, cloudy: 80, amber: 20 },
                 yieldData: { wet: '', dry: '', rosin: '' },
-                terpenes: {
-                    primary: sourcePlant.terpenes?.primary || 'Myrcene',
-                    secondary: sourcePlant.terpenes?.secondary || 'None',
-                    notes: ''
-                }
+                sensory: { flavors: [], loudness: 3, effects: [], notes: '' }
             });
 
             plants.unshift(clonedRun);
@@ -1302,9 +1412,7 @@
             document.getElementById('calc-rosin').value = plant.yieldData?.rosin ?? '';
             calculateYield();
 
-            document.getElementById('terp-primary').value = plant.terpenes?.primary ?? 'Myrcene';
-            document.getElementById('terp-secondary').value = plant.terpenes?.secondary ?? 'None';
-            document.getElementById('terp-notes').value = plant.terpenes?.notes ?? '';
+            renderSensoryEditor(plant);
 
             const harvestContainer = document.getElementById('action-harvest-container');
             const archiveBadge = document.getElementById('archive-badge');
