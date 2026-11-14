@@ -31,7 +31,6 @@
     <header class="border-b border-[#1e2336] bg-[#0b0c10]/80 backdrop-blur sticky top-0 z-30">
         <div class="max-w-2xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
-                <!-- Clean minimalist leaf symbol -->
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-blue-700 flex items-center justify-center shadow-lg shadow-emerald-900/30 border border-emerald-400/30">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -152,7 +151,6 @@
                         </div>
                         <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
                         
-                        <!-- Yield Summary info in archive -->
                         <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2 border-t border-[#1e2336] flex justify-between">
                             <span>Dry Yield: <strong id="sum-dry" class="text-white">-</strong> g</span>
                             <span>Rosin Return: <strong id="sum-return" class="text-amber-400">-</strong> %</span>
@@ -161,7 +159,7 @@
                 </div>
             </div>
 
-            <!-- NEW FEATURE 1: TRICHOME RIPENESS CHECKER -->
+            <!-- TRICHOME RIPENESS CHECKER -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
@@ -183,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- NEW FEATURE 2: YIELD & EXTRACTION CALCULATOR -->
+            <!-- YIELD & EXTRACTION CALCULATOR -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin Calculator</h3>
@@ -208,7 +206,7 @@
                 </div>
             </div>
 
-            <!-- NEW FEATURE 3: TERPENE PROFILE LOG -->
+            <!-- TERPENE PROFILE LOG -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌿 Terpene & Aroma Profile</h3>
@@ -363,7 +361,7 @@
         <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
             <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white mb-2">Select Image Source</h3>
             <button onclick="triggerFileCapture('camera')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">Take Photo with Camera</button>
-            <button onclick="triggerFileCapture('file')" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition border border-[#1e2336]">Choose from Device</button>
+            <button onclick="triggerFileCapture('file')" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition border border-[#1e2336]">Choose from Gallery</button>
             <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition uppercase font-semibold">Cancel</button>
         </div>
         <input type="file" id="hidden-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
@@ -387,17 +385,59 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC (IndexedDB Local Storage) -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
 
+        let db = null;
         let plants = [];
-        try {
-            const rawData = localStorage.getItem('trichome_plants');
-            if (rawData) {
-                const parsed = JSON.parse(rawData);
-                if (Array.isArray(parsed)) {
-                    plants = parsed.map(p => ({
+        let activePlantId = null;
+        let currentCategory = 'veg';
+        let activeStageKey = null;
+        let pendingImageData = null;
+        const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
+
+        // Init IndexedDB for robust local storage
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('TrichomeTrackerDB', 1);
+                request.onerror = e => reject(e);
+                request.onsuccess = e => {
+                    db = e.target.result;
+                    loadPlantsFromDB().then(() => resolve());
+                };
+                request.onupgradeneeded = e => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains('plants')) {
+                        database.createObjectStore('plants', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        function loadPlantsFromDB() {
+            return new Promise((resolve) => {
+                if (!db) return resolve([]);
+                const transaction = db.transaction(['plants'], 'readonly');
+                const store = transaction.objectStore('plants');
+                const request = store.getAll();
+                request.onsuccess = e => {
+                    plants = e.target.result || [];
+                    // Fallback to localStorage migration if DB is empty
+                    if (plants.length === 0) {
+                        try {
+                            const rawData = localStorage.getItem('trichome_plants');
+                            if (rawData) {
+                                const parsed = JSON.parse(rawData);
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    plants = parsed;
+                                    saveAllToDB();
+                                    localStorage.removeItem('trichome_plants');
+                                }
+                            }
+                        } catch (err) {}
+                    }
+                    plants = plants.map(p => ({
                         ...p,
                         type: p.type || 'Autoflower',
                         metrics: Array.isArray(p.metrics) ? p.metrics : [],
@@ -407,19 +447,22 @@
                         yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
                         terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
                     }));
-                }
-            }
-        } catch (e) { plants = []; }
-
-        let activePlantId = null;
-        let currentCategory = 'veg';
-        let activeStageKey = null;
-        let pendingImageData = null;
-        const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
+                    renderDashboard();
+                    resolve();
+                };
+            });
+        }
 
         function saveToStorage() {
-            try { localStorage.setItem('trichome_plants', JSON.stringify(plants)); }
-            catch (e) { alert("Storage space on device is full!"); }
+            if (!db) return;
+            const transaction = db.transaction(['plants'], 'readwrite');
+            const store = transaction.objectStore('plants');
+            store.clear();
+            plants.forEach(p => store.put(p));
+        }
+
+        function saveAllToDB() {
+            saveToStorage();
         }
 
         function calculateDays(startDate, endDate) {
@@ -568,7 +611,7 @@
             const type = document.getElementById('plant-type-input').value;
             const date = document.getElementById('date-input').value;
 
-            plants.unshift({ 
+            const newPlant = { 
                 id: Date.now().toString(), 
                 strain, 
                 type, 
@@ -582,13 +625,15 @@
                 trichomes: { clear: 0, cloudy: 80, amber: 20 },
                 yieldData: { wet: '', dry: '', rosin: '' },
                 terpenes: { primary: 'Myrcene', secondary: 'None', notes: '' }
-            });
+            };
+
+            plants.unshift(newPlant);
             saveToStorage();
             document.getElementById('plant-form').reset();
             setDefaultDate();
             renderDashboard();
 
-            if (confirm("Plant saved! Do you want to print a label for the pot right away?")) openLabelModal(strain, type, formatDate(date), plants[0].id);
+            if (confirm("Plant saved! Do you want to print a label for the pot right away?")) openLabelModal(strain, type, formatDate(date), newPlant.id);
         }
 
         function recordWatering() {
@@ -640,18 +685,15 @@
             document.getElementById('category-select').value = 'veg';
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
-            // Populate Trichome fields
             document.getElementById('tri-clear').value = plant.trichomes?.clear ?? 0;
             document.getElementById('tri-cloudy').value = plant.trichomes?.cloudy ?? 80;
             document.getElementById('tri-amber').value = plant.trichomes?.amber ?? 20;
 
-            // Populate Yield fields
             document.getElementById('calc-wet').value = plant.yieldData?.wet ?? '';
             document.getElementById('calc-dry').value = plant.yieldData?.dry ?? '';
             document.getElementById('calc-rosin').value = plant.yieldData?.rosin ?? '';
             calculateYield();
 
-            // Populate Terpene fields
             document.getElementById('terp-primary').value = plant.terpenes?.primary ?? 'Myrcene';
             document.getElementById('terp-secondary').value = plant.terpenes?.secondary ?? 'None';
             document.getElementById('terp-notes').value = plant.terpenes?.notes ?? '';
@@ -953,7 +995,12 @@
             reader.onload = function(e) {
                 try {
                     const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) { plants = imported; saveToStorage(); renderDashboard(); alert("Backup successfully restored!"); }
+                    if (Array.isArray(imported)) { 
+                        plants = imported; 
+                        saveAllToDB(); 
+                        renderDashboard(); 
+                        alert("Backup successfully restored!"); 
+                    }
                 } catch (err) { alert("Invalid file!"); }
             };
             reader.readAsText(file);
@@ -967,16 +1014,20 @@
             }
         }
 
-        setDefaultDate();
-        renderDashboard();
+        // Start app with IndexedDB initialization
+        initDB().then(() => {
+            setDefaultDate();
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash;
             if (hash.includes('#plant=')) {
                 const pId = hash.split('=')[1];
-                if (plants.some(p => p.id === pId)) {
-                    openDetail(pId);
-                }
+                setTimeout(() => {
+                    if (plants.some(p => p.id === pId)) {
+                        openDetail(pId);
+                    }
+                }, 300);
             }
         });
     </script>
