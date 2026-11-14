@@ -111,6 +111,12 @@
 
         <!-- DETAIL VIEW -->
         <div id="view-detail" class="hidden space-y-6">
+            <!-- NFC / Deep Link Banner -->
+            <div id="tag-opened-banner" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-xl px-3.5 py-2 text-xs font-semibold flex justify-between items-center">
+                <span>📲 Opened directly via Plant Tag</span>
+                <button onclick="document.getElementById('tag-opened-banner').classList.add('hidden')" class="text-emerald-400 hover:text-white text-xs ml-2">✕</button>
+            </div>
+
             <div class="flex justify-between items-center gap-2">
                 <button onclick="goHome()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold uppercase tracking-wider flex items-center space-x-1">
                     <span>← Overview</span>
@@ -133,7 +139,8 @@
                         <p class="text-[11px] text-slate-400 mt-2">Planted: <span id="detail-date" class="text-slate-200"></span> <span id="detail-harvest-date-wrap" class="hidden">• Harvested: <span id="detail-harvest-date" class="text-slate-200"></span></span></p>
                     </div>
                     <div class="flex items-center space-x-1.5 shrink-0">
-                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">🖨️</button>
+                        <button onclick="openNfcModal()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-xs font-bold transition" title="Write or Read NFC Plant Tag">📲 NFC</button>
+                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition" title="Print QR Label">🖨️</button>
                         <button onclick="openEditModal()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-[#1e2336]">Edit</button>
                         <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-500/20">✕</button>
                     </div>
@@ -159,15 +166,42 @@
                         <button onclick="recordWatering()" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-2 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
                     </div>
 
-                    <!-- Rating Box & Yield Stats (Archive) -->
+                    <!-- LOCKED RATING BOX & YIELD STATS (Archive) -->
                     <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center sm:col-span-2 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Rating (Finished Product)</span>
-                            <span id="plant-rating-display" class="text-blue-400 font-black text-sm">8.0 / 10</span>
+                        <!-- Locked View (Default - prevents accidental touch edits) -->
+                        <div id="rating-locked-view" class="flex justify-between items-center">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] flex items-center gap-1">
+                                    <span>🔒 Rating</span>
+                                </span>
+                                <div class="mt-0.5">
+                                    <span id="plant-rating-display" class="text-blue-400 font-black text-xl">8.0</span>
+                                    <span class="text-slate-500 text-xs font-bold">/ 10</span>
+                                </div>
+                            </div>
+                            <button onclick="unlockRating()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                                Unlock to Edit
+                            </button>
                         </div>
-                        <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="updatePlantRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
+
+                        <!-- Unlocked Edit View -->
+                        <div id="rating-edit-view" class="hidden space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-amber-400 font-bold uppercase tracking-[0.15em]">🔓 Editing Rating</span>
+                                <span id="plant-rating-edit-display" class="text-blue-400 font-black text-base">8.0 / 10</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <button type="button" onclick="adjustTempRating(-0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">- 0.1</button>
+                                <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="previewSliderRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
+                                <button type="button" onclick="adjustTempRating(0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">+ 0.1</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="cancelRatingEdit()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] py-1.5 rounded-lg text-xs font-semibold transition">Cancel</button>
+                                <button type="button" onclick="saveRatingEdit()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded-lg text-xs font-bold transition">Save Rating</button>
+                            </div>
+                        </div>
                         
-                        <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2 border-t border-[#1e2336] flex justify-between">
+                        <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2.5 border-t border-[#1e2336] flex justify-between">
                             <span>Dry Yield: <strong id="sum-dry" class="text-white">-</strong> g</span>
                             <span>Rosin Return: <strong id="sum-return" class="text-amber-400">-</strong></span>
                         </div>
@@ -195,7 +229,6 @@
                         <input type="number" id="tri-amber" min="0" max="100" placeholder="20" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
                     </div>
                 </div>
-                <!-- Visual Trichome Ratio Bar + Effect Predictor -->
                 <div class="space-y-1.5 pt-1">
                     <div class="w-full h-2.5 bg-[#090a0f] rounded-full overflow-hidden flex border border-[#1e2336]">
                         <div id="tri-bar-clear" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
@@ -308,7 +341,60 @@
         </div>
     </main>
 
-    <!-- MODALS -->
+    <!-- NFC PLANT TAG MODAL -->
+    <div id="nfc-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-emerald-400">📲 NFC Plant Tag</h3>
+                <button onclick="closeNfcModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+            </div>
+
+            <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Plant</span>
+                    <span id="nfc-plant-type" class="text-[10px] text-slate-300 bg-[#12151f] border border-[#1e2336] px-2 py-0.5 rounded font-semibold"></span>
+                </div>
+                <div id="nfc-plant-strain" class="text-base font-black text-white"></div>
+                <div class="pt-1">
+                    <label class="block text-[10px] text-slate-500 uppercase font-semibold mb-1">Direct Tag URL</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="nfc-url-display" readonly class="w-full bg-[#12151f] border border-[#1e2336] text-slate-300 rounded-lg px-2.5 py-1.5 text-[11px] font-mono select-all">
+                        <button type="button" onclick="copyNfcUrl()" id="nfc-copy-btn" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition">📋 Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web NFC Direct Write & Read (Supported on Android Chrome) -->
+            <div id="web-nfc-supported-box" class="space-y-2.5">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Tap <strong class="text-slate-200">Write to NFC Tag</strong> and hold your 3D-printed plant stake (NTAG213 / 215 / 216) against the back of your phone.
+                </p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button type="button" onclick="writeNfcTag()" id="btn-write-nfc" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition shadow-lg shadow-emerald-900/30">
+                        📲 Write Tag
+                    </button>
+                    <button type="button" onclick="readNfcTag()" id="btn-read-nfc" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#1e2336] font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">
+                        🔍 Read / Test
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fallback Notice for Non-Web-NFC Browsers -->
+            <div id="web-nfc-unsupported-box" class="hidden bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300 leading-relaxed">
+                Direct browser NFC writing requires Chrome on Android over HTTPS. Use the <strong>Copy</strong> button above and paste the URL into an NFC writer app (such as <em>NFC Tools</em>) to program your tag.
+            </div>
+
+            <!-- Live NFC Status Box -->
+            <div id="nfc-status-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 text-xs space-y-2">
+                <div class="flex justify-between items-center gap-2">
+                    <span id="nfc-status-text" class="text-slate-200 font-medium leading-snug"></span>
+                    <button type="button" id="nfc-cancel-op-btn" onclick="abortNfcOperation()" class="hidden bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0">Stop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTHER MODALS -->
     <div id="label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Label Preview</h3>
@@ -351,18 +437,25 @@
     <div id="metrics-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Environment / Nutrient Metric</h3>
-            <div class="grid grid-cols-2 gap-3">
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="e.g. 6.2" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="e.g. 1.4" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp (°C)</label><input type="number" step="0.5" id="metric-temp" oninput="updateLiveVPDPreview()" placeholder="e.g. 24" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
-                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Humidity (%)</label><input type="number" id="metric-rh" oninput="updateLiveVPDPreview()" placeholder="e.g. 60" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+            
+            <!-- Quick Feeding Presets -->
+            <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="applyMetricPreset('veg')" class="bg-[#181d2e] hover:bg-[#22283d] text-emerald-400 border border-[#1e2336] px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">🌱 Veg Feed</button>
+                <button type="button" onclick="applyMetricPreset('bloom')" class="bg-[#181d2e] hover:bg-[#22283d] text-blue-400 border border-[#1e2336] px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">🌸 Bloom Feed</button>
+                <button type="button" onclick="applyMetricPreset('flush')" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">💧 Flush / RO</button>
             </div>
-            <!-- Live Auto-VPD Preview -->
+
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">pH</label><input type="number" step="0.1" id="metric-ph" placeholder="e.g. 6.0" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">EC (mS/cm)</label><input type="number" step="0.01" id="metric-ec" placeholder="e.g. 1.6" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Temp (°C)</label><input type="number" step="0.1" id="metric-temp" oninput="updateLiveVPDPreview()" placeholder="e.g. 24.5" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+                <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Humidity (%)</label><input type="number" step="0.1" id="metric-rh" oninput="updateLiveVPDPreview()" placeholder="e.g. 58" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+            </div>
             <div id="live-vpd-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl px-3.5 py-2.5 flex justify-between items-center text-xs">
                 <span class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Auto VPD</span>
                 <span id="live-vpd-result" class="text-slate-500 font-semibold">Enter Temp & RH</span>
             </div>
-            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Extra</label><input type="text" id="metric-note" placeholder="e.g. Added some Cal-Mag" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
+            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Extra</label><input type="text" id="metric-note" placeholder="e.g. Powder Feeding + Cal-Mag" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeMetricsModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
                 <button onclick="saveMetric()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save Metric</button>
@@ -421,7 +514,7 @@
         </div>
     </div>
 
-    <!-- UNIFIED INDEXEDDB + SMART FEATURES -->
+    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC TAG WRITER/READER -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
@@ -433,6 +526,8 @@
         let activeStageKey = null;
         let pendingImagesData = [];
         let archiveSort = 'newest';
+        let tempRatingValue = 8.0;
+        let nfcAbortController = null;
 
         function normalizePlant(p) {
             return {
@@ -446,6 +541,11 @@
                 yieldData: p.yieldData || { wet: '', dry: '', rosin: '' },
                 terpenes: p.terpenes || { primary: 'Myrcene', secondary: 'None', notes: '' }
             };
+        }
+
+        function getPlantDeepLink(plantId) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            return `${baseUrl}#plant=${encodeURIComponent(String(plantId))}`;
         }
 
         function countPlantImages(p) {
@@ -493,6 +593,219 @@
             }
             resEl.textContent = `${vpdData.val} kPa • ${vpdData.label}`;
             resEl.className = `font-bold ${vpdData.color}`;
+        }
+
+        function applyMetricPreset(type) {
+            if (type === 'veg') {
+                document.getElementById('metric-ph').value = '5.8';
+                document.getElementById('metric-ec').value = '1.4';
+                document.getElementById('metric-note').value = 'Veg feed + Cal-Mag';
+            } else if (type === 'bloom') {
+                document.getElementById('metric-ph').value = '6.0';
+                document.getElementById('metric-ec').value = '1.8';
+                document.getElementById('metric-note').value = 'Bloom feed + PK';
+            } else if (type === 'flush') {
+                document.getElementById('metric-ph').value = '6.2';
+                document.getElementById('metric-ec').value = '0.1';
+                document.getElementById('metric-note').value = 'Pure RO water flush';
+            }
+        }
+
+        /* NFC TAG MODAL, WRITER & READER */
+        function openNfcModal() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+
+            abortNfcOperation();
+
+            document.getElementById('nfc-plant-strain').textContent = plant.strain;
+            document.getElementById('nfc-plant-type').textContent = plant.type || 'Autoflower';
+            document.getElementById('nfc-url-display').value = getPlantDeepLink(plant.id);
+            document.getElementById('nfc-status-box').classList.add('hidden');
+
+            const supported = ('NDEFReader' in window);
+            document.getElementById('web-nfc-supported-box').classList.toggle('hidden', !supported);
+            document.getElementById('web-nfc-unsupported-box').classList.toggle('hidden', supported);
+
+            document.getElementById('nfc-modal').classList.remove('hidden');
+        }
+
+        function closeNfcModal() {
+            abortNfcOperation();
+            document.getElementById('nfc-modal').classList.add('hidden');
+        }
+
+        function abortNfcOperation() {
+            if (nfcAbortController) {
+                try { nfcAbortController.abort(); } catch (_) {}
+                nfcAbortController = null;
+            }
+            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
+            if (cancelBtn) cancelBtn.classList.add('hidden');
+        }
+
+        function setNfcStatus(message, tone = 'info', showCancel = false) {
+            const box = document.getElementById('nfc-status-box');
+            const text = document.getElementById('nfc-status-text');
+            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
+
+            box.classList.remove('hidden');
+            text.textContent = message;
+
+            if (tone === 'success') {
+                text.className = 'text-emerald-400 font-semibold leading-snug';
+            } else if (tone === 'error') {
+                text.className = 'text-red-400 font-semibold leading-snug';
+            } else if (tone === 'waiting') {
+                text.className = 'text-blue-400 font-semibold leading-snug animate-pulse';
+            } else {
+                text.className = 'text-slate-200 font-medium leading-snug';
+            }
+
+            cancelBtn.classList.toggle('hidden', !showCancel);
+        }
+
+        async function copyNfcUrl() {
+            const urlInput = document.getElementById('nfc-url-display');
+            const btn = document.getElementById('nfc-copy-btn');
+            try {
+                await navigator.clipboard.writeText(urlInput.value);
+                btn.textContent = '✅ Copied';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
+            } catch (_) {
+                urlInput.select();
+                document.execCommand('copy');
+                btn.textContent = '✅ Copied';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
+            }
+        }
+
+        async function writeNfcTag() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant || !('NDEFReader' in window)) return;
+
+            abortNfcOperation();
+            nfcAbortController = new AbortController();
+            const targetUrl = getPlantDeepLink(plant.id);
+
+            setNfcStatus('📡 Hold your NFC tag against the back of your phone...', 'waiting', true);
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.write(
+                    { records: [{ recordType: 'url', data: targetUrl }] },
+                    { signal: nfcAbortController.signal }
+                );
+                nfcAbortController = null;
+                if (navigator.vibrate) navigator.vibrate(100);
+                setNfcStatus(`✅ NFC tag programmed for "${plant.strain}"! Tap it anytime to open this plant.`, 'success', false);
+            } catch (err) {
+                nfcAbortController = null;
+                if (err?.name === 'AbortError') {
+                    setNfcStatus('NFC write cancelled.', 'info', false);
+                } else {
+                    setNfcStatus(`❌ Write failed: ${err?.message || 'Keep the tag steady against the phone and try again.'}`, 'error', false);
+                }
+            }
+        }
+
+        async function readNfcTag() {
+            if (!('NDEFReader' in window)) return;
+
+            abortNfcOperation();
+            nfcAbortController = new AbortController();
+
+            setNfcStatus('🔍 Hold an NFC tag against your phone to inspect it...', 'waiting', true);
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan({ signal: nfcAbortController.signal });
+
+                ndef.onreadingerror = () => {
+                    setNfcStatus('❌ Could not read NFC tag. Try repositioning it.', 'error', false);
+                    abortNfcOperation();
+                };
+
+                ndef.onreading = (event) => {
+                    const decoder = new TextDecoder();
+                    let foundData = '';
+                    for (const record of event.message.records) {
+                        if (record.recordType === 'url' || record.recordType === 'text') {
+                            foundData = decoder.decode(record.data);
+                            break;
+                        }
+                    }
+                    if (navigator.vibrate) navigator.vibrate(60);
+
+                    if (foundData.includes('#plant=')) {
+                        const scannedId = decodeURIComponent(foundData.split('#plant=')[1].split('&')[0]);
+                        const matchedPlant = plants.find(p => p.id === scannedId);
+                        if (matchedPlant) {
+                            setNfcStatus(`✅ Tag linked to: "${matchedPlant.strain}" (${matchedPlant.type || 'Autoflower'})`, 'success', false);
+                        } else {
+                            setNfcStatus(`⚠️ Tag contains plant ID "${scannedId}", which is not in this device's database.`, 'info', false);
+                        }
+                    } else if (foundData) {
+                        setNfcStatus(`ℹ️ Tag content: ${foundData}`, 'info', false);
+                    } else {
+                        setNfcStatus('ℹ️ Tag is blank / unformatted.', 'info', false);
+                    }
+                    abortNfcOperation();
+                };
+            } catch (err) {
+                nfcAbortController = null;
+                if (err?.name === 'AbortError') {
+                    setNfcStatus('NFC scan stopped.', 'info', false);
+                } else {
+                    setNfcStatus(`❌ Scan error: ${err?.message || 'NFC permission denied or disabled.'}`, 'error', false);
+                }
+            }
+        }
+
+        /* LOCKED RATING WORKFLOW */
+        function renderLockedRatingState(plant) {
+            const savedVal = plant.rating !== undefined ? Number(plant.rating) : 8.0;
+            tempRatingValue = savedVal;
+            document.getElementById('plant-rating-display').textContent = savedVal.toFixed(1);
+            document.getElementById('plant-rating-edit-display').textContent = `${savedVal.toFixed(1)} / 10`;
+            document.getElementById('plant-rating-slider').value = savedVal;
+            document.getElementById('rating-locked-view').classList.remove('hidden');
+            document.getElementById('rating-edit-view').classList.add('hidden');
+        }
+
+        function unlockRating() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            const savedVal = plant.rating !== undefined ? Number(plant.rating) : 8.0;
+            tempRatingValue = savedVal;
+            document.getElementById('plant-rating-slider').value = savedVal;
+            document.getElementById('plant-rating-edit-display').textContent = `${savedVal.toFixed(1)} / 10`;
+            document.getElementById('rating-locked-view').classList.add('hidden');
+            document.getElementById('rating-edit-view').classList.remove('hidden');
+        }
+
+        function previewSliderRating(val) {
+            tempRatingValue = Math.min(10, Math.max(0, Math.round(parseFloat(val) * 10) / 10));
+            document.getElementById('plant-rating-edit-display').textContent = `${tempRatingValue.toFixed(1)} / 10`;
+        }
+
+        function adjustTempRating(delta) {
+            tempRatingValue = Math.min(10, Math.max(0, Math.round((tempRatingValue + delta) * 10) / 10));
+            document.getElementById('plant-rating-slider').value = tempRatingValue;
+            document.getElementById('plant-rating-edit-display').textContent = `${tempRatingValue.toFixed(1)} / 10`;
+        }
+
+        function cancelRatingEdit() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant) renderLockedRatingState(plant);
+        }
+
+        function saveRatingEdit() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.rating = tempRatingValue;
+            savePlantToDB(plant);
+            renderLockedRatingState(plant);
         }
 
         function updateTrichomeVisual() {
@@ -696,15 +1009,6 @@
             renderDashboard();
         }
 
-        function updatePlantRating(val) {
-            document.getElementById('plant-rating-display').innerText = val + " / 10";
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant) {
-                plant.rating = parseFloat(val);
-                savePlantToDB(plant);
-            }
-        }
-
         function saveTrichomeStatus() {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
@@ -812,21 +1116,13 @@
                 archiveStatsBar.classList.add('hidden');
                 archiveContainer.innerHTML = `<div class="bg-[#12151f]/50 border border-[#1e2336]/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">No archived grows yet.</p></div>`;
             } else {
-                // Sort archived plants
                 const sortedArchive = [...archivedPlants].sort((a, b) => {
-                    if (archiveSort === 'rating') {
-                        return (b.rating ?? 8.0) - (a.rating ?? 8.0);
-                    }
-                    if (archiveSort === 'rosin') {
-                        return getRosinReturnPct(b) - getRosinReturnPct(a);
-                    }
-                    if (archiveSort === 'yield') {
-                        return (parseFloat(b.yieldData?.dry) || 0) - (parseFloat(a.yieldData?.dry) || 0);
-                    }
+                    if (archiveSort === 'rating') return (b.rating ?? 8.0) - (a.rating ?? 8.0);
+                    if (archiveSort === 'rosin') return getRosinReturnPct(b) - getRosinReturnPct(a);
+                    if (archiveSort === 'yield') return (parseFloat(b.yieldData?.dry) || 0) - (parseFloat(a.yieldData?.dry) || 0);
                     return String(b.harvestedDate).localeCompare(String(a.harvestedDate));
                 });
 
-                // Compute summary stats
                 const avgDays = Math.round(archivedPlants.reduce((acc, p) => acc + calculateDays(p.date, p.harvestedDate), 0) / archivedPlants.length);
                 const avgRating = (archivedPlants.reduce((acc, p) => acc + (p.rating ?? 8.0), 0) / archivedPlants.length).toFixed(1);
                 const totalDry = archivedPlants.reduce((acc, p) => acc + (parseFloat(p.yieldData?.dry) || 0), 0);
@@ -901,9 +1197,7 @@
             savePlantToDB(newPlant);
             document.getElementById('plant-form').reset();
             setDefaultDate();
-            renderDashboard();
-
-            if (confirm("Plant saved! Do you want to print a label for the pot right away?")) openLabelModal(strain, type, formatDate(date), newPlant.id);
+            openDetail(newPlant.id);
         }
 
         function growAgain() {
@@ -963,7 +1257,7 @@
             
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = "";
-            const targetUrl = window.location.href.split('#')[0] + (plantId ? `#plant=${plantId}` : '');
+            const targetUrl = plantId ? getPlantDeepLink(plantId) : (window.location.origin + window.location.pathname);
             new QRCode(qrContainer, { text: targetUrl, width: 75, height: 75 });
 
             document.getElementById('label-modal').classList.remove('hidden');
@@ -976,10 +1270,21 @@
 
         function closeLabelModal() { document.getElementById('label-modal').classList.add('hidden'); }
 
-        function openDetail(id) {
+        function openDetail(id, openedViaTag = false) {
             activePlantId = String(id);
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
+
+            try {
+                history.replaceState(null, '', `#plant=${encodeURIComponent(plant.id)}`);
+            } catch (_) {}
+
+            const tagBanner = document.getElementById('tag-opened-banner');
+            if (openedViaTag) {
+                tagBanner.classList.remove('hidden');
+            } else {
+                tagBanner.classList.add('hidden');
+            }
 
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-detail').classList.remove('hidden');
@@ -1032,9 +1337,7 @@
                 archiveRatingBox.classList.remove('hidden');
                 waterWidgetBox.classList.add('hidden');
                 
-                const currentRating = plant.rating !== undefined ? plant.rating : 8.0;
-                document.getElementById('plant-rating-slider').value = currentRating;
-                document.getElementById('plant-rating-display').innerText = Number(currentRating).toFixed(1) + " / 10";
+                renderLockedRatingState(plant);
                 
                 harvestContainer.innerHTML = `
                     <button onclick="growAgain()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">↻ Grow Again</button>
@@ -1201,6 +1504,9 @@
 
         function goHome() {
             activePlantId = null;
+            try {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+            } catch (_) {}
             document.getElementById('view-detail').classList.add('hidden');
             document.getElementById('view-dashboard').classList.remove('hidden');
             renderDashboard();
@@ -1431,15 +1737,21 @@
             }
         }
 
-        setDefaultDate();
-        initDB().then(() => {
-            const hash = window.location.hash;
+        function handleRouteFromHash() {
+            const hash = window.location.hash || '';
             if (hash.includes('#plant=')) {
-                const pId = hash.split('=')[1];
+                const pId = decodeURIComponent(hash.split('#plant=')[1].split('&')[0]);
                 if (plants.some(p => p.id === pId)) {
-                    openDetail(pId);
+                    openDetail(pId, true);
                 }
             }
+        }
+
+        window.addEventListener('hashchange', handleRouteFromHash);
+
+        setDefaultDate();
+        initDB().then(() => {
+            handleRouteFromHash();
         });
     </script>
 </body>
