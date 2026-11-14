@@ -385,7 +385,7 @@
         </div>
     </div>
 
-    <!-- STABILIZED LOCAL STORAGE JAVASCRIPT -->
+    <!-- STABILIZED & BACKWARD-COMPATIBLE STORAGE LOGIC -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
 
@@ -396,11 +396,13 @@
         let pendingImagesData = [];
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
 
-        // Bruker stabil og umiddelbar localStorage i bunn for å garantere at data aldri forsvinner ved oppdatering.
-        // (localStorage støtter opptil 5-10MB, og med bildekomprimering holder dette i massevis lokalt).
+        // Sikrer at vi sjekker BÅDE gammel og ny lagringsnøkkel slik at data ikke blir borte
         function loadPlants() {
             try {
-                const rawData = localStorage.getItem('trichome_plants_v2');
+                let rawData = localStorage.getItem('trichome_plants_v2');
+                if (!rawData) {
+                    rawData = localStorage.getItem('trichome_plants'); // Hent fra gammel nøkkel hvis ny mangler
+                }
                 if (rawData) {
                     const parsed = JSON.parse(rawData);
                     if (Array.isArray(parsed)) {
@@ -425,7 +427,9 @@
 
         function savePlants() {
             try {
-                localStorage.setItem('trichome_plants_v2', JSON.stringify(plants));
+                const dataString = JSON.stringify(plants);
+                localStorage.setItem('trichome_plants_v2', dataString);
+                localStorage.setItem('trichome_plants', dataString); // Lagrer til begge for sikkerhets skyld
             } catch (e) {
                 alert("Lagringsplassen på enheten er full!");
             }
