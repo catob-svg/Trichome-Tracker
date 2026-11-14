@@ -267,7 +267,7 @@
                 </div>
             </div>
 
-            <!-- SENSORY & EFFECT PROFILE (Reworked practical aroma/flavor/loudness/vibe log) -->
+            <!-- SENSORY & EFFECT PROFILE -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">👃 Sensory & Effect Profile</h3>
@@ -339,12 +339,58 @@
         </div>
     </main>
 
+    <!-- NEW PLANT TAG & LABEL PROMPT MODAL -->
+    <div id="new-plant-tag-prompt-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5 border border-emerald-500/30">
+            <div class="space-y-1.5 text-center">
+                <div class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-xl mx-auto mb-1">
+                    🏷️
+                </div>
+                <h3 class="text-sm font-black uppercase tracking-[0.15em] text-white">Create Tag & Label</h3>
+                <p class="text-xs text-slate-400">
+                    New plant started: <strong id="prompt-plant-name" class="text-white"></strong>
+                    <span id="prompt-plant-type" class="text-slate-500"></span>
+                </p>
+                <p class="text-[11px] text-slate-400 pt-0.5">Choose how you want to label this pot right now:</p>
+            </div>
+
+            <div class="space-y-2.5">
+                <button type="button" onclick="handleNewPlantTagChoice('both')" class="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-500 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-4 rounded-xl transition shadow-lg flex items-center justify-between">
+                    <span>📲 + 🖨️ Both (NFC Tag + Print Label)</span>
+                    <span class="text-[10px] bg-black/25 px-2 py-0.5 rounded-md">Recommended</span>
+                </button>
+
+                <button type="button" onclick="handleNewPlantTagChoice('nfc')" class="w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition flex items-center justify-between">
+                    <span>📲 NFC Tag Only</span>
+                    <span class="text-[10px] text-emerald-400/80 font-normal">Write to 3D stake</span>
+                </button>
+
+                <button type="button" onclick="handleNewPlantTagChoice('print')" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition flex items-center justify-between">
+                    <span>🖨️ Print Label Only</span>
+                    <span class="text-[10px] text-blue-400/80 font-normal">QR sticker / paper</span>
+                </button>
+            </div>
+
+            <button type="button" onclick="handleNewPlantTagChoice('skip')" class="w-full text-slate-500 hover:text-slate-300 text-xs font-semibold uppercase tracking-wider py-1.5 transition">
+                Skip for now
+            </button>
+        </div>
+    </div>
+
     <!-- NFC PLANT TAG MODAL -->
     <div id="nfc-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-emerald-400">📲 NFC Plant Tag</h3>
                 <button onclick="closeNfcModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+            </div>
+
+            <!-- Step 1 of 2 Banner (Shown when "Both" was chosen) -->
+            <div id="nfc-chained-step-banner" class="hidden bg-blue-500/10 border border-blue-500/30 rounded-xl px-3.5 py-2.5 flex justify-between items-center gap-2">
+                <span class="text-[11px] text-blue-300 font-semibold">Step 1 of 2: Program NFC Tag</span>
+                <button type="button" onclick="proceedToChainedPrintLabel()" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition">
+                    Next: Print Label →
+                </button>
             </div>
 
             <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 space-y-2">
@@ -392,10 +438,13 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS -->
+    <!-- PRINT LABEL MODAL -->
     <div id="label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
-            <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Label Preview</h3>
+            <div class="space-y-1">
+                <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Label Preview</h3>
+                <p id="label-chained-step-text" class="hidden text-[11px] text-blue-400 font-semibold">Step 2 of 2: Print Physical Label</p>
+            </div>
             <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center">
                 <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
                 <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
@@ -412,6 +461,7 @@
         </div>
     </div>
 
+    <!-- OTHER MODALS -->
     <div id="curing-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">New Curing Log</h3>
@@ -512,7 +562,7 @@
         </div>
     </div>
 
-    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY PROFILE -->
+    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY + NEW PLANT TAG PROMPT -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
@@ -555,6 +605,7 @@
         let archiveSort = 'newest';
         let tempRatingValue = 8.0;
         let nfcAbortController = null;
+        let pendingPrintAfterNfc = false;
 
         function normalizePlant(p) {
             const existingSensory = p.sensory || {};
@@ -588,11 +639,47 @@
             }, 1400);
         }
 
+        /* NEW PLANT TAG & LABEL PROMPT */
+        function openNewPlantTagPrompt(plantId) {
+            const plant = plants.find(p => p.id === String(plantId));
+            if (!plant) return;
+            pendingPrintAfterNfc = false;
+            document.getElementById('prompt-plant-name').textContent = plant.strain;
+            document.getElementById('prompt-plant-type').textContent = `(${plant.type || 'Autoflower'})`;
+            document.getElementById('new-plant-tag-prompt-modal').classList.remove('hidden');
+        }
+
+        function closeNewPlantTagPrompt() {
+            document.getElementById('new-plant-tag-prompt-modal').classList.add('hidden');
+        }
+
+        function handleNewPlantTagChoice(choice) {
+            closeNewPlantTagPrompt();
+            if (choice === 'nfc') {
+                pendingPrintAfterNfc = false;
+                openNfcModal();
+            } else if (choice === 'print') {
+                pendingPrintAfterNfc = false;
+                openLabelModalForActive();
+            } else if (choice === 'both') {
+                pendingPrintAfterNfc = true;
+                openNfcModal();
+            } else {
+                pendingPrintAfterNfc = false;
+            }
+        }
+
+        function proceedToChainedPrintLabel() {
+            pendingPrintAfterNfc = false;
+            abortNfcOperation();
+            document.getElementById('nfc-modal').classList.add('hidden');
+            openLabelModalForActive(true);
+        }
+
         /* SENSORY & EFFECT PROFILE FUNCTIONS */
         function renderSensoryEditor(plant) {
             const sensory = plant.sensory || { flavors: [], loudness: 3, effects: [], notes: '' };
 
-            // Render Flavor Pills
             const flavorsGrid = document.getElementById('sensory-flavors-grid');
             flavorsGrid.innerHTML = FLAVOR_OPTIONS.map(flavor => {
                 const isSelected = sensory.flavors.includes(flavor);
@@ -602,7 +689,6 @@
                 return `<button type="button" onclick="toggleSensoryFlavor('${flavor}')" class="border px-2.5 py-1.5 rounded-xl text-[11px] font-semibold transition ${cls}">${flavor}</button>`;
             }).join('');
 
-            // Render Loudness 1-5 Buttons
             const loudness = sensory.loudness || 3;
             const lInfo = LOUDNESS_LABELS[loudness] || LOUDNESS_LABELS[3];
             const lLabel = document.getElementById('sensory-loudness-label');
@@ -618,7 +704,6 @@
                 return `<button type="button" onclick="setSensoryLoudness(${num})" class="border py-1.5 rounded-lg text-xs transition ${cls}">${num}</button>`;
             }).join('');
 
-            // Render Effect Pills
             const effectsGrid = document.getElementById('sensory-effects-grid');
             effectsGrid.innerHTML = EFFECT_OPTIONS.map(effect => {
                 const isSelected = sensory.effects.includes(effect);
@@ -744,6 +829,7 @@
 
             abortNfcOperation();
 
+            document.getElementById('nfc-chained-step-banner').classList.toggle('hidden', !pendingPrintAfterNfc);
             document.getElementById('nfc-plant-strain').textContent = plant.strain;
             document.getElementById('nfc-plant-type').textContent = plant.type || 'Autoflower';
             document.getElementById('nfc-url-display').value = getPlantDeepLink(plant.id);
@@ -759,6 +845,10 @@
         function closeNfcModal() {
             abortNfcOperation();
             document.getElementById('nfc-modal').classList.add('hidden');
+            if (pendingPrintAfterNfc) {
+                pendingPrintAfterNfc = false;
+                openLabelModalForActive(true);
+            }
         }
 
         function abortNfcOperation() {
@@ -824,7 +914,8 @@
                 );
                 nfcAbortController = null;
                 if (navigator.vibrate) navigator.vibrate(100);
-                setNfcStatus(`✅ NFC tag programmed for "${plant.strain}"! Tap it anytime to open this plant.`, 'success', false);
+                const extraHint = pendingPrintAfterNfc ? ' Tap "Next: Print Label →" above when ready.' : ' Tap it anytime to open this plant.';
+                setNfcStatus(`✅ NFC tag programmed for "${plant.strain}"!${extraHint}`, 'success', false);
             } catch (err) {
                 nfcAbortController = null;
                 if (err?.name === 'AbortError') {
@@ -1312,6 +1403,7 @@
             document.getElementById('plant-form').reset();
             setDefaultDate();
             openDetail(newPlant.id);
+            openNewPlantTagPrompt(newPlant.id);
         }
 
         function growAgain() {
@@ -1340,6 +1432,7 @@
             plants.unshift(clonedRun);
             savePlantToDB(clonedRun);
             openDetail(clonedRun.id);
+            openNewPlantTagPrompt(clonedRun.id);
         }
 
         function recordWatering() {
@@ -1360,10 +1453,11 @@
             box.innerText = daysAgo === 0 ? "Today" : (daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`);
         }
 
-        function openLabelModal(strain, type, dateStr, plantId = activePlantId) {
+        function openLabelModal(strain, type, dateStr, plantId = activePlantId, isStepTwo = false) {
             document.getElementById('label-strain-text').innerText = strain;
             document.getElementById('label-type-text').innerText = type;
             document.getElementById('label-date-text').innerText = dateStr;
+            document.getElementById('label-chained-step-text').classList.toggle('hidden', !isStepTwo);
             
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = "";
@@ -1373,9 +1467,9 @@
             document.getElementById('label-modal').classList.remove('hidden');
         }
 
-        function openLabelModalForActive() {
+        function openLabelModalForActive(isStepTwo = false) {
             const plant = plants.find(p => p.id === activePlantId);
-            if (plant) openLabelModal(plant.strain, plant.type || 'Autoflower', formatDate(plant.date), plant.id);
+            if (plant) openLabelModal(plant.strain, plant.type || 'Autoflower', formatDate(plant.date), plant.id, isStepTwo);
         }
 
         function closeLabelModal() { document.getElementById('label-modal').classList.add('hidden'); }
@@ -1612,6 +1706,7 @@
 
         function goHome() {
             activePlantId = null;
+            pendingPrintAfterNfc = false;
             try {
                 history.replaceState(null, '', window.location.pathname + window.location.search);
             } catch (_) {}
