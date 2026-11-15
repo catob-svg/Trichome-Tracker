@@ -562,10 +562,11 @@
         </div>
     </div>
 
-    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY + NEW PLANT TAG PROMPT -->
+    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY + NEW PLANT TAG PROMPT + RADIAL DAY RING -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
+        const TARGET_CYCLE_DAYS = 90;
 
         const FLAVOR_OPTIONS = [
             "⛽ Gas / Diesel",
@@ -637,6 +638,59 @@
                 btn.textContent = origText;
                 btn.classList.remove("bg-emerald-600/30", "text-emerald-300", "border-emerald-500/40");
             }, 1400);
+        }
+
+        /* RADIAL 90-DAY PROGRESS RING */
+        function renderDayProgressRing(days, isArchived = false) {
+            const pct = Math.min(100, Math.max(0, (days / TARGET_CYCLE_DAYS) * 100));
+            const radius = 28;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference * (1 - pct / 100);
+            const dayLabel = days === 1 ? 'DAY' : 'DAYS';
+
+            let strokeColor = '#3b82f6';
+            let textColor = 'text-blue-400';
+
+            if (isArchived) {
+                strokeColor = '#10b981';
+                textColor = 'text-slate-100';
+            } else if (days >= 75) {
+                strokeColor = '#f97316';
+                textColor = 'text-orange-400';
+            } else if (days >= 55) {
+                strokeColor = '#f59e0b';
+                textColor = 'text-amber-400';
+            } else if (days >= 25) {
+                strokeColor = '#10b981';
+                textColor = 'text-emerald-400';
+            }
+
+            return `
+                <div class="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center bg-[#090a0f] rounded-full border border-[#1e2336]/80 shadow-inner">
+                    <svg class="w-full h-full -rotate-90" viewBox="0 0 68 68">
+                        <circle
+                            cx="34" cy="34" r="${radius}"
+                            fill="transparent"
+                            stroke="#1e2336"
+                            stroke-width="4.5"
+                        />
+                        ${pct > 0 ? `
+                        <circle
+                            cx="34" cy="34" r="${radius}"
+                            fill="transparent"
+                            stroke="${strokeColor}"
+                            stroke-width="4.5"
+                            stroke-linecap="round"
+                            stroke-dasharray="${circumference.toFixed(2)}"
+                            stroke-dashoffset="${offset.toFixed(2)}"
+                        />` : ''}
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span class="text-lg font-black ${textColor} leading-none tracking-tight">${days}</span>
+                        <span class="text-[8px] font-bold tracking-widest uppercase text-slate-400 mt-0.5">${dayLabel}</span>
+                    </div>
+                </div>
+            `;
         }
 
         /* NEW PLANT TAG & LABEL PROMPT */
@@ -1291,7 +1345,6 @@
             } else {
                 container.innerHTML = activePlants.map(plant => {
                     const days = calculateDays(plant.date);
-                    const dayText = days === 1 ? "day" : "days";
                     const totalImages = countPlantImages(plant);
                     const thumb = getLatestPlantThumbnail(plant);
 
@@ -1308,10 +1361,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[56px] shrink-0">
-                                <span class="text-xl font-black text-blue-400 block leading-tight">${days}</span>
-                                <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">${dayText}</span>
-                            </div>
+                            ${renderDayProgressRing(days, false)}
                         </div>
                     `;
                 }).join('');
@@ -1366,10 +1416,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[54px] shrink-0">
-                                <span class="text-base font-black text-slate-200 block leading-tight">${totalDays}</span>
-                                <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase block">days</span>
-                            </div>
+                            ${renderDayProgressRing(totalDays, true)}
                         </div>
                     `;
                 }).join('');
