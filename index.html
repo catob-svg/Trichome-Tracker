@@ -11,6 +11,8 @@
         body { font-family: 'Inter', sans-serif; background-color: #0b0c10; color: #f1f5f9; }
         .uis-card { background-color: #12151f; border: 1px solid #1e2336; }
         .uis-card-hover:hover { background-color: #181d2e; border-color: #2a324d; }
+        .uis-archive-card { background-color: #0d0f17; border: 1px solid #191d2c; }
+        .uis-archive-card:hover { background-color: #131622; border-color: #262b40; }
         .uis-input { background-color: #090a0f; border: 1px solid #1e2336; color: white; }
         .uis-input:focus { border-color: #0077ff; outline: none; }
         @media print {
@@ -40,6 +42,14 @@
                     <h1 class="text-xs font-bold tracking-[0.2em] text-white uppercase">Trichome Tracker</h1>
                 </div>
             </div>
+
+            <!-- Discreet Settings / Backup Gear Button -->
+            <button onclick="openSettingsModal()" class="w-9 h-9 rounded-xl bg-[#12151f] hover:bg-[#181d2e] border border-[#1e2336] flex items-center justify-center text-slate-400 hover:text-white transition" title="Backup & Settings" aria-label="Backup & Settings">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
         </div>
     </header>
 
@@ -83,8 +93,11 @@
             <!-- Archive Section -->
             <div class="mt-8 pt-6 border-t border-[#1e2336] space-y-3">
                 <div class="flex justify-between items-center px-1 gap-2">
-                    <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">Archive</h2>
-                    <select id="archive-sort-select" onchange="changeArchiveSort(this.value)" class="bg-[#12151f] border border-[#1e2336] text-slate-300 text-[11px] font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xs font-bold uppercase tracking-[0.15em] text-purple-300/80">Archive</h2>
+                        <span class="text-[10px] text-slate-500 font-medium">Completed</span>
+                    </div>
+                    <select id="archive-sort-select" onchange="changeArchiveSort(this.value)" class="bg-[#0d0f17] border border-[#1e2336] text-slate-300 text-[11px] font-semibold rounded-lg px-2.5 py-1 focus:outline-none focus:border-purple-500">
                         <option value="newest">Sort: Newest</option>
                         <option value="rating">Sort: Highest Rating</option>
                         <option value="rosin">Sort: Best Rosin %</option>
@@ -93,24 +106,14 @@
                 </div>
 
                 <!-- Compact Archive Summary Bar -->
-                <div id="archive-stats-bar" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl px-3.5 py-2.5 flex flex-wrap justify-between items-center gap-2 text-[11px] text-slate-400"></div>
+                <div id="archive-stats-bar" class="hidden bg-[#090a0f] border border-[#1a1f30] rounded-xl px-3.5 py-2.5 flex flex-wrap justify-between items-center gap-2 text-[11px] text-slate-400"></div>
 
                 <div id="archive-container" class="space-y-2.5"></div>
-            </div>
-
-            <!-- Backup / Settings -->
-            <div class="uis-card rounded-2xl p-4 flex justify-between items-center mt-6">
-                <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Data & Security</span>
-                <div class="flex items-center space-x-2">
-                    <button onclick="exportData()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium transition border border-[#1e2336]">Backup</button>
-                    <label for="import-file" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer transition border border-[#1e2336]">Restore</label>
-                    <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
-                </div>
             </div>
         </div>
 
         <!-- DETAIL VIEW -->
-        <div id="view-detail" class="hidden space-y-6">
+        <div id="view-detail" class="hidden space-y-5">
             <!-- NFC / Deep Link Banner -->
             <div id="tag-opened-banner" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-xl px-3.5 py-2 text-xs font-semibold flex justify-between items-center">
                 <span>📲 Opened directly via Plant Tag</span>
@@ -124,13 +127,13 @@
                 <div id="action-harvest-container" class="flex items-center gap-2"></div>
             </div>
 
-            <!-- Plant Header Card -->
+            <!-- 1. Plant Header Card -->
             <div class="uis-card rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-4">
                 <div class="flex justify-between items-start gap-3">
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 id="detail-strain" class="text-xl font-black text-white tracking-wide break-words"></h2>
-                            <span id="archive-badge" class="hidden bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
+                            <span id="archive-badge" class="hidden bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
                             <span id="detail-type-badge" class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold"></span>
@@ -168,14 +171,13 @@
 
                     <!-- LOCKED RATING BOX & YIELD STATS (Archive) -->
                     <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center sm:col-span-2 space-y-3">
-                        <!-- Locked View (Default - prevents accidental touch edits) -->
                         <div id="rating-locked-view" class="flex justify-between items-center">
                             <div>
                                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] flex items-center gap-1">
                                     <span>🔒 Rating</span>
                                 </span>
                                 <div class="mt-0.5">
-                                    <span id="plant-rating-display" class="text-blue-400 font-black text-xl">8.0</span>
+                                    <span id="plant-rating-display" class="text-purple-300 font-black text-xl">8.0</span>
                                     <span class="text-slate-500 text-xs font-bold">/ 10</span>
                                 </div>
                             </div>
@@ -184,20 +186,19 @@
                             </button>
                         </div>
 
-                        <!-- Unlocked Edit View -->
                         <div id="rating-edit-view" class="hidden space-y-3">
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] text-amber-400 font-bold uppercase tracking-[0.15em]">🔓 Editing Rating</span>
-                                <span id="plant-rating-edit-display" class="text-blue-400 font-black text-base">8.0 / 10</span>
+                                <span id="plant-rating-edit-display" class="text-purple-300 font-black text-base">8.0 / 10</span>
                             </div>
                             <div class="flex items-center gap-2.5">
                                 <button type="button" onclick="adjustTempRating(-0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">- 0.1</button>
-                                <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="previewSliderRating(this.value)" class="w-full accent-blue-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
+                                <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="previewSliderRating(this.value)" class="w-full accent-purple-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
                                 <button type="button" onclick="adjustTempRating(0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">+ 0.1</button>
                             </div>
                             <div class="flex gap-2">
                                 <button type="button" onclick="cancelRatingEdit()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] py-1.5 rounded-lg text-xs font-semibold transition">Cancel</button>
-                                <button type="button" onclick="saveRatingEdit()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded-lg text-xs font-bold transition">Save Rating</button>
+                                <button type="button" onclick="saveRatingEdit()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-1.5 rounded-lg text-xs font-bold transition">Save Rating</button>
                             </div>
                         </div>
                         
@@ -209,7 +210,24 @@
                 </div>
             </div>
 
-            <!-- TRICHOME RIPENESS CHECKER -->
+            <!-- 2. IMMEDIATE PHOTO GALLERY (All stages visible right away!) -->
+            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3.5">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xs font-bold text-white uppercase tracking-[0.15em]">📸 Plant Photos</h3>
+                        <span id="gallery-total-badge" class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
+                    </div>
+                    <button id="btn-add-image-top" onclick="openSourceModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition shadow-md shadow-blue-900/20">+ Add Photo</button>
+                </div>
+
+                <!-- Stage Filter Pills -->
+                <div id="gallery-filter-pills" class="flex flex-wrap gap-1.5"></div>
+
+                <!-- Photos Grid -->
+                <div id="category-grid" class="pt-0.5"></div>
+            </div>
+
+            <!-- 3. TRICHOME RIPENESS CHECKER -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
@@ -242,7 +260,7 @@
                 </div>
             </div>
 
-            <!-- YIELD & EXTRACTION CALCULATOR -->
+            <!-- 4. YIELD & EXTRACTION CALCULATOR -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin Calculator</h3>
@@ -267,20 +285,18 @@
                 </div>
             </div>
 
-            <!-- SENSORY & EFFECT PROFILE -->
+            <!-- 5. SENSORY & EFFECT PROFILE -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">👃 Sensory & Effect Profile</h3>
                     <button id="btn-save-sensory" onclick="saveSensoryProfile()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
                 </div>
 
-                <!-- Aroma & Flavor Notes -->
                 <div>
                     <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Aroma & Flavor Notes (Select all that apply)</label>
                     <div id="sensory-flavors-grid" class="flex flex-wrap gap-1.5"></div>
                 </div>
 
-                <!-- Terp Loudness (1-5) -->
                 <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Nose / Terp Loudness</span>
@@ -289,20 +305,18 @@
                     <div id="sensory-loudness-buttons" class="grid grid-cols-5 gap-1.5"></div>
                 </div>
 
-                <!-- Effect / Vibe -->
                 <div>
                     <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Experience & Effect</label>
                     <div id="sensory-effects-grid" class="flex flex-wrap gap-1.5"></div>
                 </div>
 
-                <!-- Tasting Notes -->
                 <div>
                     <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-1">Tasting Notes (Jar Nose vs. Inhale / Exhale)</label>
                     <textarea id="sensory-notes" rows="2" placeholder="e.g. Sharp funky cheese on jar crack, sweet creamy gas on exhale..." class="w-full uis-input rounded-xl px-3 py-2 text-xs placeholder-slate-600"></textarea>
                 </div>
             </div>
 
-            <!-- CURING / DRYING LOG (Shown automatically when harvested) -->
+            <!-- 6. CURING / DRYING LOG (Shown automatically when harvested) -->
             <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying Log</h3>
@@ -311,7 +325,7 @@
                 <div id="curing-container" class="space-y-2"></div>
             </div>
 
-            <!-- ENVIRONMENT & NUTRIENT LOG -->
+            <!-- 7. ENVIRONMENT & NUTRIENT LOG -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌡️ Environment & Nutrient Log</h3>
@@ -319,25 +333,37 @@
                 </div>
                 <div id="metrics-container" class="space-y-2"></div>
             </div>
-
-            <!-- UNIFIED CATEGORY SELECTOR & CONTENT CARD -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <label for="category-select" class="text-xs font-bold text-white uppercase tracking-[0.15em]">Category Feed</label>
-                    <button id="btn-add-image-top" onclick="openSourceModal(document.getElementById('category-select').value)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Add Image</button>
-                </div>
-                <select id="category-select" onchange="switchCategory(this.value)" class="w-full uis-input rounded-xl px-4 py-3 text-sm font-semibold transition">
-                    <option value="veg">Vegetation</option>
-                    <option value="flower">Flower</option>
-                    <option value="cured">Cured Buds</option>
-                    <option value="extracts">Extraction</option>
-                </select>
-
-                <!-- Dynamic Content Grid -->
-                <div id="category-grid" class="grid grid-cols-1 gap-4 pt-2"></div>
-            </div>
         </div>
     </main>
+
+    <!-- SETTINGS & BACKUP MODAL (Opened from Header Gear) -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeSettingsModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
+                <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white">⚙️ Backup & Data</h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+            </div>
+
+            <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 flex justify-between items-center text-xs">
+                <span class="text-slate-400">Local Database</span>
+                <span id="settings-db-summary" class="text-slate-200 font-semibold">0 plants • 0 photos</span>
+            </div>
+
+            <div class="space-y-2.5">
+                <button onclick="exportData()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2">
+                    <span>⬇️ Export Backup (.json)</span>
+                </button>
+                <label for="import-file" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#1e2336] font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-2">
+                    <span>⬆️ Restore Backup (.json)</span>
+                </label>
+                <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+            </div>
+
+            <p class="text-[11px] text-slate-500 text-center leading-relaxed">
+                All plants and photos are stored locally in your browser's IndexedDB. Export a backup regularly to keep a copy safe.
+            </p>
+        </div>
+    </div>
 
     <!-- NEW PLANT TAG & LABEL PROMPT MODAL -->
     <div id="new-plant-tag-prompt-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -385,7 +411,6 @@
                 <button onclick="closeNfcModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
             </div>
 
-            <!-- Step 1 of 2 Banner (Shown when "Both" was chosen) -->
             <div id="nfc-chained-step-banner" class="hidden bg-blue-500/10 border border-blue-500/30 rounded-xl px-3.5 py-2.5 flex justify-between items-center gap-2">
                 <span class="text-[11px] text-blue-300 font-semibold">Step 1 of 2: Program NFC Tag</span>
                 <button type="button" onclick="proceedToChainedPrintLabel()" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition">
@@ -408,7 +433,6 @@
                 </div>
             </div>
 
-            <!-- Web NFC Direct Write & Read (Supported on Android Chrome) -->
             <div id="web-nfc-supported-box" class="space-y-2.5">
                 <p class="text-xs text-slate-400 leading-relaxed">
                     Tap <strong class="text-slate-200">Write Tag</strong> and hold your 3D-printed plant stake (NTAG213 / 215 / 216) against the back of your phone.
@@ -423,12 +447,10 @@
                 </div>
             </div>
 
-            <!-- Fallback Notice for Non-Web-NFC Browsers -->
             <div id="web-nfc-unsupported-box" class="hidden bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300 leading-relaxed">
                 Direct browser NFC writing requires Chrome on Android over HTTPS. Use the <strong>Copy</strong> button above and paste the URL into an NFC writer app (such as <em>NFC Tools</em>) to program your tag.
             </div>
 
-            <!-- Live NFC Status Box -->
             <div id="nfc-status-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 text-xs space-y-2">
                 <div class="flex justify-between items-center gap-2">
                     <span id="nfc-status-text" class="text-slate-200 font-medium leading-snug"></span>
@@ -479,14 +501,14 @@
         <div class="relative max-w-full max-h-full overflow-auto p-2" onclick="event.stopPropagation()">
             <img id="lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
         </div>
-        <p id="lightbox-comment" class="text-xs text-slate-300 mt-3 text-center max-w-md px-4 uis-card py-2 rounded-xl whitespace-pre-wrap"></p>
+        <div id="lightbox-meta" class="text-[11px] text-slate-400 mt-2 font-semibold uppercase tracking-wider"></div>
+        <p id="lightbox-comment" class="text-xs text-slate-300 mt-2 text-center max-w-md px-4 uis-card py-2 rounded-xl whitespace-pre-wrap"></p>
     </div>
 
     <div id="metrics-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Environment / Nutrient Metric</h3>
             
-            <!-- Quick Feeding Presets -->
             <div class="flex flex-wrap gap-1.5">
                 <button type="button" onclick="applyMetricPreset('veg')" class="bg-[#181d2e] hover:bg-[#22283d] text-emerald-400 border border-[#1e2336] px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">🌱 Veg Feed</button>
                 <button type="button" onclick="applyMetricPreset('bloom')" class="bg-[#181d2e] hover:bg-[#22283d] text-blue-400 border border-[#1e2336] px-2.5 py-1 rounded-lg text-[11px] font-semibold transition">🌸 Bloom Feed</button>
@@ -531,12 +553,21 @@
         </div>
     </div>
 
+    <!-- IMAGE SOURCE & STAGE PICKER MODAL -->
     <div id="source-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-3 text-center">
-            <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white mb-2">Select Image Source</h3>
-            <button onclick="triggerFileCapture('camera')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">Take Photo with Camera</button>
-            <button onclick="triggerFileCapture('file')" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition border border-[#1e2336]">Choose from Gallery (Multiple)</button>
-            <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-2 transition uppercase font-semibold">Cancel</button>
+        <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-4 text-center">
+            <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white">Add Photo</h3>
+            
+            <div class="text-left space-y-1.5">
+                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Select Stage</label>
+                <div id="upload-stage-selector" class="grid grid-cols-2 gap-1.5"></div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+                <button onclick="triggerFileCapture('camera')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">📷 Take Photo</button>
+                <button onclick="triggerFileCapture('file')" class="w-full bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition border border-[#1e2336]">🖼️ Choose from Gallery</button>
+            </div>
+            <button onclick="closeSourceModal()" class="w-full text-slate-500 hover:text-slate-400 text-xs py-1 transition uppercase font-semibold">Cancel</button>
         </div>
         <input type="file" id="hidden-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
         <input type="file" id="hidden-file-input" accept="image/*" multiple class="hidden" onchange="handleImageSelected(event)">
@@ -562,9 +593,9 @@
         </div>
     </div>
 
-    <!-- UNIFIED INDEXEDDB + LOCKED RATING + NFC + SENSORY + NEW PLANT TAG PROMPT + RADIAL DAY RING -->
     <script>
         const categories = { veg: "Vegetation", flower: "Flower", cured: "Cured Buds", extracts: "Extraction" };
+        const shortCategories = { veg: "Veg", flower: "Flower", cured: "Cured", extracts: "Extracts" };
         const stageKeys = ['veg', 'flower', 'cured', 'extracts'];
         const TARGET_CYCLE_DAYS = 90;
 
@@ -600,8 +631,8 @@
         let db = null;
         let plants = [];
         let activePlantId = null;
-        let currentCategory = 'veg';
-        let activeStageKey = null;
+        let currentCategory = 'all';
+        let activeStageKey = 'veg';
         let pendingImagesData = [];
         let archiveSort = 'newest';
         let tempRatingValue = 8.0;
@@ -640,6 +671,19 @@
             }, 1400);
         }
 
+        /* SETTINGS & BACKUP MODAL */
+        function openSettingsModal() {
+            const totalPhotos = plants.reduce((acc, p) => acc + countPlantImages(p), 0);
+            const plantWord = plants.length === 1 ? 'plant' : 'plants';
+            const photoWord = totalPhotos === 1 ? 'photo' : 'photos';
+            document.getElementById('settings-db-summary').textContent = `${plants.length} ${plantWord} • ${totalPhotos} ${photoWord}`;
+            document.getElementById('settings-modal').classList.remove('hidden');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
         /* RADIAL 90-DAY PROGRESS RING */
         function renderDayProgressRing(days, isArchived = false) {
             const pct = Math.min(100, Math.max(0, (days / TARGET_CYCLE_DAYS) * 100));
@@ -650,10 +694,16 @@
 
             let strokeColor = '#3b82f6';
             let textColor = 'text-blue-400';
+            let subLabelColor = 'text-slate-400';
+            let trackColor = '#1e2336';
+            let ringBg = 'bg-[#090a0f] border-[#1e2336]/80';
 
             if (isArchived) {
-                strokeColor = '#10b981';
-                textColor = 'text-slate-100';
+                strokeColor = '#8b5cf6';
+                textColor = 'text-purple-300';
+                subLabelColor = 'text-purple-400/75';
+                trackColor = '#1f1b33';
+                ringBg = 'bg-[#08090e] border-purple-500/20';
             } else if (days >= 75) {
                 strokeColor = '#f97316';
                 textColor = 'text-orange-400';
@@ -666,12 +716,12 @@
             }
 
             return `
-                <div class="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center bg-[#090a0f] rounded-full border border-[#1e2336]/80 shadow-inner">
+                <div class="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center ${ringBg} rounded-full border shadow-inner">
                     <svg class="w-full h-full -rotate-90" viewBox="0 0 68 68">
                         <circle
                             cx="34" cy="34" r="${radius}"
                             fill="transparent"
-                            stroke="#1e2336"
+                            stroke="${trackColor}"
                             stroke-width="4.5"
                         />
                         ${pct > 0 ? `
@@ -687,7 +737,7 @@
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                         <span class="text-lg font-black ${textColor} leading-none tracking-tight">${days}</span>
-                        <span class="text-[8px] font-bold tracking-widest uppercase text-slate-400 mt-0.5">${dayLabel}</span>
+                        <span class="text-[8px] font-bold tracking-widest uppercase ${subLabelColor} mt-0.5">${dayLabel}</span>
                     </div>
                 </div>
             `;
@@ -1369,7 +1419,7 @@
 
             if (archivedPlants.length === 0) {
                 archiveStatsBar.classList.add('hidden');
-                archiveContainer.innerHTML = `<div class="bg-[#12151f]/50 border border-[#1e2336]/60 rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">No archived grows yet.</p></div>`;
+                archiveContainer.innerHTML = `<div class="bg-[#0d0f17]/60 border border-[#191d2c] rounded-2xl p-4 text-center"><p class="text-slate-500 text-xs italic">No archived grows yet.</p></div>`;
             } else {
                 const sortedArchive = [...archivedPlants].sort((a, b) => {
                     if (archiveSort === 'rating') return (b.rating ?? 8.0) - (a.rating ?? 8.0);
@@ -1384,10 +1434,10 @@
 
                 archiveStatsBar.classList.remove('hidden');
                 archiveStatsBar.innerHTML = `
-                    <span>Completed: <strong class="text-white">${archivedPlants.length}</strong></span>
-                    <span>Avg Cycle: <strong class="text-slate-200">${avgDays}d</strong></span>
-                    <span>Avg Rating: <strong class="text-blue-400">★ ${avgRating}</strong></span>
-                    ${totalDry > 0 ? `<span>Total Dry: <strong class="text-emerald-400">${totalDry.toFixed(1)}g</strong></span>` : ''}
+                    <span>Completed: <strong class="text-slate-200">${archivedPlants.length}</strong></span>
+                    <span>Avg Cycle: <strong class="text-slate-300">${avgDays}d</strong></span>
+                    <span>Avg Rating: <strong class="text-purple-300">★ ${avgRating}</strong></span>
+                    ${totalDry > 0 ? `<span>Total Dry: <strong class="text-emerald-400/90">${totalDry.toFixed(1)}g</strong></span>` : ''}
                 `;
 
                 archiveContainer.innerHTML = sortedArchive.map(plant => {
@@ -1400,19 +1450,19 @@
                     const thumb = getLatestPlantThumbnail(plant);
 
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3 cursor-pointer transition shadow flex items-center justify-between gap-2.5 group">
+                        <div onclick="openDetail('${plant.id}')" class="uis-archive-card rounded-2xl p-3 cursor-pointer transition shadow flex items-center justify-between gap-2.5 group">
                             <div class="flex items-center gap-3 min-w-0 flex-1">
-                                ${thumb ? `<img src="${thumb}" class="w-24 h-24 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
+                                ${thumb ? `<img src="${thumb}" class="w-24 h-24 rounded-xl object-cover border border-[#1f2438] shrink-0 bg-[#08090e] opacity-90 group-hover:opacity-100 transition">` : ''}
                                 <div class="min-w-0 flex-1 space-y-1">
-                                    <h3 class="text-[15px] font-bold text-white line-clamp-2 leading-tight group-hover:text-blue-400 transition">${escapeHtml(plant.strain)}</h3>
-                                    <div class="text-[11px] text-slate-400 leading-snug">
+                                    <h3 class="text-[15px] font-bold text-slate-200 line-clamp-2 leading-tight group-hover:text-purple-300 transition">${escapeHtml(plant.strain)}</h3>
+                                    <div class="text-[11px] text-slate-500 leading-snug">
                                         ${escapeHtml(plant.type || 'Autoflower')} • ${formatDate(plant.harvestedDate)} <span class="text-slate-500">(${curingDays}d cure)</span>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
-                                        <span class="inline-flex items-center bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md text-[10px] font-bold">★ ${plantRating}/10</span>
-                                        ${totalImages > 0 ? `<span class="inline-flex items-center bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">📸 ${totalImages}</span>` : ''}
-                                        ${dryVal > 0 ? `<span class="inline-flex items-center bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">⚖️ ${dryVal}g</span>` : ''}
-                                        ${rosinPct > 0 ? `<span class="inline-flex items-center bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold">🍯 ${rosinPct.toFixed(1)}%</span>` : ''}
+                                        <span class="inline-flex items-center bg-purple-500/15 text-purple-300 border border-purple-500/25 px-2 py-0.5 rounded-md text-[10px] font-bold">★ ${plantRating}/10</span>
+                                        ${totalImages > 0 ? `<span class="inline-flex items-center bg-[#08090e] text-slate-400 border border-[#1a1f30] px-2 py-0.5 rounded-md text-[10px]">📸 ${totalImages}</span>` : ''}
+                                        ${dryVal > 0 ? `<span class="inline-flex items-center bg-[#08090e] text-slate-400 border border-[#1a1f30] px-2 py-0.5 rounded-md text-[10px]">⚖️ ${dryVal}g</span>` : ''}
+                                        ${rosinPct > 0 ? `<span class="inline-flex items-center bg-amber-500/10 text-amber-400/90 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px] font-semibold">🍯 ${rosinPct.toFixed(1)}%</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -1539,8 +1589,7 @@
 
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-detail').classList.remove('hidden');
-            currentCategory = plant.harvestedDate ? 'cured' : 'veg';
-            document.getElementById('category-select').value = currentCategory;
+            currentCategory = 'all';
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
             document.getElementById('tri-clear').value = plant.trichomes?.clear ?? 0;
@@ -1768,36 +1817,90 @@
 
             document.getElementById('detail-strain').innerText = plant.strain;
             document.getElementById('detail-date').innerText = formatDate(plant.date);
-            const container = document.getElementById('category-grid');
             if (!plant.stages) plant.stages = {};
-            const items = plant.stages[currentCategory] || [];
 
-            if (items.length === 0) {
-                container.innerHTML = `<div class="py-6 text-center text-xs text-slate-600 italic">No entries in this category yet.</div>`;
+            const totalImages = countPlantImages(plant);
+            document.getElementById('gallery-total-badge').textContent = totalImages;
+
+            // Render filter pills
+            const filterContainer = document.getElementById('gallery-filter-pills');
+            const filterKeys = ['all', ...stageKeys];
+            filterContainer.innerHTML = filterKeys.map(key => {
+                const count = key === 'all' ? totalImages : (plant.stages[key]?.length || 0);
+                const label = key === 'all' ? 'All' : shortCategories[key];
+                const isSelected = currentCategory === key;
+                const cls = isSelected
+                    ? 'bg-blue-600 text-white border-blue-500 shadow-sm'
+                    : 'bg-[#090a0f] text-slate-400 border-[#1e2336] hover:text-slate-200 hover:border-slate-600';
+                return `
+                    <button type="button" onclick="switchCategory('${key}')" class="border px-2.5 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1.5 ${cls}">
+                        <span>${label}</span>
+                        <span class="text-[10px] ${isSelected ? 'text-blue-100' : 'text-slate-500'}">${count}</span>
+                    </button>
+                `;
+            }).join('');
+
+            // Collect items to display
+            let displayItems = [];
+            if (currentCategory === 'all') {
+                stageKeys.forEach(sk => {
+                    const arr = plant.stages[sk] || [];
+                    arr.forEach((item, idx) => {
+                        displayItems.push({ ...item, stageKey: sk, stageIndex: idx });
+                    });
+                });
+                // Sort newest photos first when viewing All
+                displayItems.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+            } else {
+                const arr = plant.stages[currentCategory] || [];
+                displayItems = arr.map((item, idx) => ({ ...item, stageKey: currentCategory, stageIndex: idx }));
+            }
+
+            const container = document.getElementById('category-grid');
+            if (displayItems.length === 0) {
+                container.className = 'pt-0.5';
+                container.innerHTML = `
+                    <div class="bg-[#090a0f] border border-dashed border-[#1e2336] rounded-xl py-6 px-4 text-center space-y-1">
+                        <p class="text-xs text-slate-400 font-medium">No photos ${currentCategory === 'all' ? 'added yet' : `in ${categories[currentCategory]}`}</p>
+                        <p class="text-[11px] text-slate-600">Tap "+ Add Photo" above to log visual progress.</p>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = items.map((item, index) => {
+            const gridClass = displayItems.length === 1 ? 'grid grid-cols-1 gap-3 pt-0.5' : 'grid grid-cols-2 gap-2.5 pt-0.5';
+            const aspectClass = displayItems.length === 1 ? 'aspect-video' : 'aspect-square';
+            container.className = gridClass;
+
+            container.innerHTML = displayItems.map(item => {
                 const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
+                const stageBadge = shortCategories[item.stageKey] || item.stageKey;
                 return `
-                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
-                        <div class="relative aspect-video rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightboxByIndex(${index})">
-                            <img src="${item.image}" class="w-full h-full object-cover">
-                            ${photoDay !== null ? `<span class="absolute top-2 left-2 bg-black/75 backdrop-blur-sm text-white border border-white/10 px-2 py-0.5 rounded-md text-[10px] font-bold">Day ${photoDay}</span>` : ''}
-                            <button onclick="event.stopPropagation(); confirmDeleteItem('${currentCategory}', ${index})" class="absolute top-2 right-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full p-1.5 text-xs transition">✕</button>
+                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-2 space-y-1.5 group">
+                        <div class="relative ${aspectClass} rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightbox('${item.stageKey}', ${item.stageIndex})">
+                            <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200">
+                            <div class="absolute top-1.5 left-1.5 flex flex-wrap items-center gap-1 max-w-[78%]">
+                                <span class="bg-blue-600/90 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">${stageBadge}</span>
+                                ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-200 border border-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold">Day ${photoDay}</span>` : ''}
+                            </div>
+                            <button onclick="event.stopPropagation(); confirmDeleteItem('${item.stageKey}', ${item.stageIndex})" class="absolute top-1.5 right-1.5 bg-black/70 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-[11px] transition">✕</button>
                         </div>
-                        ${item.comment ? `<p class="text-xs text-slate-300 mt-2 bg-[#12151f] p-3 rounded-xl border border-[#1e2336] whitespace-pre-wrap">${escapeHtml(item.comment)}</p>` : ''}
+                        ${item.comment ? `<p class="text-[11px] text-slate-300 px-1 line-clamp-2 leading-snug">${escapeHtml(item.comment)}</p>` : ''}
                     </div>
                 `;
             }).join('');
         }
 
-        function openLightboxByIndex(index) {
+        function openLightbox(stageKey, index) {
             const plant = plants.find(p => p.id === activePlantId);
-            const item = plant?.stages?.[currentCategory]?.[index];
+            const item = plant?.stages?.[stageKey]?.[index];
             if (!item) return;
 
             document.getElementById('lightbox-img').src = item.image;
+            const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
+            const stageName = categories[stageKey] || stageKey;
+            document.getElementById('lightbox-meta').textContent = `${stageName}${photoDay !== null ? ` • Day ${photoDay}` : ''}`;
+
             const commentEl = document.getElementById('lightbox-comment');
             if (item.comment && item.comment.trim() !== "") {
                 commentEl.textContent = item.comment;
@@ -1810,10 +1913,39 @@
 
         function closeLightbox() { document.getElementById('lightbox-modal').classList.add('hidden'); }
 
-        function openSourceModal(stageKey) {
+        function selectUploadStage(stageKey) {
+            activeStageKey = stageKey;
+            renderUploadStageSelector();
+        }
+
+        function renderUploadStageSelector() {
+            const container = document.getElementById('upload-stage-selector');
+            if (!container) return;
+            container.innerHTML = stageKeys.map(sk => {
+                const isSelected = activeStageKey === sk;
+                const cls = isSelected
+                    ? 'bg-blue-600/25 text-blue-300 border-blue-500/60 font-bold'
+                    : 'bg-[#090a0f] text-slate-400 border-[#1e2336] hover:text-slate-200 font-medium';
+                return `<button type="button" onclick="selectUploadStage('${sk}')" class="border rounded-xl py-2 px-2.5 text-xs transition ${cls}">${categories[sk]}</button>`;
+            }).join('');
+        }
+
+        function openSourceModal(preferredStage = null) {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
-            activeStageKey = stageKey;
+
+            if (preferredStage && stageKeys.includes(preferredStage)) {
+                activeStageKey = preferredStage;
+            } else if (currentCategory !== 'all' && stageKeys.includes(currentCategory)) {
+                activeStageKey = currentCategory;
+            } else if (plant.harvestedDate) {
+                activeStageKey = 'cured';
+            } else {
+                const age = calculateDays(plant.date);
+                activeStageKey = age >= 28 ? 'flower' : 'veg';
+            }
+
+            renderUploadStageSelector();
             document.getElementById('source-modal').classList.remove('hidden');
         }
 
@@ -1866,10 +1998,11 @@
                 document.getElementById('comment-input').value = "";
                 const countBadge = document.getElementById('feedback-count-badge');
                 if (pendingImagesData.length > 1) {
-                    countBadge.textContent = `${pendingImagesData.length} images selected`;
+                    countBadge.textContent = `${pendingImagesData.length} images • ${categories[activeStageKey]}`;
                     countBadge.classList.remove('hidden');
                 } else {
-                    countBadge.classList.add('hidden');
+                    countBadge.textContent = categories[activeStageKey];
+                    countBadge.classList.remove('hidden');
                 }
                 document.getElementById('feedback-modal').classList.remove('hidden');
             }
@@ -1956,6 +2089,7 @@
             a.click();
             a.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
+            closeSettingsModal();
         }
 
         function importData(event) {
@@ -1968,7 +2102,8 @@
                     if (Array.isArray(imported)) { 
                         plants = imported.map(normalizePlant);
                         saveAllPlantsToDB(plants);
-                        renderDashboard(); 
+                        renderDashboard();
+                        closeSettingsModal();
                         alert("Backup successfully restored!"); 
                     }
                 } catch (err) {
