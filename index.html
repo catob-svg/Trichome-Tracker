@@ -1296,11 +1296,11 @@
                     const thumb = getLatestPlantThumbnail(plant);
 
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-4 cursor-pointer transition shadow-xl flex items-center justify-between gap-3 group">
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3 cursor-pointer transition shadow-xl flex items-center justify-between gap-2.5 group">
                             <div class="flex items-center gap-3 min-w-0 flex-1">
-                                ${thumb ? `<img src="${thumb}" class="w-12 h-12 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
+                                ${thumb ? `<img src="${thumb}" class="w-24 h-24 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
                                 <div class="min-w-0 flex-1 space-y-1.5">
-                                    <h3 class="text-base font-bold text-white truncate group-hover:text-blue-400 transition tracking-wide">${escapeHtml(plant.strain)}</h3>
+                                    <h3 class="text-[15px] font-bold text-white line-clamp-2 leading-tight group-hover:text-blue-400 transition tracking-wide">${escapeHtml(plant.strain)}</h3>
                                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
                                         <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px] font-semibold">${escapeHtml(plant.type || 'Autoflower')}</span>
                                         <span class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">${formatDate(plant.date)}</span>
@@ -1308,7 +1308,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-3 py-2 rounded-xl text-center min-w-[64px] shrink-0">
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[56px] shrink-0">
                                 <span class="text-xl font-black text-blue-400 block leading-tight">${days}</span>
                                 <span class="text-[9px] text-blue-500 font-bold tracking-widest uppercase block">${dayText}</span>
                             </div>
@@ -1350,12 +1350,12 @@
                     const thumb = getLatestPlantThumbnail(plant);
 
                     return `
-                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3.5 cursor-pointer transition shadow flex items-center justify-between gap-3 group">
+                        <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3 cursor-pointer transition shadow flex items-center justify-between gap-2.5 group">
                             <div class="flex items-center gap-3 min-w-0 flex-1">
-                                ${thumb ? `<img src="${thumb}" class="w-12 h-12 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
+                                ${thumb ? `<img src="${thumb}" class="w-24 h-24 rounded-xl object-cover border border-[#1e2336] shrink-0 bg-[#090a0f]">` : ''}
                                 <div class="min-w-0 flex-1 space-y-1">
-                                    <h3 class="text-sm font-bold text-white truncate group-hover:text-blue-400 transition">${escapeHtml(plant.strain)}</h3>
-                                    <div class="text-[11px] text-slate-400 truncate">
+                                    <h3 class="text-[15px] font-bold text-white line-clamp-2 leading-tight group-hover:text-blue-400 transition">${escapeHtml(plant.strain)}</h3>
+                                    <div class="text-[11px] text-slate-400 leading-snug">
                                         ${escapeHtml(plant.type || 'Autoflower')} • ${formatDate(plant.harvestedDate)} <span class="text-slate-500">(${curingDays}d cure)</span>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
@@ -1366,7 +1366,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[58px] shrink-0">
+                            <div class="bg-[#090a0f] border border-[#1e2336] px-2.5 py-2 rounded-xl text-center min-w-[54px] shrink-0">
                                 <span class="text-base font-black text-slate-200 block leading-tight">${totalDays}</span>
                                 <span class="text-[9px] text-slate-500 font-bold tracking-wider uppercase block">days</span>
                             </div>
