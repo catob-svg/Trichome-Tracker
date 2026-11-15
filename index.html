@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0b0c10; color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #0b0c10; color: #f1f5f9; overscroll-behavior-x: contain; }
         .uis-card { background-color: #12151f; border: 1px solid #1e2336; }
         .uis-card-hover:hover { background-color: #181d2e; border-color: #2a324d; }
         .uis-archive-card { background-color: #0d0f17; border: 1px solid #191d2c; }
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <!-- Discreet Settings / Backup Gear Button -->
+            <!-- Settings / Backup Gear Button -->
             <button onclick="openSettingsModal()" class="w-9 h-9 rounded-xl bg-[#12151f] hover:bg-[#181d2e] border border-[#1e2336] flex items-center justify-center text-slate-400 hover:text-white transition" title="Backup & Settings" aria-label="Backup & Settings">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -54,7 +54,7 @@
     </header>
 
     <!-- MAIN CONTAINER -->
-    <main class="max-w-2xl mx-auto px-4 mt-6">
+    <main class="max-w-2xl mx-auto px-4 mt-5">
         
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="space-y-6">
@@ -112,41 +112,44 @@
             </div>
         </div>
 
-        <!-- DETAIL VIEW -->
-        <div id="view-detail" class="hidden space-y-5">
+        <!-- DETAIL VIEW (Streamlined, Photo-First & Tabbed) -->
+        <div id="view-detail" class="hidden space-y-4">
             <!-- NFC / Deep Link Banner -->
             <div id="tag-opened-banner" class="hidden bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-xl px-3.5 py-2 text-xs font-semibold flex justify-between items-center">
                 <span>📲 Opened directly via Plant Tag</span>
                 <button onclick="document.getElementById('tag-opened-banner').classList.add('hidden')" class="text-emerald-400 hover:text-white text-xs ml-2">✕</button>
             </div>
 
+            <!-- Top Action Bar -->
             <div class="flex justify-between items-center gap-2">
-                <button onclick="goHome()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold uppercase tracking-wider flex items-center space-x-1">
+                <button onclick="goHome()" class="text-xs text-blue-400 hover:text-blue-300 font-semibold uppercase tracking-wider flex items-center space-x-1 py-1">
                     <span>← Overview</span>
                 </button>
                 <div id="action-harvest-container" class="flex items-center gap-2"></div>
             </div>
 
-            <!-- 1. Plant Header Card -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl relative space-y-4">
+            <!-- 1. COMPACT HERO PLANT CARD -->
+            <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3.5">
+                <!-- Title & Clean Action Menu -->
                 <div class="flex justify-between items-start gap-3">
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
-                            <h2 id="detail-strain" class="text-xl font-black text-white tracking-wide break-words"></h2>
+                            <h2 id="detail-strain" class="text-lg sm:text-xl font-black text-white tracking-wide leading-tight break-words"></h2>
                             <span id="archive-badge" class="hidden bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Archived</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
-                            <span id="detail-type-badge" class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded text-[10px] font-semibold"></span>
-                            <span id="detail-curing-badge" class="hidden bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-semibold"></span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-2">Planted: <span id="detail-date" class="text-slate-200"></span> <span id="detail-harvest-date-wrap" class="hidden">• Harvested: <span id="detail-harvest-date" class="text-slate-200"></span></span></p>
+                        <p class="text-[11px] text-slate-400 mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                            <span id="detail-type-badge" class="text-slate-300 font-semibold"></span>
+                            <span>•</span>
+                            <span>Planted <span id="detail-date" class="text-slate-300"></span></span>
+                            <span id="detail-harvest-date-wrap" class="hidden">• Harvested <span id="detail-harvest-date" class="text-slate-300"></span></span>
+                        </p>
                     </div>
 
-                    <!-- Clean, Consolidated Action Controls -->
+                    <!-- Tag & Overflow Menu -->
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="openTagLabelModal('nfc')" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#2a324d] px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="NFC Tag & Print Label">
+                        <button onclick="openTagLabelModal('nfc')" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#2a324d] px-2.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="NFC Tag & Print Label">
                             <span>🏷️</span>
-                            <span>Tag & Label</span>
+                            <span>Tag</span>
                         </button>
                         <div class="relative">
                             <button id="plant-actions-btn" onclick="togglePlantActionsMenu(event)" class="w-8 h-8 rounded-xl bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] flex items-center justify-center text-xs font-bold tracking-widest transition" title="More Options" aria-label="More Options">•••</button>
@@ -165,186 +168,204 @@
                     </div>
                 </div>
 
-                <!-- Age & Watering Widgets -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="header-stats-grid">
-                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex items-center justify-between" id="age-box-container">
-                        <div>
-                            <span id="age-label-text" class="text-[10px] text-slate-400 block font-bold uppercase tracking-[0.15em]">Age</span>
-                            <div>
-                                <span id="detail-days" class="text-3xl font-black text-blue-400 tracking-tight">0</span> 
-                                <span id="age-unit-text" class="text-blue-500 font-semibold text-xs">days</span>
-                            </div>
+                <!-- Compact Status Strip (Ring + One-Tap Action) -->
+                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-2.5 flex items-center justify-between gap-3">
+                    <!-- Left: Progress Ring & Stage Info -->
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div id="detail-ring-slot" class="shrink-0"></div>
+                        <div class="min-w-0">
+                            <span id="detail-phase-label" class="text-xs font-bold text-white block truncate">Vegetation</span>
+                            <span id="detail-sub-status" class="text-[11px] text-slate-400 block truncate">Active cultivation</span>
                         </div>
                     </div>
-                    
-                    <div id="water-widget-box" class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em]">Last Watered</span>
-                            <span id="water-days-ago" class="text-blue-400 font-bold text-xs">-</span>
+
+                    <!-- Right (Active): Compact One-Tap Watering Control -->
+                    <div id="water-widget-box" class="flex items-center gap-2 shrink-0">
+                        <div class="text-right hidden xs:block">
+                            <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Watered</span>
+                            <span id="water-days-ago" class="text-[11px] text-blue-400 font-bold">-</span>
                         </div>
-                        <button onclick="recordWatering()" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-[11px] py-2 px-3 rounded-lg font-semibold transition text-center">💧 Watered Today</button>
+                        <button onclick="recordWatering()" id="btn-water-quick" class="bg-blue-600/20 hover:bg-blue-600/35 text-blue-300 border border-blue-500/35 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                            <span>💧</span>
+                            <span id="water-btn-text">Water</span>
+                        </button>
                     </div>
 
-                    <!-- LOCKED RATING BOX & YIELD STATS (Archive) -->
-                    <div id="archive-rating-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-4 flex flex-col justify-center sm:col-span-2 space-y-3">
-                        <div id="rating-locked-view" class="flex justify-between items-center">
-                            <div>
-                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] flex items-center gap-1">
-                                    <span>🔒 Rating</span>
-                                </span>
-                                <div class="mt-0.5">
-                                    <span id="plant-rating-display" class="text-purple-300 font-black text-xl">8.0</span>
-                                    <span class="text-slate-500 text-xs font-bold">/ 10</span>
-                                </div>
-                            </div>
-                            <button onclick="unlockRating()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-semibold transition">
-                                Unlock to Edit
-                            </button>
-                        </div>
+                    <!-- Right (Archive): Compact Rating & Yield Pill -->
+                    <div id="archive-compact-stats" class="hidden flex items-center gap-2 shrink-0">
+                        <div id="archive-yield-pill" class="hidden bg-[#12151f] border border-[#1e2336] px-2.5 py-1.5 rounded-xl text-[11px] text-slate-300 font-semibold"></div>
+                        <button type="button" onclick="toggleRatingDrawer()" class="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1" title="Tap to adjust rating">
+                            <span>🔒 ★</span>
+                            <span id="plant-rating-display">8.0</span>
+                        </button>
+                    </div>
+                </div>
 
-                        <div id="rating-edit-view" class="hidden space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-amber-400 font-bold uppercase tracking-[0.15em]">🔓 Editing Rating</span>
-                                <span id="plant-rating-edit-display" class="text-purple-300 font-black text-base">8.0 / 10</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <button type="button" onclick="adjustTempRating(-0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">- 0.1</button>
-                                <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="previewSliderRating(this.value)" class="w-full accent-purple-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
-                                <button type="button" onclick="adjustTempRating(0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">+ 0.1</button>
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="button" onclick="cancelRatingEdit()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] py-1.5 rounded-lg text-xs font-semibold transition">Cancel</button>
-                                <button type="button" onclick="saveRatingEdit()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-1.5 rounded-lg text-xs font-bold transition">Save Rating</button>
-                            </div>
-                        </div>
-                        
-                        <div id="archive-yield-summary" class="text-xs text-slate-300 pt-2.5 border-t border-[#1e2336] flex justify-between">
-                            <span>Dry Yield: <strong id="sum-dry" class="text-white">-</strong> g</span>
-                            <span>Rosin Return: <strong id="sum-return" class="text-amber-400">-</strong></span>
-                        </div>
+                <!-- Collapsible Rating Editor Drawer (Only opens when user taps rating pill) -->
+                <div id="rating-edit-view" class="hidden bg-[#090a0f] border border-purple-500/30 rounded-xl p-3 space-y-2.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-purple-300 font-bold uppercase tracking-[0.15em]">🔓 Adjust Rating</span>
+                        <span id="plant-rating-edit-display" class="text-purple-300 font-black text-sm">8.0 / 10</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adjustTempRating(-0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-2.5 py-1 rounded-lg text-xs font-bold shrink-0">- 0.1</button>
+                        <input type="range" id="plant-rating-slider" min="0" max="10" step="0.1" value="8.0" oninput="previewSliderRating(this.value)" class="w-full accent-purple-500 bg-[#12151f] h-2 rounded-lg cursor-pointer">
+                        <button type="button" onclick="adjustTempRating(0.1)" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-2.5 py-1 rounded-lg text-xs font-bold shrink-0">+ 0.1</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="cancelRatingEdit()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] py-1.5 rounded-lg text-xs font-semibold transition">Cancel</button>
+                        <button type="button" onclick="saveRatingEdit()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-1.5 rounded-lg text-xs font-bold transition">Save Rating</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. IMMEDIATE PHOTO GALLERY -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3.5">
-                <div class="flex justify-between items-center">
+            <!-- 2. HERO PHOTO SHOWCASE (Prominent, clean, immediate) -->
+            <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3">
+                <div class="flex justify-between items-center gap-2">
                     <div class="flex items-center gap-2">
-                        <h3 class="text-xs font-bold text-white uppercase tracking-[0.15em]">📸 Plant Photos</h3>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-[0.15em]">📸 Photos</h3>
                         <span id="gallery-total-badge" class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
                     </div>
-                    <button id="btn-add-image-top" onclick="openSourceModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition shadow-md shadow-blue-900/20">+ Add Photo</button>
+                    <button id="btn-add-image-top" onclick="openSourceModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md shadow-blue-900/25">+ Add Photo</button>
                 </div>
 
+                <!-- Compact Stage Filter Pills -->
                 <div id="gallery-filter-pills" class="flex flex-wrap gap-1.5"></div>
-                <div id="category-grid" class="pt-0.5"></div>
+
+                <!-- Vibrant Edge-to-Edge Photo Grid -->
+                <div id="category-grid"></div>
             </div>
 
-            <!-- 3. TRICHOME RIPENESS CHECKER -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness Tracker</h3>
-                    <button id="btn-save-trichomes" onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
-                </div>
-                <div class="grid grid-cols-3 gap-3 text-center pt-1">
-                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Clear (%)</span>
-                        <input type="number" id="tri-clear" min="0" max="100" placeholder="0" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-blue-400 text-sm mt-1 uis-input rounded-lg py-1">
-                    </div>
-                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Cloudy (%)</span>
-                        <input type="number" id="tri-cloudy" min="0" max="100" placeholder="80" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-emerald-400 text-sm mt-1 uis-input rounded-lg py-1">
-                    </div>
-                    <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 block font-semibold uppercase">Amber (%)</span>
-                        <input type="number" id="tri-amber" min="0" max="100" placeholder="20" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
-                    </div>
-                </div>
-                <div class="space-y-1.5 pt-1">
-                    <div class="w-full h-2.5 bg-[#090a0f] rounded-full overflow-hidden flex border border-[#1e2336]">
-                        <div id="tri-bar-clear" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
-                        <div id="tri-bar-cloudy" class="bg-emerald-400 h-full transition-all duration-300" style="width: 80%"></div>
-                        <div id="tri-bar-amber" class="bg-amber-500 h-full transition-all duration-300" style="width: 20%"></div>
-                    </div>
-                    <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-slate-500">Effect Profile:</span>
-                        <span id="tri-effect-label" class="font-semibold text-emerald-400">Balanced / Peak THC</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. YIELD & EXTRACTION CALCULATOR -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin Calculator</h3>
-                </div>
-                <div class="grid grid-cols-3 gap-2.5">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Wet (g)</label>
-                        <input type="number" step="0.1" id="calc-wet" oninput="calculateYield()" placeholder="500" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Dry (g)</label>
-                        <input type="number" step="0.1" id="calc-dry" oninput="calculateYield()" placeholder="125" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Rosin (g)</label>
-                        <input type="number" step="0.1" id="calc-rosin" oninput="calculateYield()" placeholder="25" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
-                    </div>
-                </div>
-                <div class="bg-[#090a0f] border border-[#1e2336] p-3 rounded-xl flex justify-around text-center text-xs">
-                    <div><span class="text-slate-400 block text-[10px] uppercase">Dry Loss</span><strong id="res-dry-loss" class="text-white">-</strong></div>
-                    <div class="border-l border-[#1e2336] pl-4"><span class="text-slate-400 block text-[10px] uppercase">Rosin Return</span><strong id="res-return" class="text-amber-400 font-bold">-</strong></div>
-                </div>
-            </div>
-
-            <!-- 5. SENSORY & EFFECT PROFILE -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">👃 Sensory & Effect Profile</h3>
-                    <button id="btn-save-sensory" onclick="saveSensoryProfile()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
+            <!-- 3. CLEAN SEGMENTED TABS FOR DATA & LOGS (Eliminates endless scrolling) -->
+            <div class="space-y-3">
+                <div class="grid grid-cols-3 gap-1.5 bg-[#12151f] p-1.5 rounded-2xl border border-[#1e2336] shadow-lg">
+                    <button type="button" id="detail-tab-btn-logs" onclick="switchDetailTab('logs')" class="py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#1d2438] text-white border border-blue-500/40 shadow-sm">
+                        <span>🌡️</span>
+                        <span>Logs</span>
+                        <span id="tab-badge-logs" class="text-[10px] text-blue-300 font-extrabold"></span>
+                    </button>
+                    <button type="button" id="detail-tab-btn-harvest" onclick="switchDetailTab('harvest')" class="py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+                        <span>🔬</span>
+                        <span>Ripeness & Yield</span>
+                    </button>
+                    <button type="button" id="detail-tab-btn-sensory" onclick="switchDetailTab('sensory')" class="py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+                        <span>👃</span>
+                        <span>Sensory</span>
+                    </button>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Aroma & Flavor Notes (Select all that apply)</label>
-                    <div id="sensory-flavors-grid" class="flex flex-wrap gap-1.5"></div>
-                </div>
-
-                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Nose / Terp Loudness</span>
-                        <span id="sensory-loudness-label" class="text-[11px] font-bold text-emerald-400">3 / 5 • Noticeable</span>
+                <!-- TAB PANEL A: LOGS (Environment/Nutrients + Curing when harvested) -->
+                <div id="detail-panel-logs" class="space-y-3">
+                    <!-- Curing Log (Shown automatically when harvested) -->
+                    <div id="curing-section" class="hidden uis-card rounded-2xl p-4 shadow-xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying</h3>
+                            <button onclick="openCuringModal()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider transition">+ Curing</button>
+                        </div>
+                        <div id="curing-container" class="space-y-2"></div>
                     </div>
-                    <div id="sensory-loudness-buttons" class="grid grid-cols-5 gap-1.5"></div>
+
+                    <!-- Environment & Nutrient Log -->
+                    <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌡️ Environment & Nutrients</h3>
+                            <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase tracking-wider transition">+ Metric</button>
+                        </div>
+                        <div id="metrics-container" class="space-y-2"></div>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Experience & Effect</label>
-                    <div id="sensory-effects-grid" class="flex flex-wrap gap-1.5"></div>
+                <!-- TAB PANEL B: TRICHOMES & YIELD -->
+                <div id="detail-panel-harvest" class="hidden space-y-3">
+                    <!-- Trichome Ripeness -->
+                    <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🔬 Trichome Ripeness</h3>
+                            <button id="btn-save-trichomes" onclick="saveTrichomeStatus()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2.5 text-center">
+                            <div class="bg-[#090a0f] border border-[#1e2336] p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Clear (%)</span>
+                                <input type="number" id="tri-clear" min="0" max="100" placeholder="0" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-blue-400 text-sm mt-1 uis-input rounded-lg py-1">
+                            </div>
+                            <div class="bg-[#090a0f] border border-[#1e2336] p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Cloudy (%)</span>
+                                <input type="number" id="tri-cloudy" min="0" max="100" placeholder="80" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-emerald-400 text-sm mt-1 uis-input rounded-lg py-1">
+                            </div>
+                            <div class="bg-[#090a0f] border border-[#1e2336] p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-400 block font-semibold uppercase">Amber (%)</span>
+                                <input type="number" id="tri-amber" min="0" max="100" placeholder="20" oninput="updateTrichomeVisual()" class="w-full bg-transparent text-center font-bold text-amber-400 text-sm mt-1 uis-input rounded-lg py-1">
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="w-full h-2.5 bg-[#090a0f] rounded-full overflow-hidden flex border border-[#1e2336]">
+                                <div id="tri-bar-clear" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
+                                <div id="tri-bar-cloudy" class="bg-emerald-400 h-full transition-all duration-300" style="width: 80%"></div>
+                                <div id="tri-bar-amber" class="bg-amber-500 h-full transition-all duration-300" style="width: 20%"></div>
+                            </div>
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="text-slate-500">Effect Profile:</span>
+                                <span id="tri-effect-label" class="font-semibold text-emerald-400">Balanced / Peak THC</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yield & Rosin Calculator -->
+                    <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3">
+                        <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">⚖️ Yield & Rosin</h3>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Wet (g)</label>
+                                <input type="number" step="0.1" id="calc-wet" oninput="calculateYield()" placeholder="500" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Dry (g)</label>
+                                <input type="number" step="0.1" id="calc-dry" oninput="calculateYield()" placeholder="125" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 uppercase font-semibold mb-1">Rosin (g)</label>
+                                <input type="number" step="0.1" id="calc-rosin" oninput="calculateYield()" placeholder="25" class="w-full uis-input rounded-xl px-3 py-2 text-xs">
+                            </div>
+                        </div>
+                        <div class="bg-[#090a0f] border border-[#1e2336] p-2.5 rounded-xl flex justify-around text-center text-xs">
+                            <div><span class="text-slate-400 block text-[10px] uppercase">Dry Loss</span><strong id="res-dry-loss" class="text-white">-</strong></div>
+                            <div class="border-l border-[#1e2336] pl-4"><span class="text-slate-400 block text-[10px] uppercase">Rosin Return</span><strong id="res-return" class="text-amber-400 font-bold">-</strong></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-1">Tasting Notes (Jar Nose vs. Inhale / Exhale)</label>
-                    <textarea id="sensory-notes" rows="2" placeholder="e.g. Sharp funky cheese on jar crack, sweet creamy gas on exhale..." class="w-full uis-input rounded-xl px-3 py-2 text-xs placeholder-slate-600"></textarea>
-                </div>
-            </div>
+                <!-- TAB PANEL C: SENSORY & EFFECT PROFILE -->
+                <div id="detail-panel-sensory" class="hidden">
+                    <div class="uis-card rounded-2xl p-4 shadow-xl space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">👃 Sensory & Effect</h3>
+                            <button id="btn-save-sensory" onclick="saveSensoryProfile()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 px-3 py-1 rounded-lg text-xs font-semibold transition">Save</button>
+                        </div>
 
-            <!-- 6. CURING / DRYING LOG -->
-            <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying Log</h3>
-                    <button onclick="openCuringModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ Curing Log</button>
-                </div>
-                <div id="curing-container" class="space-y-2"></div>
-            </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Aroma & Flavor</label>
+                            <div id="sensory-flavors-grid" class="flex flex-wrap gap-1.5"></div>
+                        </div>
 
-            <!-- 7. ENVIRONMENT & NUTRIENT LOG -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
-                    <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🌡️ Environment & Nutrient Log</h3>
-                    <button id="btn-open-metrics" onclick="openMetricsModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition">+ New Metric</button>
+                        <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">Terp Loudness</span>
+                                <span id="sensory-loudness-label" class="text-[11px] font-bold text-emerald-400">3 / 5 • Noticeable</span>
+                            </div>
+                            <div id="sensory-loudness-buttons" class="grid grid-cols-5 gap-1.5"></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-2">Experience & Effect</label>
+                            <div id="sensory-effects-grid" class="flex flex-wrap gap-1.5"></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-400 uppercase font-semibold tracking-wider mb-1">Tasting Notes</label>
+                            <textarea id="sensory-notes" rows="2" placeholder="e.g. Sharp funky cheese on jar crack, sweet creamy gas on exhale..." class="w-full uis-input rounded-xl px-3 py-2 text-xs placeholder-slate-600"></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div id="metrics-container" class="space-y-2"></div>
             </div>
         </div>
     </main>
@@ -416,10 +437,9 @@
         </div>
     </div>
 
-    <!-- UNIFIED TAG & LABEL MODAL (Combines NFC Tag & Print Label cleanly) -->
+    <!-- UNIFIED TAG & LABEL MODAL -->
     <div id="tag-label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeTagLabelModal()">
         <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4" onclick="event.stopPropagation()">
-            <!-- Header -->
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2 min-w-0">
                     <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white shrink-0">🏷️ Tag & Label</h3>
@@ -428,7 +448,6 @@
                 <button onclick="closeTagLabelModal()" class="text-slate-400 hover:text-white text-sm ml-2">✕</button>
             </div>
 
-            <!-- Segmented Tab Bar -->
             <div class="grid grid-cols-2 gap-1.5 bg-[#090a0f] p-1 rounded-xl border border-[#1e2336]">
                 <button type="button" id="tl-tab-btn-nfc" onclick="switchTagLabelTab('nfc')" class="py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#181d2e] text-emerald-400 border border-emerald-500/30 shadow-sm">
                     <span>📲</span>
@@ -505,8 +524,8 @@
     </div>
 
     <!-- OTHER MODALS -->
-    <div id="curing-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+    <div id="curing-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeCuringModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4" onclick="event.stopPropagation()">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">New Curing Log</h3>
             <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Jar Humidity (%)</label><input type="number" id="curing-rh" placeholder="e.g. 62" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
             <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Burping Status</label><input type="text" id="curing-note" placeholder="e.g. Opened jar for 15 minutes" class="w-full uis-input rounded-xl px-3 py-2 text-sm transition"></div>
@@ -520,14 +539,14 @@
     <div id="lightbox-modal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden z-50 flex flex-col items-center justify-center p-2" onclick="closeLightbox()">
         <button onclick="closeLightbox()" class="absolute top-4 right-4 bg-[#12151f] border border-[#1e2336] text-white rounded-full p-3 text-lg transition z-50">✕</button>
         <div class="relative max-w-full max-h-full overflow-auto p-2" onclick="event.stopPropagation()">
-            <img id="lightbox-img" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
+            <img id="lightbox-img" class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl transition-transform duration-200">
         </div>
         <div id="lightbox-meta" class="text-[11px] text-slate-400 mt-2 font-semibold uppercase tracking-wider"></div>
         <p id="lightbox-comment" class="text-xs text-slate-300 mt-2 text-center max-w-md px-4 uis-card py-2 rounded-xl whitespace-pre-wrap"></p>
     </div>
 
-    <div id="metrics-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+    <div id="metrics-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeMetricsModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4" onclick="event.stopPropagation()">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Environment / Nutrient Metric</h3>
             
             <div class="flex flex-wrap gap-1.5">
@@ -554,8 +573,8 @@
         </div>
     </div>
 
-    <div id="edit-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+    <div id="edit-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeEditModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4" onclick="event.stopPropagation()">
             <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Edit Plant</h3>
             <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Strain</label><input type="text" id="edit-strain-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition"></div>
             <div>
@@ -575,8 +594,8 @@
     </div>
 
     <!-- IMAGE SOURCE & STAGE PICKER MODAL -->
-    <div id="source-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-4 text-center">
+    <div id="source-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeSourceModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-xs shadow-2xl space-y-4 text-center" onclick="event.stopPropagation()">
             <h3 class="text-xs font-bold uppercase tracking-[0.15em] text-white">Add Photo</h3>
             
             <div class="text-left space-y-1.5">
@@ -600,7 +619,7 @@
                 <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Add Note / Comment</h3>
                 <span id="feedback-count-badge" class="hidden bg-blue-600/20 text-blue-400 border border-blue-500/30 text-[10px] px-2.5 py-0.5 rounded-full font-bold"></span>
             </div>
-            <div class="w-full h-32 rounded-xl overflow-hidden bg-[#090a0f] border border-[#1e2336] flex items-center justify-center">
+            <div class="w-full h-36 rounded-xl overflow-hidden bg-[#090a0f] border border-[#1e2336] flex items-center justify-center">
                 <img id="feedback-preview-img" class="w-full h-full object-cover">
             </div>
             <div>
@@ -653,12 +672,90 @@
         let plants = [];
         let activePlantId = null;
         let currentCategory = 'all';
+        let activeDetailTab = 'logs';
         let activeStageKey = 'veg';
         let pendingImagesData = [];
         let archiveSort = 'newest';
         let tempRatingValue = 8.0;
         let nfcAbortController = null;
         let isChainedTagFlow = false;
+
+        /* HISTORY / ANDROID EDGE-SWIPE NAVIGATION SUPPORT */
+        const MODAL_IDS = [
+            'lightbox-modal',
+            'tag-label-modal',
+            'new-plant-tag-prompt-modal',
+            'settings-modal',
+            'metrics-modal',
+            'curing-modal',
+            'edit-modal',
+            'source-modal',
+            'feedback-modal'
+        ];
+
+        function getOpenModalId() {
+            return MODAL_IDS.find(id => {
+                const el = document.getElementById(id);
+                return el && !el.classList.contains('hidden');
+            }) || null;
+        }
+
+        function hideAllModalsDOM() {
+            abortNfcOperation();
+            isChainedTagFlow = false;
+            pendingImagesData = [];
+            MODAL_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+        }
+
+        function pushModalHistory(modalName) {
+            try {
+                if (history.state?.modal !== modalName) {
+                    const baseState = history.state && typeof history.state === 'object' ? { ...history.state } : { view: activePlantId ? 'detail' : 'dashboard', plantId: activePlantId };
+                    history.pushState({ ...baseState, modal: modalName }, '', window.location.hash || window.location.pathname + window.location.search);
+                }
+            } catch (_) {}
+        }
+
+        function popModalHistoryIfActive(modalName) {
+            try {
+                if (history.state?.modal === modalName) {
+                    history.back();
+                    return true;
+                }
+            } catch (_) {}
+            return false;
+        }
+
+        window.addEventListener('popstate', (event) => {
+            // 1. If any modal is open, edge-swiping closes the modal first
+            const openModal = getOpenModalId();
+            if (openModal) {
+                hideAllModalsDOM();
+                return;
+            }
+
+            // 2. Navigate between Plant Detail and Dashboard inside the app
+            const state = event.state;
+            const hash = window.location.hash || '';
+            if (state?.view === 'detail' && state?.plantId) {
+                if (plants.some(p => p.id === String(state.plantId))) {
+                    openDetail(String(state.plantId), false, true);
+                    return;
+                }
+            } else if (hash.includes('#plant=')) {
+                const pId = decodeURIComponent(hash.split('#plant=')[1].split('&')[0]);
+                if (plants.some(p => p.id === pId)) {
+                    openDetail(pId, false, true);
+                    return;
+                }
+            }
+
+            // Return to Dashboard overview
+            goHome(true);
+        });
 
         function normalizePlant(p) {
             const existingSensory = p.sensory || {};
@@ -692,6 +789,24 @@
             }, 1400);
         }
 
+        /* DETAIL WORKSPACE TAB SWITCHER */
+        function switchDetailTab(tabName) {
+            activeDetailTab = tabName;
+            const tabs = ['logs', 'harvest', 'sensory'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`detail-tab-btn-${t}`);
+                const panel = document.getElementById(`detail-panel-${t}`);
+                if (!btn || !panel) return;
+                if (t === tabName) {
+                    btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#1d2438] text-white border border-blue-500/40 shadow-sm';
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = 'py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
         /* PLANT HEADER ACTIONS MENU (•••) */
         function togglePlantActionsMenu(e) {
             e.stopPropagation();
@@ -721,10 +836,12 @@
             const photoWord = totalPhotos === 1 ? 'photo' : 'photos';
             document.getElementById('settings-db-summary').textContent = `${plants.length} ${plantWord} • ${totalPhotos} ${photoWord}`;
             document.getElementById('settings-modal').classList.remove('hidden');
+            pushModalHistory('settings-modal');
         }
 
         function closeSettingsModal() {
             document.getElementById('settings-modal').classList.add('hidden');
+            popModalHistoryIfActive('settings-modal');
         }
 
         /* RADIAL 90-DAY PROGRESS RING */
@@ -759,7 +876,7 @@
             }
 
             return `
-                <div class="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center ${ringBg} rounded-full border shadow-inner">
+                <div class="relative w-[64px] h-[64px] shrink-0 flex items-center justify-center ${ringBg} rounded-full border shadow-inner">
                     <svg class="w-full h-full -rotate-90" viewBox="0 0 68 68">
                         <circle
                             cx="34" cy="34" r="${radius}"
@@ -779,11 +896,19 @@
                         />` : ''}
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-lg font-black ${textColor} leading-none tracking-tight">${days}</span>
+                        <span class="text-base font-black ${textColor} leading-none tracking-tight">${days}</span>
                         <span class="text-[8px] font-bold tracking-widest uppercase ${subLabelColor} mt-0.5">${dayLabel}</span>
                     </div>
                 </div>
             `;
+        }
+
+        function getGrowthPhaseDescription(days) {
+            if (days < 14) return 'Seedling / Early Root';
+            if (days < 28) return 'Vegetative Growth';
+            if (days < 55) return 'Flowering Stage';
+            if (days < 75) return 'Late Flower / Bulking';
+            return 'Ripening / Harvest Window';
         }
 
         /* NEW PLANT TAG & LABEL PROMPT */
@@ -794,32 +919,35 @@
             document.getElementById('prompt-plant-name').textContent = plant.strain;
             document.getElementById('prompt-plant-type').textContent = `(${plant.type || 'Autoflower'})`;
             document.getElementById('new-plant-tag-prompt-modal').classList.remove('hidden');
+            pushModalHistory('new-plant-tag-prompt-modal');
         }
 
         function closeNewPlantTagPrompt() {
             document.getElementById('new-plant-tag-prompt-modal').classList.add('hidden');
+            popModalHistoryIfActive('new-plant-tag-prompt-modal');
         }
 
         function handleNewPlantTagChoice(choice) {
-            closeNewPlantTagPrompt();
+            document.getElementById('new-plant-tag-prompt-modal').classList.add('hidden');
             if (choice === 'nfc') {
-                openTagLabelModal('nfc', false);
+                openTagLabelModal('nfc', false, true);
             } else if (choice === 'print') {
-                openTagLabelModal('print', false);
+                openTagLabelModal('print', false, true);
             } else if (choice === 'both') {
-                openTagLabelModal('nfc', true);
+                openTagLabelModal('nfc', true, true);
+            } else {
+                popModalHistoryIfActive('new-plant-tag-prompt-modal');
             }
         }
 
-        /* UNIFIED TAG & LABEL MODAL (NFC + PRINT IN ONE CLEAN INTERFACE) */
-        function openTagLabelModal(initialTab = 'nfc', chainedBoth = false) {
+        /* UNIFIED TAG & LABEL MODAL */
+        function openTagLabelModal(initialTab = 'nfc', chainedBoth = false, replaceModalState = false) {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
 
             abortNfcOperation();
             isChainedTagFlow = chainedBoth;
 
-            // Populate shared plant info
             document.getElementById('tl-plant-badge').textContent = plant.strain;
             document.getElementById('nfc-plant-type').textContent = plant.type || 'Autoflower';
             document.getElementById('nfc-url-display').value = getPlantDeepLink(plant.id);
@@ -830,7 +958,6 @@
             document.getElementById('web-nfc-supported-box').classList.toggle('hidden', !supported);
             document.getElementById('web-nfc-unsupported-box').classList.toggle('hidden', supported);
 
-            // Populate Print Label preview & QR code
             document.getElementById('label-strain-text').innerText = plant.strain;
             document.getElementById('label-type-text').innerText = plant.type || 'Autoflower';
             document.getElementById('label-date-text').innerText = formatDate(plant.date);
@@ -840,6 +967,15 @@
 
             switchTagLabelTab(initialTab);
             document.getElementById('tag-label-modal').classList.remove('hidden');
+
+            if (replaceModalState) {
+                try {
+                    const baseState = history.state && typeof history.state === 'object' ? { ...history.state } : { view: 'detail', plantId: activePlantId };
+                    history.replaceState({ ...baseState, modal: 'tag-label-modal' }, '', window.location.hash);
+                } catch (_) {}
+            } else {
+                pushModalHistory('tag-label-modal');
+            }
         }
 
         function switchTagLabelTab(tab) {
@@ -866,6 +1002,7 @@
             abortNfcOperation();
             isChainedTagFlow = false;
             document.getElementById('tag-label-modal').classList.add('hidden');
+            popModalHistoryIfActive('tag-label-modal');
         }
 
         function abortNfcOperation() {
@@ -1142,26 +1279,29 @@
             }
         }
 
-        /* LOCKED RATING WORKFLOW */
+        /* LOCKED RATING WORKFLOW (COMPACT DRAWER) */
         function renderLockedRatingState(plant) {
             const savedVal = plant.rating !== undefined ? Number(plant.rating) : 8.0;
             tempRatingValue = savedVal;
             document.getElementById('plant-rating-display').textContent = savedVal.toFixed(1);
             document.getElementById('plant-rating-edit-display').textContent = `${savedVal.toFixed(1)} / 10`;
             document.getElementById('plant-rating-slider').value = savedVal;
-            document.getElementById('rating-locked-view').classList.remove('hidden');
             document.getElementById('rating-edit-view').classList.add('hidden');
         }
 
-        function unlockRating() {
+        function toggleRatingDrawer() {
+            const drawer = document.getElementById('rating-edit-view');
+            if (!drawer.classList.contains('hidden')) {
+                cancelRatingEdit();
+                return;
+            }
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
             const savedVal = plant.rating !== undefined ? Number(plant.rating) : 8.0;
             tempRatingValue = savedVal;
             document.getElementById('plant-rating-slider').value = savedVal;
             document.getElementById('plant-rating-edit-display').textContent = `${savedVal.toFixed(1)} / 10`;
-            document.getElementById('rating-locked-view').classList.add('hidden');
-            document.getElementById('rating-edit-view').classList.remove('hidden');
+            drawer.classList.remove('hidden');
         }
 
         function previewSliderRating(val) {
@@ -1401,6 +1541,22 @@
             flashSaveButton('btn-save-trichomes');
         }
 
+        function updateArchiveYieldPill(plant) {
+            const pill = document.getElementById('archive-yield-pill');
+            if (!pill) return;
+            const dry = parseFloat(plant?.yieldData?.dry) || 0;
+            const rosinPct = getRosinReturnPct(plant);
+            let parts = [];
+            if (dry > 0) parts.push(`⚖️ ${dry}g`);
+            if (rosinPct > 0) parts.push(`🍯 ${rosinPct.toFixed(1)}%`);
+            if (parts.length > 0) {
+                pill.textContent = parts.join(' • ');
+                pill.classList.remove('hidden');
+            } else {
+                pill.classList.add('hidden');
+            }
+        }
+
         function calculateYield() {
             const wet = parseFloat(document.getElementById('calc-wet').value) || 0;
             const dry = parseFloat(document.getElementById('calc-dry').value) || 0;
@@ -1410,6 +1566,7 @@
             if (plant) {
                 plant.yieldData = { wet, dry, rosin };
                 savePlantToDB(plant);
+                updateArchiveYieldPill(plant);
             }
 
             let dryLossText = "-";
@@ -1423,12 +1580,8 @@
             if (dry > 0 && rosin > 0) {
                 const ret = (rosin / dry * 100).toFixed(1);
                 returnText = `${ret}%`;
-                document.getElementById('sum-return').innerText = `${ret}%`;
-            } else {
-                document.getElementById('sum-return').innerText = "-";
             }
             document.getElementById('res-return').innerText = returnText;
-            document.getElementById('sum-dry').innerText = dry > 0 ? dry : "-";
         }
 
         function getRosinReturnPct(plant) {
@@ -1597,28 +1750,57 @@
             plant.lastWatered = new Date().toISOString();
             savePlantToDB(plant);
             updateWaterWidget(plant);
+
+            const btn = document.getElementById('btn-water-quick');
+            if (btn) {
+                btn.classList.add('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/40');
+                setTimeout(() => {
+                    btn.classList.remove('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/40');
+                }, 1200);
+            }
         }
 
         function updateWaterWidget(plant) {
-            const box = document.getElementById('water-days-ago');
+            const label = document.getElementById('water-days-ago');
+            const btnText = document.getElementById('water-btn-text');
             if (!plant.lastWatered) {
-                box.innerText = "Never";
+                if (label) label.innerText = "Never";
+                if (btnText) btnText.innerText = "Water";
                 return;
             }
             const daysAgo = calculateDays(plant.lastWatered.slice(0,10));
-            box.innerText = daysAgo === 0 ? "Today" : (daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`);
+            const statusText = daysAgo === 0 ? "Today" : (daysAgo === 1 ? "1d ago" : `${daysAgo}d ago`);
+            if (label) label.innerText = statusText;
+            if (btnText) btnText.innerText = daysAgo === 0 ? "Watered ✓" : "Water";
         }
 
-        function openDetail(id, openedViaTag = false) {
+        function updateTabBadges(plant) {
+            const badgeLogs = document.getElementById('tab-badge-logs');
+            if (!badgeLogs) return;
+            const totalLogs = (plant.metrics?.length || 0) + (plant.curingLogs?.length || 0);
+            badgeLogs.textContent = totalLogs > 0 ? `(${totalLogs})` : '';
+        }
+
+        function openDetail(id, openedViaTag = false, fromPopState = false) {
             activePlantId = String(id);
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
 
             closePlantActionsMenu();
+            hideAllModalsDOM();
 
-            try {
-                history.replaceState(null, '', `#plant=${encodeURIComponent(plant.id)}`);
-            } catch (_) {}
+            if (!fromPopState) {
+                try {
+                    const targetHash = `#plant=${encodeURIComponent(plant.id)}`;
+                    if (openedViaTag) {
+                        // Seed dashboard state first so edge-swipe goes back to dashboard instead of closing Chrome
+                        history.replaceState({ view: 'dashboard' }, '', window.location.pathname + window.location.search);
+                        history.pushState({ view: 'detail', plantId: plant.id }, '', targetHash);
+                    } else if (history.state?.view !== 'detail' || history.state?.plantId !== plant.id) {
+                        history.pushState({ view: 'detail', plantId: plant.id }, '', targetHash);
+                    }
+                } catch (_) {}
+            }
 
             const tagBanner = document.getElementById('tag-opened-banner');
             if (openedViaTag) {
@@ -1630,6 +1812,8 @@
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-detail').classList.remove('hidden');
             currentCategory = 'all';
+            switchDetailTab('logs');
+
             document.getElementById('detail-type-badge').innerText = plant.type || 'Autoflower';
 
             document.getElementById('tri-clear').value = plant.trichomes?.clear ?? 0;
@@ -1646,14 +1830,14 @@
 
             const harvestContainer = document.getElementById('action-harvest-container');
             const archiveBadge = document.getElementById('archive-badge');
-            const curingBadge = document.getElementById('detail-curing-badge');
             const curingSection = document.getElementById('curing-section');
             const harvestDateWrap = document.getElementById('detail-harvest-date-wrap');
-            const ageLabelText = document.getElementById('age-label-text');
-            const ageUnitText = document.getElementById('age-unit-text');
             const addBtnTop = document.getElementById('btn-add-image-top');
-            const archiveRatingBox = document.getElementById('archive-rating-box');
             const waterWidgetBox = document.getElementById('water-widget-box');
+            const archiveCompactStats = document.getElementById('archive-compact-stats');
+            const ringSlot = document.getElementById('detail-ring-slot');
+            const phaseLabel = document.getElementById('detail-phase-label');
+            const subStatus = document.getElementById('detail-sub-status');
 
             updateWaterWidget(plant);
             addBtnTop.classList.remove('hidden');
@@ -1664,17 +1848,16 @@
                 curingSection.classList.remove('hidden');
 
                 const curingDays = calculateDays(plant.harvestedDate);
-                curingBadge.textContent = `🏺 Curing: ${curingDays}d`;
-                curingBadge.classList.remove('hidden');
+                const totalDays = calculateDays(plant.date, plant.harvestedDate);
 
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
-                const totalDays = calculateDays(plant.date, plant.harvestedDate);
-                document.getElementById('detail-days').innerText = totalDays;
-                ageLabelText.innerText = "Total Cycle";
-                ageUnitText.innerText = totalDays === 1 ? "day" : "days";
-                archiveRatingBox.classList.remove('hidden');
+                ringSlot.innerHTML = renderDayProgressRing(totalDays, true);
+                phaseLabel.textContent = 'Completed Cycle';
+                subStatus.textContent = `🏺 Curing for ${curingDays} ${curingDays === 1 ? 'day' : 'days'}`;
+
                 waterWidgetBox.classList.add('hidden');
-                
+                archiveCompactStats.classList.remove('hidden');
+                updateArchiveYieldPill(plant);
                 renderLockedRatingState(plant);
                 
                 harvestContainer.innerHTML = `
@@ -1684,18 +1867,20 @@
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
-                curingBadge.classList.add('hidden');
                 curingSection.classList.add('hidden');
 
                 const ageDays = calculateDays(plant.date);
-                document.getElementById('detail-days').innerText = ageDays;
-                ageLabelText.innerText = "Age";
-                ageUnitText.innerText = ageDays === 1 ? "day" : "days";
-                archiveRatingBox.classList.add('hidden');
+                ringSlot.innerHTML = renderDayProgressRing(ageDays, false);
+                phaseLabel.textContent = getGrowthPhaseDescription(ageDays);
+                subStatus.textContent = `Week ${Math.floor(ageDays / 7) + 1} • Active`;
+
                 waterWidgetBox.classList.remove('hidden');
+                archiveCompactStats.classList.add('hidden');
+                document.getElementById('rating-edit-view').classList.add('hidden');
                 harvestContainer.innerHTML = `<button onclick="confirmHarvest()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow">✂️ Harvested</button>`;
             }
 
+            updateTabBadges(plant);
             renderCuringLogs();
             renderMetrics();
             renderDetail();
@@ -1705,8 +1890,12 @@
             document.getElementById('curing-rh').value = '';
             document.getElementById('curing-note').value = '';
             document.getElementById('curing-modal').classList.remove('hidden');
+            pushModalHistory('curing-modal');
         }
-        function closeCuringModal() { document.getElementById('curing-modal').classList.add('hidden'); }
+        function closeCuringModal() {
+            document.getElementById('curing-modal').classList.add('hidden');
+            popModalHistoryIfActive('curing-modal');
+        }
         function saveCuringLog() {
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
@@ -1717,6 +1906,7 @@
                 note: document.getElementById('curing-note').value.trim()
             });
             savePlantToDB(plant);
+            updateTabBadges(plant);
             closeCuringModal();
             renderCuringLogs();
         }
@@ -1724,15 +1914,17 @@
             const plant = plants.find(p => p.id === activePlantId);
             const container = document.getElementById('curing-container');
             if (!plant?.curingLogs?.length) {
-                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">No curing logs yet</div>`;
+                container.innerHTML = `<div class="py-3 text-center text-xs text-slate-600 italic">No curing logs yet</div>`;
                 return;
             }
             container.innerHTML = plant.curingLogs.map((c, index) => `
                 <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                     <div class="space-y-1">
-                        <span class="text-slate-400 font-medium">${formatDate(c.date.slice(0,10))}</span>
-                        <div class="text-slate-300 mt-1">Jar Humidity: <span class="text-amber-400 font-bold">${escapeHtml(c.rh)}%</span></div>
-                        ${c.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${escapeHtml(c.note)}</p>` : ''}
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400 font-medium">${formatDate(c.date.slice(0,10))}</span>
+                            <span class="text-amber-400 font-bold">RH: ${escapeHtml(c.rh)}%</span>
+                        </div>
+                        ${c.note ? `<p class="text-xs text-slate-300">💬 ${escapeHtml(c.note)}</p>` : ''}
                     </div>
                     <button onclick="deleteCuringLog(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
                 </div>
@@ -1743,6 +1935,7 @@
             if (plant?.curingLogs) {
                 plant.curingLogs.splice(index, 1);
                 savePlantToDB(plant);
+                updateTabBadges(plant);
                 renderCuringLogs();
             }
         }
@@ -1751,9 +1944,13 @@
             ['metric-ph', 'metric-ec', 'metric-temp', 'metric-rh', 'metric-note'].forEach(id => document.getElementById(id).value = '');
             updateLiveVPDPreview();
             document.getElementById('metrics-modal').classList.remove('hidden');
+            pushModalHistory('metrics-modal');
         }
 
-        function closeMetricsModal() { document.getElementById('metrics-modal').classList.add('hidden'); }
+        function closeMetricsModal() {
+            document.getElementById('metrics-modal').classList.add('hidden');
+            popModalHistoryIfActive('metrics-modal');
+        }
 
         function saveMetric() {
             const plant = plants.find(p => p.id === activePlantId);
@@ -1773,6 +1970,7 @@
                 note: document.getElementById('metric-note').value.trim()
             });
             savePlantToDB(plant);
+            updateTabBadges(plant);
             closeMetricsModal();
             renderMetrics();
         }
@@ -1781,27 +1979,30 @@
             const plant = plants.find(p => p.id === activePlantId);
             const container = document.getElementById('metrics-container');
             if (!plant?.metrics?.length) {
-                container.innerHTML = `<div class="py-4 text-center text-xs text-slate-600 italic">No metrics recorded yet.</div>`;
+                container.innerHTML = `<div class="py-3 text-center text-xs text-slate-600 italic">No metrics recorded yet.</div>`;
                 return;
             }
             container.innerHTML = plant.metrics.map((m, index) => {
                 let parts = [];
-                if (m.ph) parts.push(`pH: <span class="text-white font-bold">${escapeHtml(m.ph)}</span>`);
-                if (m.ec) parts.push(`EC: <span class="text-white font-bold">${escapeHtml(m.ec)}</span>`);
-                if (m.temp) parts.push(`Temp: <span class="text-white font-bold">${escapeHtml(m.temp)}°C</span>`);
-                if (m.rh) parts.push(`RH: <span class="text-white font-bold">${escapeHtml(m.rh)}%</span>`);
+                if (m.ph) parts.push(`pH <span class="text-white font-bold">${escapeHtml(m.ph)}</span>`);
+                if (m.ec) parts.push(`EC <span class="text-white font-bold">${escapeHtml(m.ec)}</span>`);
+                if (m.temp) parts.push(`<span class="text-white font-bold">${escapeHtml(m.temp)}°C</span>`);
+                if (m.rh) parts.push(`<span class="text-white font-bold">${escapeHtml(m.rh)}%</span>`);
                 
                 const computedVpd = m.vpd || calculateVPD(m.temp, m.rh)?.val;
                 if (computedVpd) {
-                    parts.push(`VPD: <span class="text-emerald-400 font-bold">${escapeHtml(computedVpd)} kPa</span>`);
+                    parts.push(`VPD <span class="text-emerald-400 font-bold">${escapeHtml(computedVpd)}</span>`);
                 }
 
                 return `
                     <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3 flex justify-between items-start text-xs">
                         <div class="space-y-1">
-                            <span class="text-slate-400 font-medium">${formatDate(m.date.slice(0,10))}</span>
-                            <div class="flex flex-wrap gap-2.5 text-slate-300 mt-1">${parts.join(' • ')}</div>
-                            ${m.note ? `<p class="text-xs text-slate-300 mt-1">💬 ${escapeHtml(m.note)}</p>` : ''}
+                            <div class="flex flex-wrap items-center gap-2 text-slate-300">
+                                <span class="text-slate-500 font-medium">${formatDate(m.date.slice(0,10))}</span>
+                                <span>•</span>
+                                <span>${parts.join(' • ')}</span>
+                            </div>
+                            ${m.note ? `<p class="text-xs text-slate-300">💬 ${escapeHtml(m.note)}</p>` : ''}
                         </div>
                         <button onclick="deleteMetric(${index})" class="text-red-400 hover:text-red-300 text-xs ml-2">✕</button>
                     </div>
@@ -1814,6 +2015,7 @@
             if (plant?.metrics) {
                 plant.metrics.splice(index, 1);
                 savePlantToDB(plant);
+                updateTabBadges(plant);
                 renderMetrics();
             }
         }
@@ -1840,13 +2042,23 @@
             }
         }
 
-        function goHome() {
+        function goHome(fromPopState = false) {
             activePlantId = null;
             isChainedTagFlow = false;
             closePlantActionsMenu();
-            try {
-                history.replaceState(null, '', window.location.pathname + window.location.search);
-            } catch (_) {}
+            hideAllModalsDOM();
+
+            if (!fromPopState) {
+                try {
+                    if (history.state?.view === 'detail') {
+                        history.back();
+                        return;
+                    } else {
+                        history.replaceState({ view: 'dashboard' }, '', window.location.pathname + window.location.search);
+                    }
+                } catch (_) {}
+            }
+
             document.getElementById('view-detail').classList.add('hidden');
             document.getElementById('view-dashboard').classList.remove('hidden');
             renderDashboard();
@@ -1896,34 +2108,43 @@
 
             const container = document.getElementById('category-grid');
             if (displayItems.length === 0) {
-                container.className = 'pt-0.5';
+                container.className = '';
                 container.innerHTML = `
-                    <div class="bg-[#090a0f] border border-dashed border-[#1e2336] rounded-xl py-6 px-4 text-center space-y-1">
-                        <p class="text-xs text-slate-400 font-medium">No photos ${currentCategory === 'all' ? 'added yet' : `in ${categories[currentCategory]}`}</p>
-                        <p class="text-[11px] text-slate-600">Tap "+ Add Photo" above to log visual progress.</p>
+                    <div onclick="openSourceModal()" class="bg-[#090a0f] hover:bg-[#0f121b] border border-dashed border-[#242b42] rounded-xl py-8 px-4 text-center space-y-1.5 cursor-pointer transition">
+                        <div class="text-2xl">📷</div>
+                        <p class="text-xs text-slate-300 font-semibold">No photos ${currentCategory === 'all' ? 'yet' : `in ${categories[currentCategory]}`}</p>
+                        <p class="text-[11px] text-slate-500">Tap here or "+ Add Photo" to capture visual progress.</p>
                     </div>
                 `;
                 return;
             }
 
-            const gridClass = displayItems.length === 1 ? 'grid grid-cols-1 gap-3 pt-0.5' : 'grid grid-cols-2 gap-2.5 pt-0.5';
-            const aspectClass = displayItems.length === 1 ? 'aspect-video' : 'aspect-square';
-            container.className = gridClass;
+            const isSingle = displayItems.length === 1;
+            container.className = isSingle ? 'grid grid-cols-1 gap-2.5' : 'grid grid-cols-2 gap-2';
+            const aspectClass = isSingle ? 'aspect-[16/10]' : 'aspect-square';
 
             container.innerHTML = displayItems.map(item => {
                 const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
                 const stageBadge = shortCategories[item.stageKey] || item.stageKey;
                 return `
-                    <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-2 space-y-1.5 group">
-                        <div class="relative ${aspectClass} rounded-lg overflow-hidden border border-[#1e2336] bg-[#12151f] cursor-pointer" onclick="openLightbox('${item.stageKey}', ${item.stageIndex})">
-                            <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200">
-                            <div class="absolute top-1.5 left-1.5 flex flex-wrap items-center gap-1 max-w-[78%]">
-                                <span class="bg-blue-600/90 backdrop-blur-sm text-white px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">${stageBadge}</span>
-                                ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-200 border border-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold">Day ${photoDay}</span>` : ''}
-                            </div>
-                            <button onclick="event.stopPropagation(); confirmDeleteItem('${item.stageKey}', ${item.stageIndex})" class="absolute top-1.5 right-1.5 bg-black/70 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-[11px] transition">✕</button>
+                    <div class="relative ${aspectClass} rounded-xl overflow-hidden border border-[#1e2336] bg-[#090a0f] cursor-pointer group shadow-md" onclick="openLightbox('${item.stageKey}', ${item.stageIndex})">
+                        <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300">
+                        
+                        <!-- Top Badges -->
+                        <div class="absolute top-2 left-2 flex flex-wrap items-center gap-1 max-w-[78%]">
+                            <span class="bg-blue-600/90 backdrop-blur-sm text-white px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow">${stageBadge}</span>
+                            ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-100 border border-white/10 px-1.5 py-0.5 rounded-md text-[9px] font-bold">Day ${photoDay}</span>` : ''}
                         </div>
-                        ${item.comment ? `<p class="text-[11px] text-slate-300 px-1 line-clamp-2 leading-snug">${escapeHtml(item.comment)}</p>` : ''}
+
+                        <!-- Delete Button -->
+                        <button onclick="event.stopPropagation(); confirmDeleteItem('${item.stageKey}', ${item.stageIndex})" class="absolute top-2 right-2 bg-black/65 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-[11px] transition">✕</button>
+
+                        <!-- Bottom Caption Gradient Overlay (if comment exists) -->
+                        ${item.comment ? `
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-2.5 pt-6 pointer-events-none">
+                                <p class="text-[11px] text-slate-100 line-clamp-2 leading-snug drop-shadow">${escapeHtml(item.comment)}</p>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
@@ -1947,9 +2168,13 @@
                 commentEl.classList.add('hidden');
             }
             document.getElementById('lightbox-modal').classList.remove('hidden');
+            pushModalHistory('lightbox-modal');
         }
 
-        function closeLightbox() { document.getElementById('lightbox-modal').classList.add('hidden'); }
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            popModalHistoryIfActive('lightbox-modal');
+        }
 
         function selectUploadStage(stageKey) {
             activeStageKey = stageKey;
@@ -1985,12 +2210,16 @@
 
             renderUploadStageSelector();
             document.getElementById('source-modal').classList.remove('hidden');
+            pushModalHistory('source-modal');
         }
 
-        function closeSourceModal() { document.getElementById('source-modal').classList.add('hidden'); }
+        function closeSourceModal() {
+            document.getElementById('source-modal').classList.add('hidden');
+            popModalHistoryIfActive('source-modal');
+        }
 
         function triggerFileCapture(type) {
-            closeSourceModal();
+            document.getElementById('source-modal').classList.add('hidden');
             document.getElementById(type === 'camera' ? 'hidden-camera-input' : 'hidden-file-input').click();
         }
 
@@ -2019,7 +2248,10 @@
 
         async function handleImageSelected(event) {
             const files = event.target.files;
-            if (!files || files.length === 0 || !activePlantId || !activeStageKey) return;
+            if (!files || files.length === 0 || !activePlantId || !activeStageKey) {
+                popModalHistoryIfActive('source-modal');
+                return;
+            }
 
             pendingImagesData = [];
             const fileArray = Array.from(files);
@@ -2043,12 +2275,19 @@
                     countBadge.classList.remove('hidden');
                 }
                 document.getElementById('feedback-modal').classList.remove('hidden');
+                try {
+                    const baseState = history.state && typeof history.state === 'object' ? { ...history.state } : { view: 'detail', plantId: activePlantId };
+                    history.replaceState({ ...baseState, modal: 'feedback-modal' }, '', window.location.hash);
+                } catch (_) {}
+            } else {
+                popModalHistoryIfActive('source-modal');
             }
         }
 
         function closeFeedbackModal() {
             pendingImagesData = [];
             document.getElementById('feedback-modal').classList.add('hidden');
+            popModalHistoryIfActive('feedback-modal');
         }
 
         function saveFeedbackAndImage() {
@@ -2093,9 +2332,13 @@
             document.getElementById('edit-type-input').value = plant.type || 'Autoflower';
             document.getElementById('edit-date-input').value = plant.date;
             document.getElementById('edit-modal').classList.remove('hidden');
+            pushModalHistory('edit-modal');
         }
 
-        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+            popModalHistoryIfActive('edit-modal');
+        }
 
         function saveEditedPlant() {
             const plant = plants.find(p => p.id === activePlantId);
@@ -2104,8 +2347,8 @@
             plant.type = document.getElementById('edit-type-input').value;
             plant.date = document.getElementById('edit-date-input').value;
             savePlantToDB(plant);
-            closeEditModal();
-            openDetail(plant.id);
+            document.getElementById('edit-modal').classList.add('hidden');
+            openDetail(plant.id, false, true);
         }
 
         function confirmDeletePlant() {
@@ -2165,9 +2408,13 @@
             if (hash.includes('#plant=')) {
                 const pId = decodeURIComponent(hash.split('#plant=')[1].split('&')[0]);
                 if (plants.some(p => p.id === pId)) {
-                    openDetail(pId, true);
+                    openDetail(pId, true, false);
+                    return;
                 }
             }
+            try {
+                history.replaceState({ view: 'dashboard' }, '', window.location.pathname + window.location.search);
+            } catch (_) {}
         }
 
         window.addEventListener('hashchange', handleRouteFromHash);
