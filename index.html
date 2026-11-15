@@ -128,7 +128,7 @@
             </div>
 
             <!-- 1. Plant Header Card -->
-            <div class="uis-card rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-4">
+            <div class="uis-card rounded-2xl p-5 shadow-xl relative space-y-4">
                 <div class="flex justify-between items-start gap-3">
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
@@ -141,11 +141,27 @@
                         </div>
                         <p class="text-[11px] text-slate-400 mt-2">Planted: <span id="detail-date" class="text-slate-200"></span> <span id="detail-harvest-date-wrap" class="hidden">• Harvested: <span id="detail-harvest-date" class="text-slate-200"></span></span></p>
                     </div>
-                    <div class="flex items-center space-x-1.5 shrink-0">
-                        <button onclick="openNfcModal()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-xs font-bold transition" title="Write or Read NFC Plant Tag">📲 NFC</button>
-                        <button onclick="openLabelModalForActive()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition" title="Print QR Label">🖨️</button>
-                        <button onclick="openEditModal()" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-300 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-[#1e2336]">Edit</button>
-                        <button onclick="confirmDeletePlant()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition border border-red-500/20">✕</button>
+
+                    <!-- Clean, Consolidated Action Controls -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="openTagLabelModal('nfc')" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#2a324d] px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="NFC Tag & Print Label">
+                            <span>🏷️</span>
+                            <span>Tag & Label</span>
+                        </button>
+                        <div class="relative">
+                            <button id="plant-actions-btn" onclick="togglePlantActionsMenu(event)" class="w-8 h-8 rounded-xl bg-[#181d2e] hover:bg-[#22283d] text-slate-300 border border-[#1e2336] flex items-center justify-center text-xs font-bold tracking-widest transition" title="More Options" aria-label="More Options">•••</button>
+                            <div id="plant-actions-menu" class="hidden absolute right-0 mt-1.5 w-40 bg-[#12151f] border border-[#2a324d] rounded-xl shadow-2xl py-1 z-40">
+                                <button onclick="closePlantActionsMenu(); openEditModal()" class="w-full text-left px-3.5 py-2 text-xs text-slate-200 hover:bg-[#181d2e] flex items-center gap-2 transition">
+                                    <span>✏️</span>
+                                    <span>Edit Plant</span>
+                                </button>
+                                <div class="border-t border-[#1e2336] my-1"></div>
+                                <button onclick="closePlantActionsMenu(); confirmDeletePlant()" class="w-full text-left px-3.5 py-2 text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition">
+                                    <span>🗑️</span>
+                                    <span>Delete Plant</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -210,7 +226,7 @@
                 </div>
             </div>
 
-            <!-- 2. IMMEDIATE PHOTO GALLERY (All stages visible right away!) -->
+            <!-- 2. IMMEDIATE PHOTO GALLERY -->
             <div class="uis-card rounded-2xl p-5 shadow-xl space-y-3.5">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
@@ -220,10 +236,7 @@
                     <button id="btn-add-image-top" onclick="openSourceModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition shadow-md shadow-blue-900/20">+ Add Photo</button>
                 </div>
 
-                <!-- Stage Filter Pills -->
                 <div id="gallery-filter-pills" class="flex flex-wrap gap-1.5"></div>
-
-                <!-- Photos Grid -->
                 <div id="category-grid" class="pt-0.5"></div>
             </div>
 
@@ -316,7 +329,7 @@
                 </div>
             </div>
 
-            <!-- 6. CURING / DRYING LOG (Shown automatically when harvested) -->
+            <!-- 6. CURING / DRYING LOG -->
             <div id="curing-section" class="hidden uis-card rounded-2xl p-5 shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
                     <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying Log</h3>
@@ -336,7 +349,7 @@
         </div>
     </main>
 
-    <!-- SETTINGS & BACKUP MODAL (Opened from Header Gear) -->
+    <!-- SETTINGS & BACKUP MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeSettingsModal()">
         <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-[#1e2336] pb-3">
@@ -403,82 +416,90 @@
         </div>
     </div>
 
-    <!-- NFC PLANT TAG MODAL -->
-    <div id="nfc-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+    <!-- UNIFIED TAG & LABEL MODAL (Combines NFC Tag & Print Label cleanly) -->
+    <div id="tag-label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4" onclick="closeTagLabelModal()">
+        <div class="uis-card rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4" onclick="event.stopPropagation()">
+            <!-- Header -->
             <div class="flex justify-between items-center">
-                <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-emerald-400">📲 NFC Plant Tag</h3>
-                <button onclick="closeNfcModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white shrink-0">🏷️ Tag & Label</h3>
+                    <span id="tl-plant-badge" class="text-[10px] text-slate-400 bg-[#090a0f] border border-[#1e2336] px-2 py-0.5 rounded-md truncate"></span>
+                </div>
+                <button onclick="closeTagLabelModal()" class="text-slate-400 hover:text-white text-sm ml-2">✕</button>
             </div>
 
-            <div id="nfc-chained-step-banner" class="hidden bg-blue-500/10 border border-blue-500/30 rounded-xl px-3.5 py-2.5 flex justify-between items-center gap-2">
-                <span class="text-[11px] text-blue-300 font-semibold">Step 1 of 2: Program NFC Tag</span>
-                <button type="button" onclick="proceedToChainedPrintLabel()" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition">
-                    Next: Print Label →
+            <!-- Segmented Tab Bar -->
+            <div class="grid grid-cols-2 gap-1.5 bg-[#090a0f] p-1 rounded-xl border border-[#1e2336]">
+                <button type="button" id="tl-tab-btn-nfc" onclick="switchTagLabelTab('nfc')" class="py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#181d2e] text-emerald-400 border border-emerald-500/30 shadow-sm">
+                    <span>📲</span>
+                    <span>NFC Tag</span>
+                </button>
+                <button type="button" id="tl-tab-btn-print" onclick="switchTagLabelTab('print')" class="py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+                    <span>🖨️</span>
+                    <span>Print Label</span>
                 </button>
             </div>
 
-            <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 space-y-2">
-                <div class="flex justify-between items-center">
-                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Plant</span>
-                    <span id="nfc-plant-type" class="text-[10px] text-slate-300 bg-[#12151f] border border-[#1e2336] px-2 py-0.5 rounded font-semibold"></span>
+            <!-- TAB 1: NFC TAG -->
+            <div id="tl-tab-nfc" class="space-y-4">
+                <div id="nfc-chained-step-banner" class="hidden bg-blue-500/10 border border-blue-500/30 rounded-xl px-3.5 py-2.5 flex justify-between items-center gap-2">
+                    <span class="text-[11px] text-blue-300 font-semibold">Step 1 of 2: Program NFC Tag</span>
+                    <button type="button" onclick="switchTagLabelTab('print')" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0 transition">
+                        Next: Print →
+                    </button>
                 </div>
-                <div id="nfc-plant-strain" class="text-base font-black text-white"></div>
-                <div class="pt-1">
-                    <label class="block text-[10px] text-slate-500 uppercase font-semibold mb-1">Direct Tag URL</label>
+
+                <div class="bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Direct Plant Link</span>
+                        <span id="nfc-plant-type" class="text-[10px] text-slate-300 bg-[#12151f] border border-[#1e2336] px-2 py-0.5 rounded font-semibold"></span>
+                    </div>
                     <div class="flex items-center gap-2">
                         <input type="text" id="nfc-url-display" readonly class="w-full bg-[#12151f] border border-[#1e2336] text-slate-300 rounded-lg px-2.5 py-1.5 text-[11px] font-mono select-all">
                         <button type="button" onclick="copyNfcUrl()" id="nfc-copy-btn" class="bg-[#181d2e] hover:bg-[#22283d] text-white border border-[#1e2336] px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition">📋 Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div id="web-nfc-supported-box" class="space-y-2.5">
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Tap <strong class="text-slate-200">Write Tag</strong> and hold your 3D-printed plant stake (NTAG213 / 215 / 216) against the back of your phone.
-                </p>
-                <div class="grid grid-cols-2 gap-2.5">
-                    <button type="button" onclick="writeNfcTag()" id="btn-write-nfc" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition shadow-lg shadow-emerald-900/30">
-                        📲 Write Tag
-                    </button>
-                    <button type="button" onclick="readNfcTag()" id="btn-read-nfc" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#1e2336] font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">
-                        🔍 Read / Test
-                    </button>
+                <div id="web-nfc-supported-box" class="space-y-2.5">
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Tap <strong class="text-slate-200">Write Tag</strong> and hold your 3D-printed stake (NTAG213 / 215 / 216) against the back of your phone.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" onclick="writeNfcTag()" id="btn-write-nfc" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition shadow-lg shadow-emerald-900/30">
+                            📲 Write Tag
+                        </button>
+                        <button type="button" onclick="readNfcTag()" id="btn-read-nfc" class="bg-[#181d2e] hover:bg-[#22283d] text-slate-200 border border-[#1e2336] font-bold text-xs uppercase tracking-wider py-3 rounded-xl transition">
+                            🔍 Read / Test
+                        </button>
+                    </div>
+                </div>
+
+                <div id="web-nfc-unsupported-box" class="hidden bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300 leading-relaxed">
+                    Direct browser NFC writing requires Chrome on Android over HTTPS. Use the <strong>Copy</strong> button above and paste the URL into an NFC writer app (such as <em>NFC Tools</em>) to program your tag.
+                </div>
+
+                <div id="nfc-status-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 text-xs space-y-2">
+                    <div class="flex justify-between items-center gap-2">
+                        <span id="nfc-status-text" class="text-slate-200 font-medium leading-snug"></span>
+                        <button type="button" id="nfc-cancel-op-btn" onclick="abortNfcOperation()" class="hidden bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0">Stop</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="web-nfc-unsupported-box" class="hidden bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300 leading-relaxed">
-                Direct browser NFC writing requires Chrome on Android over HTTPS. Use the <strong>Copy</strong> button above and paste the URL into an NFC writer app (such as <em>NFC Tools</em>) to program your tag.
-            </div>
-
-            <div id="nfc-status-box" class="hidden bg-[#090a0f] border border-[#1e2336] rounded-xl p-3.5 text-xs space-y-2">
-                <div class="flex justify-between items-center gap-2">
-                    <span id="nfc-status-text" class="text-slate-200 font-medium leading-snug"></span>
-                    <button type="button" id="nfc-cancel-op-btn" onclick="abortNfcOperation()" class="hidden bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0">Stop</button>
+            <!-- TAB 2: PRINT QR LABEL -->
+            <div id="tl-tab-print" class="hidden space-y-4 text-center">
+                <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center">
+                    <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
+                    <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
+                        <span id="label-type-text" class="border border-black px-2 py-0.5 rounded">Autoflower</span>
+                        <span>•</span>
+                        <span id="label-date-text">01.01.2026</span>
+                    </div>
+                    <div id="qrcode" class="mt-2"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PRINT LABEL MODAL -->
-    <div id="label-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="uis-card rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4 text-center">
-            <div class="space-y-1">
-                <h3 class="text-sm font-bold uppercase tracking-[0.15em] text-white">Label Preview</h3>
-                <p id="label-chained-step-text" class="hidden text-[11px] text-blue-400 font-semibold">Step 2 of 2: Print Physical Label</p>
-            </div>
-            <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center">
-                <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
-                <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
-                    <span id="label-type-text" class="border border-black px-2 py-0.5 rounded">Autoflower</span>
-                    <span>•</span>
-                    <span id="label-date-text">01.01.2026</span>
-                </div>
-                <div id="qrcode" class="mt-2"></div>
-            </div>
-            <div class="flex space-x-3 pt-2">
-                <button onclick="closeLabelModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Close</button>
-                <button onclick="window.print()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">🖨️ Print</button>
+                <button type="button" onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg shadow-blue-900/25">
+                    🖨️ Print QR Label
+                </button>
             </div>
         </div>
     </div>
@@ -637,7 +658,7 @@
         let archiveSort = 'newest';
         let tempRatingValue = 8.0;
         let nfcAbortController = null;
-        let pendingPrintAfterNfc = false;
+        let isChainedTagFlow = false;
 
         function normalizePlant(p) {
             const existingSensory = p.sensory || {};
@@ -670,6 +691,28 @@
                 btn.classList.remove("bg-emerald-600/30", "text-emerald-300", "border-emerald-500/40");
             }, 1400);
         }
+
+        /* PLANT HEADER ACTIONS MENU (•••) */
+        function togglePlantActionsMenu(e) {
+            e.stopPropagation();
+            const menu = document.getElementById('plant-actions-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function closePlantActionsMenu() {
+            const menu = document.getElementById('plant-actions-menu');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('plant-actions-menu');
+            const btn = document.getElementById('plant-actions-btn');
+            if (menu && !menu.classList.contains('hidden')) {
+                if (!menu.contains(e.target) && e.target !== btn) {
+                    menu.classList.add('hidden');
+                }
+            }
+        });
 
         /* SETTINGS & BACKUP MODAL */
         function openSettingsModal() {
@@ -747,7 +790,7 @@
         function openNewPlantTagPrompt(plantId) {
             const plant = plants.find(p => p.id === String(plantId));
             if (!plant) return;
-            pendingPrintAfterNfc = false;
+            isChainedTagFlow = false;
             document.getElementById('prompt-plant-name').textContent = plant.strain;
             document.getElementById('prompt-plant-type').textContent = `(${plant.type || 'Autoflower'})`;
             document.getElementById('new-plant-tag-prompt-modal').classList.remove('hidden');
@@ -760,24 +803,197 @@
         function handleNewPlantTagChoice(choice) {
             closeNewPlantTagPrompt();
             if (choice === 'nfc') {
-                pendingPrintAfterNfc = false;
-                openNfcModal();
+                openTagLabelModal('nfc', false);
             } else if (choice === 'print') {
-                pendingPrintAfterNfc = false;
-                openLabelModalForActive();
+                openTagLabelModal('print', false);
             } else if (choice === 'both') {
-                pendingPrintAfterNfc = true;
-                openNfcModal();
-            } else {
-                pendingPrintAfterNfc = false;
+                openTagLabelModal('nfc', true);
             }
         }
 
-        function proceedToChainedPrintLabel() {
-            pendingPrintAfterNfc = false;
+        /* UNIFIED TAG & LABEL MODAL (NFC + PRINT IN ONE CLEAN INTERFACE) */
+        function openTagLabelModal(initialTab = 'nfc', chainedBoth = false) {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+
             abortNfcOperation();
-            document.getElementById('nfc-modal').classList.add('hidden');
-            openLabelModalForActive(true);
+            isChainedTagFlow = chainedBoth;
+
+            // Populate shared plant info
+            document.getElementById('tl-plant-badge').textContent = plant.strain;
+            document.getElementById('nfc-plant-type').textContent = plant.type || 'Autoflower';
+            document.getElementById('nfc-url-display').value = getPlantDeepLink(plant.id);
+            document.getElementById('nfc-status-box').classList.add('hidden');
+            document.getElementById('nfc-chained-step-banner').classList.toggle('hidden', !chainedBoth);
+
+            const supported = ('NDEFReader' in window);
+            document.getElementById('web-nfc-supported-box').classList.toggle('hidden', !supported);
+            document.getElementById('web-nfc-unsupported-box').classList.toggle('hidden', supported);
+
+            // Populate Print Label preview & QR code
+            document.getElementById('label-strain-text').innerText = plant.strain;
+            document.getElementById('label-type-text').innerText = plant.type || 'Autoflower';
+            document.getElementById('label-date-text').innerText = formatDate(plant.date);
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, { text: getPlantDeepLink(plant.id), width: 75, height: 75 });
+
+            switchTagLabelTab(initialTab);
+            document.getElementById('tag-label-modal').classList.remove('hidden');
+        }
+
+        function switchTagLabelTab(tab) {
+            const nfcBtn = document.getElementById('tl-tab-btn-nfc');
+            const printBtn = document.getElementById('tl-tab-btn-print');
+            const nfcPanel = document.getElementById('tl-tab-nfc');
+            const printPanel = document.getElementById('tl-tab-print');
+
+            if (tab === 'nfc') {
+                nfcBtn.className = 'py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#181d2e] text-emerald-400 border border-emerald-500/30 shadow-sm';
+                printBtn.className = 'py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+                nfcPanel.classList.remove('hidden');
+                printPanel.classList.add('hidden');
+            } else {
+                abortNfcOperation();
+                printBtn.className = 'py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#181d2e] text-blue-400 border border-blue-500/30 shadow-sm';
+                nfcBtn.className = 'py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+                printPanel.classList.remove('hidden');
+                nfcPanel.classList.add('hidden');
+            }
+        }
+
+        function closeTagLabelModal() {
+            abortNfcOperation();
+            isChainedTagFlow = false;
+            document.getElementById('tag-label-modal').classList.add('hidden');
+        }
+
+        function abortNfcOperation() {
+            if (nfcAbortController) {
+                try { nfcAbortController.abort(); } catch (_) {}
+                nfcAbortController = null;
+            }
+            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
+            if (cancelBtn) cancelBtn.classList.add('hidden');
+        }
+
+        function setNfcStatus(message, tone = 'info', showCancel = false) {
+            const box = document.getElementById('nfc-status-box');
+            const text = document.getElementById('nfc-status-text');
+            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
+
+            box.classList.remove('hidden');
+            text.textContent = message;
+
+            if (tone === 'success') {
+                text.className = 'text-emerald-400 font-semibold leading-snug';
+            } else if (tone === 'error') {
+                text.className = 'text-red-400 font-semibold leading-snug';
+            } else if (tone === 'waiting') {
+                text.className = 'text-blue-400 font-semibold leading-snug animate-pulse';
+            } else {
+                text.className = 'text-slate-200 font-medium leading-snug';
+            }
+
+            cancelBtn.classList.toggle('hidden', !showCancel);
+        }
+
+        async function copyNfcUrl() {
+            const urlInput = document.getElementById('nfc-url-display');
+            const btn = document.getElementById('nfc-copy-btn');
+            try {
+                await navigator.clipboard.writeText(urlInput.value);
+                btn.textContent = '✅ Copied';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
+            } catch (_) {
+                urlInput.select();
+                document.execCommand('copy');
+                btn.textContent = '✅ Copied';
+                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
+            }
+        }
+
+        async function writeNfcTag() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant || !('NDEFReader' in window)) return;
+
+            abortNfcOperation();
+            nfcAbortController = new AbortController();
+            const targetUrl = getPlantDeepLink(plant.id);
+
+            setNfcStatus('📡 Hold your NFC tag against the back of your phone...', 'waiting', true);
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.write(
+                    { records: [{ recordType: 'url', data: targetUrl }] },
+                    { signal: nfcAbortController.signal }
+                );
+                nfcAbortController = null;
+                if (navigator.vibrate) navigator.vibrate(100);
+                const extraHint = isChainedTagFlow ? ' Switch to "Print Label" tab above when ready.' : ' Tap it anytime to open this plant.';
+                setNfcStatus(`✅ NFC tag programmed for "${plant.strain}"!${extraHint}`, 'success', false);
+            } catch (err) {
+                nfcAbortController = null;
+                if (err?.name === 'AbortError') {
+                    setNfcStatus('NFC write cancelled.', 'info', false);
+                } else {
+                    setNfcStatus(`❌ Write failed: ${err?.message || 'Keep the tag steady against the phone and try again.'}`, 'error', false);
+                }
+            }
+        }
+
+        async function readNfcTag() {
+            if (!('NDEFReader' in window)) return;
+
+            abortNfcOperation();
+            nfcAbortController = new AbortController();
+
+            setNfcStatus('🔍 Hold an NFC tag against your phone to inspect it...', 'waiting', true);
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan({ signal: nfcAbortController.signal });
+
+                ndef.onreadingerror = () => {
+                    setNfcStatus('❌ Could not read NFC tag. Try repositioning it.', 'error', false);
+                    abortNfcOperation();
+                };
+
+                ndef.onreading = (event) => {
+                    const decoder = new TextDecoder();
+                    let foundData = '';
+                    for (const record of event.message.records) {
+                        if (record.recordType === 'url' || record.recordType === 'text') {
+                            foundData = decoder.decode(record.data);
+                            break;
+                        }
+                    }
+                    if (navigator.vibrate) navigator.vibrate(60);
+
+                    if (foundData.includes('#plant=')) {
+                        const scannedId = decodeURIComponent(foundData.split('#plant=')[1].split('&')[0]);
+                        const matchedPlant = plants.find(p => p.id === scannedId);
+                        if (matchedPlant) {
+                            setNfcStatus(`✅ Tag linked to: "${matchedPlant.strain}" (${matchedPlant.type || 'Autoflower'})`, 'success', false);
+                        } else {
+                            setNfcStatus(`⚠️ Tag contains plant ID "${scannedId}", which is not in this device's database.`, 'info', false);
+                        }
+                    } else if (foundData) {
+                        setNfcStatus(`ℹ️ Tag content: ${foundData}`, 'info', false);
+                    } else {
+                        setNfcStatus('ℹ️ Tag is blank / unformatted.', 'info', false);
+                    }
+                    abortNfcOperation();
+                };
+            } catch (err) {
+                nfcAbortController = null;
+                if (err?.name === 'AbortError') {
+                    setNfcStatus('NFC scan stopped.', 'info', false);
+                } else {
+                    setNfcStatus(`❌ Scan error: ${err?.message || 'NFC permission denied or disabled.'}`, 'error', false);
+                }
+            }
         }
 
         /* SENSORY & EFFECT PROFILE FUNCTIONS */
@@ -923,163 +1139,6 @@
                 document.getElementById('metric-ph').value = '6.2';
                 document.getElementById('metric-ec').value = '0.1';
                 document.getElementById('metric-note').value = 'Pure RO water flush';
-            }
-        }
-
-        /* NFC TAG MODAL, WRITER & READER */
-        function openNfcModal() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant) return;
-
-            abortNfcOperation();
-
-            document.getElementById('nfc-chained-step-banner').classList.toggle('hidden', !pendingPrintAfterNfc);
-            document.getElementById('nfc-plant-strain').textContent = plant.strain;
-            document.getElementById('nfc-plant-type').textContent = plant.type || 'Autoflower';
-            document.getElementById('nfc-url-display').value = getPlantDeepLink(plant.id);
-            document.getElementById('nfc-status-box').classList.add('hidden');
-
-            const supported = ('NDEFReader' in window);
-            document.getElementById('web-nfc-supported-box').classList.toggle('hidden', !supported);
-            document.getElementById('web-nfc-unsupported-box').classList.toggle('hidden', supported);
-
-            document.getElementById('nfc-modal').classList.remove('hidden');
-        }
-
-        function closeNfcModal() {
-            abortNfcOperation();
-            document.getElementById('nfc-modal').classList.add('hidden');
-            if (pendingPrintAfterNfc) {
-                pendingPrintAfterNfc = false;
-                openLabelModalForActive(true);
-            }
-        }
-
-        function abortNfcOperation() {
-            if (nfcAbortController) {
-                try { nfcAbortController.abort(); } catch (_) {}
-                nfcAbortController = null;
-            }
-            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
-            if (cancelBtn) cancelBtn.classList.add('hidden');
-        }
-
-        function setNfcStatus(message, tone = 'info', showCancel = false) {
-            const box = document.getElementById('nfc-status-box');
-            const text = document.getElementById('nfc-status-text');
-            const cancelBtn = document.getElementById('nfc-cancel-op-btn');
-
-            box.classList.remove('hidden');
-            text.textContent = message;
-
-            if (tone === 'success') {
-                text.className = 'text-emerald-400 font-semibold leading-snug';
-            } else if (tone === 'error') {
-                text.className = 'text-red-400 font-semibold leading-snug';
-            } else if (tone === 'waiting') {
-                text.className = 'text-blue-400 font-semibold leading-snug animate-pulse';
-            } else {
-                text.className = 'text-slate-200 font-medium leading-snug';
-            }
-
-            cancelBtn.classList.toggle('hidden', !showCancel);
-        }
-
-        async function copyNfcUrl() {
-            const urlInput = document.getElementById('nfc-url-display');
-            const btn = document.getElementById('nfc-copy-btn');
-            try {
-                await navigator.clipboard.writeText(urlInput.value);
-                btn.textContent = '✅ Copied';
-                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
-            } catch (_) {
-                urlInput.select();
-                document.execCommand('copy');
-                btn.textContent = '✅ Copied';
-                setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800);
-            }
-        }
-
-        async function writeNfcTag() {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (!plant || !('NDEFReader' in window)) return;
-
-            abortNfcOperation();
-            nfcAbortController = new AbortController();
-            const targetUrl = getPlantDeepLink(plant.id);
-
-            setNfcStatus('📡 Hold your NFC tag against the back of your phone...', 'waiting', true);
-
-            try {
-                const ndef = new NDEFReader();
-                await ndef.write(
-                    { records: [{ recordType: 'url', data: targetUrl }] },
-                    { signal: nfcAbortController.signal }
-                );
-                nfcAbortController = null;
-                if (navigator.vibrate) navigator.vibrate(100);
-                const extraHint = pendingPrintAfterNfc ? ' Tap "Next: Print Label →" above when ready.' : ' Tap it anytime to open this plant.';
-                setNfcStatus(`✅ NFC tag programmed for "${plant.strain}"!${extraHint}`, 'success', false);
-            } catch (err) {
-                nfcAbortController = null;
-                if (err?.name === 'AbortError') {
-                    setNfcStatus('NFC write cancelled.', 'info', false);
-                } else {
-                    setNfcStatus(`❌ Write failed: ${err?.message || 'Keep the tag steady against the phone and try again.'}`, 'error', false);
-                }
-            }
-        }
-
-        async function readNfcTag() {
-            if (!('NDEFReader' in window)) return;
-
-            abortNfcOperation();
-            nfcAbortController = new AbortController();
-
-            setNfcStatus('🔍 Hold an NFC tag against your phone to inspect it...', 'waiting', true);
-
-            try {
-                const ndef = new NDEFReader();
-                await ndef.scan({ signal: nfcAbortController.signal });
-
-                ndef.onreadingerror = () => {
-                    setNfcStatus('❌ Could not read NFC tag. Try repositioning it.', 'error', false);
-                    abortNfcOperation();
-                };
-
-                ndef.onreading = (event) => {
-                    const decoder = new TextDecoder();
-                    let foundData = '';
-                    for (const record of event.message.records) {
-                        if (record.recordType === 'url' || record.recordType === 'text') {
-                            foundData = decoder.decode(record.data);
-                            break;
-                        }
-                    }
-                    if (navigator.vibrate) navigator.vibrate(60);
-
-                    if (foundData.includes('#plant=')) {
-                        const scannedId = decodeURIComponent(foundData.split('#plant=')[1].split('&')[0]);
-                        const matchedPlant = plants.find(p => p.id === scannedId);
-                        if (matchedPlant) {
-                            setNfcStatus(`✅ Tag linked to: "${matchedPlant.strain}" (${matchedPlant.type || 'Autoflower'})`, 'success', false);
-                        } else {
-                            setNfcStatus(`⚠️ Tag contains plant ID "${scannedId}", which is not in this device's database.`, 'info', false);
-                        }
-                    } else if (foundData) {
-                        setNfcStatus(`ℹ️ Tag content: ${foundData}`, 'info', false);
-                    } else {
-                        setNfcStatus('ℹ️ Tag is blank / unformatted.', 'info', false);
-                    }
-                    abortNfcOperation();
-                };
-            } catch (err) {
-                nfcAbortController = null;
-                if (err?.name === 'AbortError') {
-                    setNfcStatus('NFC scan stopped.', 'info', false);
-                } else {
-                    setNfcStatus(`❌ Scan error: ${err?.message || 'NFC permission denied or disabled.'}`, 'error', false);
-                }
             }
         }
 
@@ -1550,31 +1609,12 @@
             box.innerText = daysAgo === 0 ? "Today" : (daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`);
         }
 
-        function openLabelModal(strain, type, dateStr, plantId = activePlantId, isStepTwo = false) {
-            document.getElementById('label-strain-text').innerText = strain;
-            document.getElementById('label-type-text').innerText = type;
-            document.getElementById('label-date-text').innerText = dateStr;
-            document.getElementById('label-chained-step-text').classList.toggle('hidden', !isStepTwo);
-            
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-            const targetUrl = plantId ? getPlantDeepLink(plantId) : (window.location.origin + window.location.pathname);
-            new QRCode(qrContainer, { text: targetUrl, width: 75, height: 75 });
-
-            document.getElementById('label-modal').classList.remove('hidden');
-        }
-
-        function openLabelModalForActive(isStepTwo = false) {
-            const plant = plants.find(p => p.id === activePlantId);
-            if (plant) openLabelModal(plant.strain, plant.type || 'Autoflower', formatDate(plant.date), plant.id, isStepTwo);
-        }
-
-        function closeLabelModal() { document.getElementById('label-modal').classList.add('hidden'); }
-
         function openDetail(id, openedViaTag = false) {
             activePlantId = String(id);
             const plant = plants.find(p => p.id === activePlantId);
             if (!plant) return;
+
+            closePlantActionsMenu();
 
             try {
                 history.replaceState(null, '', `#plant=${encodeURIComponent(plant.id)}`);
@@ -1802,7 +1842,8 @@
 
         function goHome() {
             activePlantId = null;
-            pendingPrintAfterNfc = false;
+            isChainedTagFlow = false;
+            closePlantActionsMenu();
             try {
                 history.replaceState(null, '', window.location.pathname + window.location.search);
             } catch (_) {}
@@ -1822,7 +1863,6 @@
             const totalImages = countPlantImages(plant);
             document.getElementById('gallery-total-badge').textContent = totalImages;
 
-            // Render filter pills
             const filterContainer = document.getElementById('gallery-filter-pills');
             const filterKeys = ['all', ...stageKeys];
             filterContainer.innerHTML = filterKeys.map(key => {
@@ -1840,7 +1880,6 @@
                 `;
             }).join('');
 
-            // Collect items to display
             let displayItems = [];
             if (currentCategory === 'all') {
                 stageKeys.forEach(sk => {
@@ -1849,7 +1888,6 @@
                         displayItems.push({ ...item, stageKey: sk, stageIndex: idx });
                     });
                 });
-                // Sort newest photos first when viewing All
                 displayItems.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
             } else {
                 const arr = plant.stages[currentCategory] || [];
