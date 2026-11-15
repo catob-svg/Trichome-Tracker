@@ -18,11 +18,19 @@
         @media print {
             body * { visibility: hidden; }
             #print-label-area, #print-label-area * { visibility: visible; }
-            #print-label-area {
-                position: absolute; left: 0; top: 0; width: 100%;
+            #print-label-area.label-standard {
+                position: fixed; left: 0; top: 0; width: 100%;
                 background: white !important; color: black !important;
-                border: none !important; padding: 10mm;
+                border: none !important; padding: 8mm;
                 display: flex; flex-direction: column; align-items: center; justify-content: center;
+            }
+            #print-label-area.label-small {
+                position: fixed; left: 0; top: 0;
+                width: auto; max-width: 64mm;
+                background: white !important; color: black !important;
+                border: none !important; padding: 1.5mm 2mm;
+                display: flex; flex-direction: row; align-items: center; justify-content: flex-start;
+                gap: 2.5mm;
             }
         }
     </style>
@@ -175,7 +183,7 @@
                         <div id="detail-ring-slot" class="shrink-0"></div>
                         <div class="min-w-0">
                             <span id="detail-phase-label" class="text-xs font-bold text-white block truncate">Vegetation</span>
-                            <span id="detail-sub-status" class="text-[11px] text-slate-400 block truncate">Active cultivation</span>
+                            <span id="detail-sub-status" class="text-[11px] text-slate-400 block truncate">Day 0 • Week 1</span>
                         </div>
                     </div>
 
@@ -201,7 +209,7 @@
                     </div>
                 </div>
 
-                <!-- Collapsible Rating Editor Drawer (Only opens when user taps rating pill) -->
+                <!-- Collapsible Rating Editor Drawer -->
                 <div id="rating-edit-view" class="hidden bg-[#090a0f] border border-purple-500/30 rounded-xl p-3 space-y-2.5">
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] text-purple-300 font-bold uppercase tracking-[0.15em]">🔓 Adjust Rating</span>
@@ -219,7 +227,7 @@
                 </div>
             </div>
 
-            <!-- 2. HERO PHOTO SHOWCASE (Prominent, clean, immediate) -->
+            <!-- 2. HERO PHOTO SHOWCASE -->
             <div class="uis-card rounded-2xl p-4 shadow-xl space-y-3">
                 <div class="flex justify-between items-center gap-2">
                     <div class="flex items-center gap-2">
@@ -236,7 +244,7 @@
                 <div id="category-grid"></div>
             </div>
 
-            <!-- 3. CLEAN SEGMENTED TABS FOR DATA & LOGS (Eliminates endless scrolling) -->
+            <!-- 3. CLEAN SEGMENTED TABS FOR DATA & LOGS -->
             <div class="space-y-3">
                 <div class="grid grid-cols-3 gap-1.5 bg-[#12151f] p-1.5 rounded-2xl border border-[#1e2336] shadow-lg">
                     <button type="button" id="detail-tab-btn-logs" onclick="switchDetailTab('logs')" class="py-2 px-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5 bg-[#1d2438] text-white border border-blue-500/40 shadow-sm">
@@ -254,9 +262,9 @@
                     </button>
                 </div>
 
-                <!-- TAB PANEL A: LOGS (Environment/Nutrients + Curing when harvested) -->
+                <!-- TAB PANEL A: LOGS -->
                 <div id="detail-panel-logs" class="space-y-3">
-                    <!-- Curing Log (Shown automatically when harvested) -->
+                    <!-- Curing Log -->
                     <div id="curing-section" class="hidden uis-card rounded-2xl p-4 shadow-xl space-y-3">
                         <div class="flex justify-between items-center">
                             <h3 class="font-bold text-white text-xs uppercase tracking-[0.15em]">🏺 Curing & Drying</h3>
@@ -427,7 +435,7 @@
 
                 <button type="button" onclick="handleNewPlantTagChoice('print')" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold text-xs uppercase tracking-wider py-3 px-4 rounded-xl transition flex items-center justify-between">
                     <span>🖨️ Print Label Only</span>
-                    <span class="text-[10px] text-blue-400/80 font-normal">QR sticker / paper</span>
+                    <span class="text-[10px] text-blue-400/80 font-normal">Label printer / sticker</span>
                 </button>
             </div>
 
@@ -506,16 +514,20 @@
             </div>
 
             <!-- TAB 2: PRINT QR LABEL -->
-            <div id="tl-tab-print" class="hidden space-y-4 text-center">
-                <div id="print-label-area" class="bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center">
-                    <h4 id="label-strain-text" class="text-2xl font-black tracking-tight text-black">Strain</h4>
-                    <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
-                        <span id="label-type-text" class="border border-black px-2 py-0.5 rounded">Autoflower</span>
-                        <span>•</span>
-                        <span id="label-date-text">01.01.2026</span>
-                    </div>
-                    <div id="qrcode" class="mt-2"></div>
+            <div id="tl-tab-print" class="hidden space-y-3.5 text-center">
+                <!-- Label Size / Layout Selector -->
+                <div class="grid grid-cols-2 gap-1.5 bg-[#090a0f] p-1 rounded-xl border border-[#1e2336]">
+                    <button type="button" id="label-layout-btn-standard" onclick="setLabelLayout('standard')" class="py-1.5 px-2 rounded-lg text-[11px] font-bold transition bg-[#181d2e] text-white border border-[#2a324d]">
+                        📄 Standard
+                    </button>
+                    <button type="button" id="label-layout-btn-small" onclick="setLabelLayout('small')" class="py-1.5 px-2 rounded-lg text-[11px] font-bold transition text-slate-400 hover:text-slate-200 border border-transparent">
+                        🏷️ Small (Label Printer)
+                    </button>
                 </div>
+
+                <!-- Dynamic Print Area -->
+                <div id="print-label-area" class="label-standard bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center"></div>
+
                 <button type="button" onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg shadow-blue-900/25">
                     🖨️ Print QR Label
                 </button>
@@ -679,6 +691,7 @@
         let tempRatingValue = 8.0;
         let nfcAbortController = null;
         let isChainedTagFlow = false;
+        let labelLayout = localStorage.getItem('trichome_label_layout') || 'standard';
 
         /* HISTORY / ANDROID EDGE-SWIPE NAVIGATION SUPPORT */
         const MODAL_IDS = [
@@ -730,14 +743,12 @@
         }
 
         window.addEventListener('popstate', (event) => {
-            // 1. If any modal is open, edge-swiping closes the modal first
             const openModal = getOpenModalId();
             if (openModal) {
                 hideAllModalsDOM();
                 return;
             }
 
-            // 2. Navigate between Plant Detail and Dashboard inside the app
             const state = event.state;
             const hash = window.location.hash || '';
             if (state?.view === 'detail' && state?.plantId) {
@@ -753,7 +764,6 @@
                 }
             }
 
-            // Return to Dashboard overview
             goHome(true);
         });
 
@@ -844,10 +854,15 @@
             popModalHistoryIfActive('settings-modal');
         }
 
-        /* RADIAL 90-DAY PROGRESS RING */
+        /* WEEK CALCULATION & RADIAL PROGRESS RING (DAYS + WEEK) */
+        function getWeekNumber(days) {
+            return Math.floor(Math.max(0, days) / 7) + 1;
+        }
+
         function renderDayProgressRing(days, isArchived = false) {
             const pct = Math.min(100, Math.max(0, (days / TARGET_CYCLE_DAYS) * 100));
-            const radius = 28;
+            const week = getWeekNumber(days);
+            const radius = 30;
             const circumference = 2 * Math.PI * radius;
             const offset = circumference * (1 - pct / 100);
             const dayLabel = days === 1 ? 'DAY' : 'DAYS';
@@ -855,6 +870,7 @@
             let strokeColor = '#3b82f6';
             let textColor = 'text-blue-400';
             let subLabelColor = 'text-slate-400';
+            let weekTextColor = 'text-slate-200';
             let trackColor = '#1e2336';
             let ringBg = 'bg-[#090a0f] border-[#1e2336]/80';
 
@@ -862,6 +878,7 @@
                 strokeColor = '#8b5cf6';
                 textColor = 'text-purple-300';
                 subLabelColor = 'text-purple-400/75';
+                weekTextColor = 'text-purple-200';
                 trackColor = '#1f1b33';
                 ringBg = 'bg-[#08090e] border-purple-500/20';
             } else if (days >= 75) {
@@ -876,17 +893,17 @@
             }
 
             return `
-                <div class="relative w-[64px] h-[64px] shrink-0 flex items-center justify-center ${ringBg} rounded-full border shadow-inner">
-                    <svg class="w-full h-full -rotate-90" viewBox="0 0 68 68">
+                <div class="relative w-[68px] h-[68px] shrink-0 flex items-center justify-center ${ringBg} rounded-full border shadow-inner">
+                    <svg class="w-full h-full -rotate-90" viewBox="0 0 72 72">
                         <circle
-                            cx="34" cy="34" r="${radius}"
+                            cx="36" cy="36" r="${radius}"
                             fill="transparent"
                             stroke="${trackColor}"
                             stroke-width="4.5"
                         />
                         ${pct > 0 ? `
                         <circle
-                            cx="34" cy="34" r="${radius}"
+                            cx="36" cy="36" r="${radius}"
                             fill="transparent"
                             stroke="${strokeColor}"
                             stroke-width="4.5"
@@ -895,9 +912,10 @@
                             stroke-dashoffset="${offset.toFixed(2)}"
                         />` : ''}
                     </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span class="text-base font-black ${textColor} leading-none tracking-tight">${days}</span>
-                        <span class="text-[8px] font-bold tracking-widest uppercase ${subLabelColor} mt-0.5">${dayLabel}</span>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none leading-none">
+                        <span class="text-[15px] font-black ${textColor} tracking-tight">${days}</span>
+                        <span class="text-[7px] font-bold tracking-widest uppercase ${subLabelColor} mt-0.5">${dayLabel}</span>
+                        <span class="text-[8px] font-extrabold tracking-wider uppercase ${weekTextColor} mt-0.5">WEEK ${week}</span>
                     </div>
                 </div>
             `;
@@ -940,6 +958,75 @@
             }
         }
 
+        /* PRINT LABEL LAYOUT SWITCHER & RENDERER */
+        function setLabelLayout(layout) {
+            labelLayout = layout === 'small' ? 'small' : 'standard';
+            try {
+                localStorage.setItem('trichome_label_layout', labelLayout);
+            } catch (_) {}
+            updateLabelLayoutButtons();
+            const plant = plants.find(p => p.id === activePlantId);
+            if (plant) renderPrintLabel(plant);
+        }
+
+        function updateLabelLayoutButtons() {
+            const stdBtn = document.getElementById('label-layout-btn-standard');
+            const smlBtn = document.getElementById('label-layout-btn-small');
+            if (!stdBtn || !smlBtn) return;
+
+            if (labelLayout === 'small') {
+                smlBtn.className = 'py-1.5 px-2 rounded-lg text-[11px] font-bold transition bg-[#181d2e] text-white border border-[#2a324d]';
+                stdBtn.className = 'py-1.5 px-2 rounded-lg text-[11px] font-bold transition text-slate-400 hover:text-slate-200 border border-transparent';
+            } else {
+                stdBtn.className = 'py-1.5 px-2 rounded-lg text-[11px] font-bold transition bg-[#181d2e] text-white border border-[#2a324d]';
+                smlBtn.className = 'py-1.5 px-2 rounded-lg text-[11px] font-bold transition text-slate-400 hover:text-slate-200 border border-transparent';
+            }
+        }
+
+        function renderPrintLabel(plant) {
+            const area = document.getElementById('print-label-area');
+            if (!area || !plant) return;
+
+            const deepLink = getPlantDeepLink(plant.id);
+            const strainSafe = escapeHtml(plant.strain);
+            const typeSafe = escapeHtml(plant.type || 'Autoflower');
+            const dateSafe = escapeHtml(formatDate(plant.date));
+
+            if (labelLayout === 'small') {
+                area.className = 'label-small max-w-[265px] w-full bg-white text-black px-3 py-2 rounded-lg border-2 border-dashed border-slate-400 mx-auto shadow-inner flex items-center gap-3 text-left';
+                area.innerHTML = `
+                    <div id="qrcode" class="shrink-0 bg-white"></div>
+                    <div class="min-w-0 flex-1 leading-tight">
+                        <div class="text-sm font-black tracking-tight text-black line-clamp-2 break-words">${strainSafe}</div>
+                        <div class="text-[10px] font-bold text-black mt-0.5 truncate">${typeSafe} • ${dateSafe}</div>
+                    </div>
+                `;
+                new QRCode(document.getElementById('qrcode'), {
+                    text: deepLink,
+                    width: 52,
+                    height: 52,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                area.className = 'label-standard bg-white text-black p-6 rounded-xl border-2 border-dashed border-slate-400 space-y-3 text-center mx-auto shadow-inner flex flex-col items-center';
+                area.innerHTML = `
+                    <h4 class="text-2xl font-black tracking-tight text-black">${strainSafe}</h4>
+                    <div class="flex justify-center items-center space-x-2 text-xs font-bold text-black">
+                        <span class="border border-black px-2 py-0.5 rounded">${typeSafe}</span>
+                        <span>•</span>
+                        <span>${dateSafe}</span>
+                    </div>
+                    <div id="qrcode" class="mt-2"></div>
+                `;
+                new QRCode(document.getElementById('qrcode'), {
+                    text: deepLink,
+                    width: 75,
+                    height: 75,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+        }
+
         /* UNIFIED TAG & LABEL MODAL */
         function openTagLabelModal(initialTab = 'nfc', chainedBoth = false, replaceModalState = false) {
             const plant = plants.find(p => p.id === activePlantId);
@@ -958,12 +1045,8 @@
             document.getElementById('web-nfc-supported-box').classList.toggle('hidden', !supported);
             document.getElementById('web-nfc-unsupported-box').classList.toggle('hidden', supported);
 
-            document.getElementById('label-strain-text').innerText = plant.strain;
-            document.getElementById('label-type-text').innerText = plant.type || 'Autoflower';
-            document.getElementById('label-date-text').innerText = formatDate(plant.date);
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = "";
-            new QRCode(qrContainer, { text: getPlantDeepLink(plant.id), width: 75, height: 75 });
+            updateLabelLayoutButtons();
+            renderPrintLabel(plant);
 
             switchTagLabelTab(initialTab);
             document.getElementById('tag-label-modal').classList.remove('hidden');
@@ -1647,7 +1730,7 @@
                 archiveStatsBar.classList.remove('hidden');
                 archiveStatsBar.innerHTML = `
                     <span>Completed: <strong class="text-slate-200">${archivedPlants.length}</strong></span>
-                    <span>Avg Cycle: <strong class="text-slate-300">${avgDays}d</strong></span>
+                    <span>Avg Cycle: <strong class="text-slate-300">${avgDays}d (W${getWeekNumber(avgDays)})</strong></span>
                     <span>Avg Rating: <strong class="text-purple-300">★ ${avgRating}</strong></span>
                     ${totalDry > 0 ? `<span>Total Dry: <strong class="text-emerald-400/90">${totalDry.toFixed(1)}g</strong></span>` : ''}
                 `;
@@ -1655,6 +1738,7 @@
                 archiveContainer.innerHTML = sortedArchive.map(plant => {
                     const totalDays = calculateDays(plant.date, plant.harvestedDate);
                     const curingDays = calculateDays(plant.harvestedDate);
+                    const curingWeek = getWeekNumber(curingDays);
                     const totalImages = countPlantImages(plant);
                     const plantRating = plant.rating !== undefined ? Number(plant.rating).toFixed(1) : '8.0';
                     const dryVal = parseFloat(plant.yieldData?.dry) || 0;
@@ -1668,7 +1752,7 @@
                                 <div class="min-w-0 flex-1 space-y-1">
                                     <h3 class="text-[15px] font-bold text-slate-200 line-clamp-2 leading-tight group-hover:text-purple-300 transition">${escapeHtml(plant.strain)}</h3>
                                     <div class="text-[11px] text-slate-500 leading-snug">
-                                        ${escapeHtml(plant.type || 'Autoflower')} • ${formatDate(plant.harvestedDate)} <span class="text-slate-500">(${curingDays}d cure)</span>
+                                        ${escapeHtml(plant.type || 'Autoflower')} • ${formatDate(plant.harvestedDate)} <span class="text-slate-400">(${curingDays}d • W${curingWeek} cure)</span>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
                                         <span class="inline-flex items-center bg-purple-500/15 text-purple-300 border border-purple-500/25 px-2 py-0.5 rounded-md text-[10px] font-bold">★ ${plantRating}/10</span>
@@ -1793,7 +1877,6 @@
                 try {
                     const targetHash = `#plant=${encodeURIComponent(plant.id)}`;
                     if (openedViaTag) {
-                        // Seed dashboard state first so edge-swipe goes back to dashboard instead of closing Chrome
                         history.replaceState({ view: 'dashboard' }, '', window.location.pathname + window.location.search);
                         history.pushState({ view: 'detail', plantId: plant.id }, '', targetHash);
                     } else if (history.state?.view !== 'detail' || history.state?.plantId !== plant.id) {
@@ -1848,12 +1931,14 @@
                 curingSection.classList.remove('hidden');
 
                 const curingDays = calculateDays(plant.harvestedDate);
+                const curingWeek = getWeekNumber(curingDays);
                 const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                const totalWeek = getWeekNumber(totalDays);
 
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
                 ringSlot.innerHTML = renderDayProgressRing(totalDays, true);
-                phaseLabel.textContent = 'Completed Cycle';
-                subStatus.textContent = `🏺 Curing for ${curingDays} ${curingDays === 1 ? 'day' : 'days'}`;
+                phaseLabel.textContent = `Completed (${totalDays}d • Week ${totalWeek})`;
+                subStatus.textContent = `🏺 Curing: ${curingDays}d (Week ${curingWeek})`;
 
                 waterWidgetBox.classList.add('hidden');
                 archiveCompactStats.classList.remove('hidden');
@@ -1870,9 +1955,10 @@
                 curingSection.classList.add('hidden');
 
                 const ageDays = calculateDays(plant.date);
+                const ageWeek = getWeekNumber(ageDays);
                 ringSlot.innerHTML = renderDayProgressRing(ageDays, false);
                 phaseLabel.textContent = getGrowthPhaseDescription(ageDays);
-                subStatus.textContent = `Week ${Math.floor(ageDays / 7) + 1} • Active`;
+                subStatus.textContent = `Day ${ageDays} • Week ${ageWeek}`;
 
                 waterWidgetBox.classList.remove('hidden');
                 archiveCompactStats.classList.add('hidden');
@@ -2125,6 +2211,7 @@
 
             container.innerHTML = displayItems.map(item => {
                 const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
+                const photoWeek = photoDay !== null ? getWeekNumber(photoDay) : null;
                 const stageBadge = shortCategories[item.stageKey] || item.stageKey;
                 return `
                     <div class="relative ${aspectClass} rounded-xl overflow-hidden border border-[#1e2336] bg-[#090a0f] cursor-pointer group shadow-md" onclick="openLightbox('${item.stageKey}', ${item.stageIndex})">
@@ -2133,7 +2220,7 @@
                         <!-- Top Badges -->
                         <div class="absolute top-2 left-2 flex flex-wrap items-center gap-1 max-w-[78%]">
                             <span class="bg-blue-600/90 backdrop-blur-sm text-white px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow">${stageBadge}</span>
-                            ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-100 border border-white/10 px-1.5 py-0.5 rounded-md text-[9px] font-bold">Day ${photoDay}</span>` : ''}
+                            ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-100 border border-white/10 px-1.5 py-0.5 rounded-md text-[9px] font-bold">Day ${photoDay} • W${photoWeek}</span>` : ''}
                         </div>
 
                         <!-- Delete Button -->
@@ -2157,8 +2244,9 @@
 
             document.getElementById('lightbox-img').src = item.image;
             const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
+            const photoWeek = photoDay !== null ? getWeekNumber(photoDay) : null;
             const stageName = categories[stageKey] || stageKey;
-            document.getElementById('lightbox-meta').textContent = `${stageName}${photoDay !== null ? ` • Day ${photoDay}` : ''}`;
+            document.getElementById('lightbox-meta').textContent = `${stageName}${photoDay !== null ? ` • Day ${photoDay} (Week ${photoWeek})` : ''}`;
 
             const commentEl = document.getElementById('lightbox-comment');
             if (item.comment && item.comment.trim() !== "") {
