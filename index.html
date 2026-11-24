@@ -149,6 +149,7 @@
                             <span id="detail-type-badge" class="text-slate-300 font-semibold"></span>
                             <span>•</span>
                             <span>Planted <span id="detail-date" class="text-slate-300"></span></span>
+                            <span id="detail-sprouted-date-wrap" class="hidden">• Sprouted <span id="detail-sprouted-date" class="text-emerald-300 font-semibold"></span></span>
                             <span id="detail-harvest-date-wrap" class="hidden">• Harvested <span id="detail-harvest-date" class="text-slate-300"></span></span>
                         </p>
                     </div>
@@ -187,7 +188,15 @@
                         </div>
                     </div>
 
-                    <!-- Right (Active): Compact One-Tap Watering Control -->
+                    <!-- Right (Germinating): One-Tap Sprouted Today Button -->
+                    <div id="germinating-action-box" class="hidden flex items-center gap-2 shrink-0">
+                        <button onclick="markSproutedToday()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-900/30 flex items-center gap-1.5">
+                            <span>🌱</span>
+                            <span>Sprouted Today</span>
+                        </button>
+                    </div>
+
+                    <!-- Right (Active & Sprouted): Compact One-Tap Watering Control -->
                     <div id="water-widget-box" class="flex items-center gap-2 shrink-0">
                         <div class="text-right hidden xs:block">
                             <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Watered</span>
@@ -597,7 +606,20 @@
                     <option value="Cutting / Clone">Cutting / Clone</option>
                 </select>
             </div>
-            <div><label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Date Planted</label><input type="date" id="edit-date-input" class="w-full uis-input rounded-xl px-4 py-3 text-sm transition"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Date Planted</label>
+                    <input type="date" id="edit-date-input" class="w-full uis-input rounded-xl px-3 py-2.5 text-sm transition">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Date Sprouted</label>
+                        <button type="button" onclick="document.getElementById('edit-sprouted-input').value = ''" class="text-[10px] text-slate-500 hover:text-slate-300 underline">Clear</button>
+                    </div>
+                    <input type="date" id="edit-sprouted-input" class="w-full uis-input rounded-xl px-3 py-2.5 text-sm transition">
+                </div>
+            </div>
+            <p class="text-[11px] text-slate-500">Leave <strong>Date Sprouted</strong> blank if the seed is still germinating.</p>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeEditModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
                 <button onclick="saveEditedPlant()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save</button>
@@ -769,10 +791,13 @@
 
         function normalizePlant(p) {
             const existingSensory = p.sensory || {};
+            // Legacy plants without sproutedDate default to p.date; newly planted seeds set sproutedDate: null
+            const resolvedSproutedDate = p.sproutedDate !== undefined ? p.sproutedDate : p.date;
             return {
                 ...p,
                 id: String(p.id),
                 type: p.type || 'Autoflower',
+                sproutedDate: resolvedSproutedDate,
                 metrics: Array.isArray(p.metrics) ? p.metrics : [],
                 curingLogs: Array.isArray(p.curingLogs) ? p.curingLogs : [],
                 stages: p.stages || {},
@@ -785,6 +810,10 @@
                     notes: existingSensory.notes !== undefined ? existingSensory.notes : (p.terpenes?.notes || '')
                 }
             };
+        }
+
+        function getGrowStartDate(plant) {
+            return plant?.sproutedDate || plant?.date;
         }
 
         function flashSaveButton(btnId) {
@@ -854,9 +883,20 @@
             popModalHistoryIfActive('settings-modal');
         }
 
-        /* WEEK CALCULATION & RADIAL PROGRESS RING (DAYS + WEEK) */
+        /* WEEK CALCULATION & RADIAL PROGRESS RING (DAYS + WEEK / GERMINATING) */
         function getWeekNumber(days) {
             return Math.floor(Math.max(0, days) / 7) + 1;
+        }
+
+        function renderGerminatingRing(germDays) {
+            const dayLabel = germDays === 1 ? 'DAY' : 'DAYS';
+            return `
+                <div class="relative w-[68px] h-[68px] shrink-0 flex flex-col items-center justify-center bg-[#090a0f] border-2 border-dashed border-emerald-500/45 rounded-full shadow-inner leading-none">
+                    <span class="text-xs leading-none">🌱</span>
+                    <span class="text-sm font-black text-emerald-400 tracking-tight mt-0.5">${germDays}</span>
+                    <span class="text-[7px] font-extrabold tracking-widest uppercase text-emerald-300/80 mt-0.5">${dayLabel} GERM</span>
+                </div>
+            `;
         }
 
         function renderDayProgressRing(days, isArchived = false) {
@@ -958,7 +998,7 @@
             }
         }
 
-        /* PRINT LABEL LAYOUT SWITCHER & RENDERER */
+        /* PRINT LABEL LAYOUT SWITCHER & RENDERER (UNCHANGED CONTENT) */
         function setLabelLayout(layout) {
             labelLayout = layout === 'small' ? 'small' : 'standard';
             try {
@@ -1689,9 +1729,12 @@
                 container.innerHTML = `<div class="uis-card rounded-2xl p-6 text-center"><p class="text-slate-400 text-xs">No active grows currently.</p></div>`;
             } else {
                 container.innerHTML = activePlants.map(plant => {
-                    const days = calculateDays(plant.date);
+                    const isGerminating = !plant.sproutedDate;
+                    const germDays = calculateDays(plant.date);
+                    const growDays = isGerminating ? 0 : calculateDays(plant.sproutedDate);
                     const totalImages = countPlantImages(plant);
                     const thumb = getLatestPlantThumbnail(plant);
+                    const displayDate = isGerminating ? `Planted ${formatDate(plant.date)}` : formatDate(plant.sproutedDate);
 
                     return `
                         <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3 cursor-pointer transition shadow-xl flex items-center justify-between gap-2.5 group">
@@ -1701,12 +1744,13 @@
                                     <h3 class="text-[15px] font-bold text-white line-clamp-2 leading-tight group-hover:text-blue-400 transition tracking-wide">${escapeHtml(plant.strain)}</h3>
                                     <div class="flex flex-wrap items-center gap-1.5 text-xs">
                                         <span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px] font-semibold">${escapeHtml(plant.type || 'Autoflower')}</span>
-                                        <span class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">${formatDate(plant.date)}</span>
+                                        ${isGerminating ? `<span class="bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md text-[10px] font-bold">🌱 Germinating</span>` : ''}
+                                        <span class="bg-[#090a0f] text-slate-400 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">${displayDate}</span>
                                         ${totalImages > 0 ? `<span class="bg-[#090a0f] text-slate-300 border border-[#1e2336] px-2 py-0.5 rounded-md text-[10px]">📸 ${totalImages}</span>` : ''}
                                     </div>
                                 </div>
                             </div>
-                            ${renderDayProgressRing(days, false)}
+                            ${isGerminating ? renderGerminatingRing(germDays) : renderDayProgressRing(growDays, false)}
                         </div>
                     `;
                 }).join('');
@@ -1723,7 +1767,7 @@
                     return String(b.harvestedDate).localeCompare(String(a.harvestedDate));
                 });
 
-                const avgDays = Math.round(archivedPlants.reduce((acc, p) => acc + calculateDays(p.date, p.harvestedDate), 0) / archivedPlants.length);
+                const avgDays = Math.round(archivedPlants.reduce((acc, p) => acc + calculateDays(getGrowStartDate(p), p.harvestedDate), 0) / archivedPlants.length);
                 const avgRating = (archivedPlants.reduce((acc, p) => acc + (p.rating ?? 8.0), 0) / archivedPlants.length).toFixed(1);
                 const totalDry = archivedPlants.reduce((acc, p) => acc + (parseFloat(p.yieldData?.dry) || 0), 0);
 
@@ -1736,7 +1780,7 @@
                 `;
 
                 archiveContainer.innerHTML = sortedArchive.map(plant => {
-                    const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                    const totalDays = calculateDays(getGrowStartDate(plant), plant.harvestedDate);
                     const curingDays = calculateDays(plant.harvestedDate);
                     const curingWeek = getWeekNumber(curingDays);
                     const totalImages = countPlantImages(plant);
@@ -1769,6 +1813,11 @@
             }
         }
 
+        function getTodayStr() {
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        }
+
         function addPlant(e) {
             e.preventDefault();
             const strain = document.getElementById('strain-input').value;
@@ -1779,7 +1828,8 @@
                 id: Date.now().toString(), 
                 strain, 
                 type, 
-                date, 
+                date,
+                sproutedDate: null,
                 harvestedDate: null, 
                 rating: 8.0, 
                 lastWatered: null, 
@@ -1799,18 +1849,24 @@
             openNewPlantTagPrompt(newPlant.id);
         }
 
+        function markSproutedToday() {
+            const plant = plants.find(p => p.id === activePlantId);
+            if (!plant) return;
+            plant.sproutedDate = getTodayStr();
+            savePlantToDB(plant);
+            openDetail(plant.id, false, true);
+        }
+
         function growAgain() {
             const sourcePlant = plants.find(p => p.id === activePlantId);
             if (!sourcePlant) return;
-
-            const today = new Date();
-            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
             const clonedRun = normalizePlant({
                 id: Date.now().toString(),
                 strain: sourcePlant.strain,
                 type: sourcePlant.type || 'Autoflower',
-                date: todayStr,
+                date: getTodayStr(),
+                sproutedDate: null,
                 harvestedDate: null,
                 rating: 8.0,
                 lastWatered: null,
@@ -1914,8 +1970,11 @@
             const harvestContainer = document.getElementById('action-harvest-container');
             const archiveBadge = document.getElementById('archive-badge');
             const curingSection = document.getElementById('curing-section');
+            const sproutedDateWrap = document.getElementById('detail-sprouted-date-wrap');
+            const sproutedDateEl = document.getElementById('detail-sprouted-date');
             const harvestDateWrap = document.getElementById('detail-harvest-date-wrap');
             const addBtnTop = document.getElementById('btn-add-image-top');
+            const germinatingActionBox = document.getElementById('germinating-action-box');
             const waterWidgetBox = document.getElementById('water-widget-box');
             const archiveCompactStats = document.getElementById('archive-compact-stats');
             const ringSlot = document.getElementById('detail-ring-slot');
@@ -1925,6 +1984,14 @@
             updateWaterWidget(plant);
             addBtnTop.classList.remove('hidden');
 
+            if (plant.sproutedDate) {
+                sproutedDateWrap.classList.remove('hidden');
+                const germTime = calculateDays(plant.date, plant.sproutedDate);
+                sproutedDateEl.textContent = germTime > 0 ? `${formatDate(plant.sproutedDate)} (${germTime}d germ)` : formatDate(plant.sproutedDate);
+            } else {
+                sproutedDateWrap.classList.add('hidden');
+            }
+
             if (plant.harvestedDate) {
                 archiveBadge.classList.remove('hidden');
                 harvestDateWrap.classList.remove('hidden');
@@ -1932,7 +1999,7 @@
 
                 const curingDays = calculateDays(plant.harvestedDate);
                 const curingWeek = getWeekNumber(curingDays);
-                const totalDays = calculateDays(plant.date, plant.harvestedDate);
+                const totalDays = calculateDays(getGrowStartDate(plant), plant.harvestedDate);
                 const totalWeek = getWeekNumber(totalDays);
 
                 document.getElementById('detail-harvest-date').innerText = formatDate(plant.harvestedDate);
@@ -1940,6 +2007,7 @@
                 phaseLabel.textContent = `Completed (${totalDays}d • Week ${totalWeek})`;
                 subStatus.textContent = `🏺 Curing: ${curingDays}d (Week ${curingWeek})`;
 
+                germinatingActionBox.classList.add('hidden');
                 waterWidgetBox.classList.add('hidden');
                 archiveCompactStats.classList.remove('hidden');
                 updateArchiveYieldPill(plant);
@@ -1949,17 +2017,33 @@
                     <button onclick="growAgain()" class="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">↻ Grow Again</button>
                     <button onclick="unharvestPlant()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-500/30 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition">↩️ Unharvest</button>
                 `;
+            } else if (!plant.sproutedDate) {
+                archiveBadge.classList.add('hidden');
+                harvestDateWrap.classList.add('hidden');
+                curingSection.classList.add('hidden');
+
+                const germDays = calculateDays(plant.date);
+                ringSlot.innerHTML = renderGerminatingRing(germDays);
+                phaseLabel.textContent = '🌱 Germinating';
+                subStatus.textContent = `Planted ${germDays} ${germDays === 1 ? 'day' : 'days'} ago`;
+
+                germinatingActionBox.classList.remove('hidden');
+                waterWidgetBox.classList.add('hidden');
+                archiveCompactStats.classList.add('hidden');
+                document.getElementById('rating-edit-view').classList.add('hidden');
+                harvestContainer.innerHTML = '';
             } else {
                 archiveBadge.classList.add('hidden');
                 harvestDateWrap.classList.add('hidden');
                 curingSection.classList.add('hidden');
 
-                const ageDays = calculateDays(plant.date);
+                const ageDays = calculateDays(plant.sproutedDate);
                 const ageWeek = getWeekNumber(ageDays);
                 ringSlot.innerHTML = renderDayProgressRing(ageDays, false);
                 phaseLabel.textContent = getGrowthPhaseDescription(ageDays);
                 subStatus.textContent = `Day ${ageDays} • Week ${ageWeek}`;
 
+                germinatingActionBox.classList.add('hidden');
                 waterWidgetBox.classList.remove('hidden');
                 archiveCompactStats.classList.add('hidden');
                 document.getElementById('rating-edit-view').classList.add('hidden');
@@ -2110,7 +2194,8 @@
             if (confirm("Mark this plant as harvested today and move to archive?")) {
                 const plant = plants.find(p => p.id === activePlantId);
                 if (plant) {
-                    plant.harvestedDate = new Date().toISOString().slice(0, 10);
+                    if (!plant.sproutedDate) plant.sproutedDate = plant.date;
+                    plant.harvestedDate = getTodayStr();
                     savePlantToDB(plant);
                     openDetail(plant.id);
                 }
@@ -2148,6 +2233,18 @@
             document.getElementById('view-detail').classList.add('hidden');
             document.getElementById('view-dashboard').classList.remove('hidden');
             renderDashboard();
+        }
+
+        function getPhotoAgeBadgeText(plant, itemDateStr) {
+            if (!itemDateStr) return null;
+            const dateOnly = itemDateStr.slice(0, 10);
+            if (!plant.sproutedDate || dateOnly < plant.sproutedDate) {
+                const gDay = calculateDays(plant.date, dateOnly);
+                return `Germ • D${gDay}`;
+            }
+            const pDay = calculateDays(plant.sproutedDate, dateOnly);
+            const pWeek = getWeekNumber(pDay);
+            return `Day ${pDay} • W${pWeek}`;
         }
 
         function renderDetail() {
@@ -2210,8 +2307,7 @@
             const aspectClass = isSingle ? 'aspect-[16/10]' : 'aspect-square';
 
             container.innerHTML = displayItems.map(item => {
-                const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
-                const photoWeek = photoDay !== null ? getWeekNumber(photoDay) : null;
+                const ageBadge = getPhotoAgeBadgeText(plant, item.date);
                 const stageBadge = shortCategories[item.stageKey] || item.stageKey;
                 return `
                     <div class="relative ${aspectClass} rounded-xl overflow-hidden border border-[#1e2336] bg-[#090a0f] cursor-pointer group shadow-md" onclick="openLightbox('${item.stageKey}', ${item.stageIndex})">
@@ -2220,7 +2316,7 @@
                         <!-- Top Badges -->
                         <div class="absolute top-2 left-2 flex flex-wrap items-center gap-1 max-w-[78%]">
                             <span class="bg-blue-600/90 backdrop-blur-sm text-white px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow">${stageBadge}</span>
-                            ${photoDay !== null ? `<span class="bg-black/75 backdrop-blur-sm text-slate-100 border border-white/10 px-1.5 py-0.5 rounded-md text-[9px] font-bold">Day ${photoDay} • W${photoWeek}</span>` : ''}
+                            ${ageBadge ? `<span class="bg-black/75 backdrop-blur-sm text-slate-100 border border-white/10 px-1.5 py-0.5 rounded-md text-[9px] font-bold">${ageBadge}</span>` : ''}
                         </div>
 
                         <!-- Delete Button -->
@@ -2243,10 +2339,18 @@
             if (!item) return;
 
             document.getElementById('lightbox-img').src = item.image;
-            const photoDay = item.date ? calculateDays(plant.date, item.date.slice(0, 10)) : null;
-            const photoWeek = photoDay !== null ? getWeekNumber(photoDay) : null;
             const stageName = categories[stageKey] || stageKey;
-            document.getElementById('lightbox-meta').textContent = `${stageName}${photoDay !== null ? ` • Day ${photoDay} (Week ${photoWeek})` : ''}`;
+            let metaAge = '';
+            if (item.date) {
+                const dateOnly = item.date.slice(0, 10);
+                if (!plant.sproutedDate || dateOnly < plant.sproutedDate) {
+                    metaAge = ` • Germinating (Day ${calculateDays(plant.date, dateOnly)})`;
+                } else {
+                    const pDay = calculateDays(plant.sproutedDate, dateOnly);
+                    metaAge = ` • Day ${pDay} (Week ${getWeekNumber(pDay)})`;
+                }
+            }
+            document.getElementById('lightbox-meta').textContent = `${stageName}${metaAge}`;
 
             const commentEl = document.getElementById('lightbox-comment');
             if (item.comment && item.comment.trim() !== "") {
@@ -2291,8 +2395,10 @@
                 activeStageKey = currentCategory;
             } else if (plant.harvestedDate) {
                 activeStageKey = 'cured';
+            } else if (!plant.sproutedDate) {
+                activeStageKey = 'veg';
             } else {
-                const age = calculateDays(plant.date);
+                const age = calculateDays(plant.sproutedDate);
                 activeStageKey = age >= 28 ? 'flower' : 'veg';
             }
 
@@ -2419,6 +2525,7 @@
             document.getElementById('edit-strain-input').value = plant.strain;
             document.getElementById('edit-type-input').value = plant.type || 'Autoflower';
             document.getElementById('edit-date-input').value = plant.date;
+            document.getElementById('edit-sprouted-input').value = plant.sproutedDate || '';
             document.getElementById('edit-modal').classList.remove('hidden');
             pushModalHistory('edit-modal');
         }
@@ -2434,6 +2541,8 @@
             plant.strain = document.getElementById('edit-strain-input').value;
             plant.type = document.getElementById('edit-type-input').value;
             plant.date = document.getElementById('edit-date-input').value;
+            const sproutedVal = document.getElementById('edit-sprouted-input').value;
+            plant.sproutedDate = sproutedVal ? sproutedVal : null;
             savePlantToDB(plant);
             document.getElementById('edit-modal').classList.add('hidden');
             openDetail(plant.id, false, true);
@@ -2486,8 +2595,7 @@
         function setDefaultDate() {
             const dateInput = document.getElementById('date-input');
             if (dateInput && !dateInput.value) {
-                const today = new Date();
-                dateInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                dateInput.value = getTodayStr();
             }
         }
 
