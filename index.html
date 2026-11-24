@@ -619,7 +619,7 @@
                     <input type="date" id="edit-sprouted-input" class="w-full uis-input rounded-xl px-3 py-2.5 text-sm transition">
                 </div>
             </div>
-            <p class="text-[11px] text-slate-500">Leave <strong>Date Sprouted</strong> blank if the seed is still germinating.</p>
+            <p class="text-[11px] text-slate-500">Growth days & weeks count from <strong>Date Sprouted</strong>. Leave blank if still germinating.</p>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeEditModal()" class="flex-1 bg-[#181d2e] hover:bg-[#22283d] text-slate-300 font-semibold py-3 rounded-xl transition text-xs uppercase tracking-wider border border-[#1e2336]">Cancel</button>
                 <button onclick="saveEditedPlant()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-xs uppercase tracking-wider">Save</button>
@@ -791,7 +791,6 @@
 
         function normalizePlant(p) {
             const existingSensory = p.sensory || {};
-            // Legacy plants without sproutedDate default to p.date; newly planted seeds set sproutedDate: null
             const resolvedSproutedDate = p.sproutedDate !== undefined ? p.sproutedDate : p.date;
             return {
                 ...p,
@@ -998,7 +997,7 @@
             }
         }
 
-        /* PRINT LABEL LAYOUT SWITCHER & RENDERER (UNCHANGED CONTENT) */
+        /* PRINT LABEL LAYOUT SWITCHER & RENDERER */
         function setLabelLayout(layout) {
             labelLayout = layout === 'small' ? 'small' : 'standard';
             try {
@@ -1734,7 +1733,7 @@
                     const growDays = isGerminating ? 0 : calculateDays(plant.sproutedDate);
                     const totalImages = countPlantImages(plant);
                     const thumb = getLatestPlantThumbnail(plant);
-                    const displayDate = isGerminating ? `Planted ${formatDate(plant.date)}` : formatDate(plant.sproutedDate);
+                    const displayDate = isGerminating ? `Planted ${formatDate(plant.date)}` : `🌱 ${formatDate(plant.sproutedDate)}`;
 
                     return `
                         <div onclick="openDetail('${plant.id}')" class="uis-card uis-card-hover rounded-2xl p-3 cursor-pointer transition shadow-xl flex items-center justify-between gap-2.5 group">
